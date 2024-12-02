@@ -26,7 +26,7 @@ class getConsistencyMtx():
                     continue
                 F[i,j]=features[j]/features[i]
                 F[j,i]=1/F[i,j]
-        # print("F\n",F)
+        print("F\n",F)
         return F
 
     def evaluate_mtx(self,A):
