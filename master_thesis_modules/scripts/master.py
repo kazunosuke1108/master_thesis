@@ -17,7 +17,18 @@ class Master(GraphManager,FuzzyReasoning,PseudoDataGenerator):
         # ネットワークが正しく作成できていることを確認
         self.visualize()
 
+    def main(self):
+        # 重みの編集
+        ## lv.4 -> 5 (AHP)
         
+        ## lv.3 -> 4 (Fuzzy)
+        
+        ## lv.2 -> 3 (Entropy)
+
+
+        # スコア計算の実施 (forループ)
+        pass
 
 if __name__=="__main__":
     cls=Master()
+    cls.main()
