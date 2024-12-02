@@ -2,7 +2,25 @@ import numpy as np
 
 class getConsistencyMtx():
     def __init__(self) -> None:
+        super().__init__()
         pass
+
+    def get_comparison_mtx(self,criteria=[],comparison_answer=[]):
+        n=len(criteria)
+        A=np.eye(n)
+        answer_count=0
+        for i in range(n):
+            for j in range(n):
+                if i>=j:
+                    continue
+                if len(comparison_answer)!=0:
+                    val=comparison_answer[answer_count]
+                    answer_count+=1
+                else:
+                    val=float(input(f"{criteria[i]}行{criteria[j]}列の比較行列成分："))
+                A[i,j]=val
+                A[j,i]=1/val
+        return A
 
     def input_comparison_mtx(self):
         n=3
@@ -37,6 +55,11 @@ class getConsistencyMtx():
         weights = weights / weights.sum()        
         CI=(max_eigval-n)/(n-1)
         return eigvals,eigvecs,max_eigval,weights,CI
+    
+    def get_AHP_weight(self,criteria=[],comparison_answer=[]):
+        A=self.get_comparison_mtx(criteria=criteria,comparison_answer=comparison_answer)
+        eigvals,eigvecs,max_eigval,weights,CI=self.evaluate_mtx(A)
+        return A,eigvals,eigvecs,max_eigval,weights,CI
 
 
 if __name__=="__main__":

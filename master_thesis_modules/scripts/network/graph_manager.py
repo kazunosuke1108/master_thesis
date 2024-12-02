@@ -201,7 +201,8 @@ class GraphManager():
         self.colorize()
         weights = nx.get_edge_attributes(self.G, 'weight').values()
         nx.draw(self.G, self.pos, node_color=self.nodecolor, with_labels=True, edge_color = weights, edge_cmap=plt.cm.RdBu_r)
-        plt.show()
+        plt.pause(1)
+        plt.close()
 
     def main(self):
         self.colorize(default=False)

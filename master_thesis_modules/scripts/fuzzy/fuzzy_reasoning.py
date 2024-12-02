@@ -64,9 +64,9 @@ class FuzzyReasoning():
                 h=self.membership_func(x=values[condition],type=self.rule_dict[rule_id][proposition_id]["conditions"][condition])
                 height=height*h
             peak,height=self.triangle_func(height,result=self.rule_dict[rule_id][proposition_id]["result"])
-            ic(peak,height)
+            # ic(peak,height)
             reasoning_result+=peak*height
-        print(reasoning_result)
+        return reasoning_result
 
 
     
