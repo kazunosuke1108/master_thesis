@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 class GraphManager():
     def __init__(self):
         # define network
+        super().__init__()
         self.G = nx.Graph()
         
         # node定義
@@ -197,6 +198,7 @@ class GraphManager():
             pass
         
     def visualize(self):
+        self.colorize()
         weights = nx.get_edge_attributes(self.G, 'weight').values()
         nx.draw(self.G, self.pos, node_color=self.nodecolor, with_labels=True, edge_color = weights, edge_cmap=plt.cm.RdBu_r)
         plt.show()

@@ -5,6 +5,7 @@ from icecream import ic
 
 class FuzzyReasoning():
     def __init__(self):
+        super().__init__()
         self.define_rules()
         pass
 
