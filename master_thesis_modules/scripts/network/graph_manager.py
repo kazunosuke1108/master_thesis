@@ -6,7 +6,6 @@ class GraphManager():
     def __init__(self):
         # define network
         super().__init__()
-        self.G = nx.Graph()
         
         # node定義
         self.node_dict={
@@ -106,7 +105,6 @@ class GraphManager():
                 "description":"面会者の存在"
                 },
         }
-        self.G.add_nodes_from(self.node_dict.keys())
 
         # 重み定義
         self.weight_dict={
@@ -148,6 +146,12 @@ class GraphManager():
             },
         }
 
+        self.define_graph()
+    
+    def define_graph(self):
+        self.G = nx.Graph()
+        # node定義
+        self.G.add_nodes_from(self.node_dict.keys())
         # edge定義
         for lv in range(5):
             for node_code_from in [n for n in list(self.node_dict.keys()) if str(n)[0]==str(lv)]:
@@ -155,7 +159,6 @@ class GraphManager():
                     continue
                 node_codes_to=[k for k in [j for j in list(self.node_dict.keys()) if str(j)[0]==str(lv+1)] if str(node_code_from)[2:] == str(k)[1:3]]
                 self.G.add_edges_from([(node_code_from,node_code_to,{"weight":self.weight_dict[node_code_from][node_code_to]}) for node_code_to in node_codes_to])
-
         # 位置追記
         self.pos={}
         previous_layer=0
@@ -170,18 +173,29 @@ class GraphManager():
     def update_score(self,new_score_dict):
         for node_code,score in new_score_dict.items():
             self.node_dict[node_code]["score"]=score
+        self.update_graph()
 
     def update_weight(self,new_weight_dict):
         for node_from in new_weight_dict.keys():
             for node_to in new_weight_dict[node_from].keys():
                 self.weight_dict[node_from][node_to]=new_weight_dict[node_from][node_to]
+        self.update_graph()
     
     def update_lower_layer_status(self,new_status="active"):
         for node in self.G.nodes():
             if int(str(node)[0])>=4:
                 self.node_dict[node]["status"]=new_status
+        self.update_graph()
         self.colorize(default=False)
         
+    def update_graph(self):
+        try:
+            del self.G
+        except AttributeError:
+            pass
+        self.define_graph()
+
+        pass
     def colorize(self,default=True):
         # 色追記
         self.nodecolor=[]
@@ -213,3 +227,4 @@ class GraphManager():
 if __name__=="__main__":
     cls=GraphManager()
     cls.main()
+    cls.update_graph()
