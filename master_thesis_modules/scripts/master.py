@@ -1,3 +1,5 @@
+import os
+
 from icecream import ic
 import numpy as np
 import pandas as pd
@@ -11,10 +13,17 @@ from fuzzy.fuzzy_reasoning import FuzzyReasoning
 from AHP.get_comparison_mtx import getConsistencyMtx
 from pseudo_data.pseudo_data_generator_ABC import PseudoDataGenerator_ABC
 from entropy.entropy_weight_generator import EntropyWeightGenerator
+from management.manager import Manager
 
-class Master(GraphManager,FuzzyReasoning,getConsistencyMtx,PseudoDataGenerator_ABC,EntropyWeightGenerator):
+
+class Master(GraphManager,FuzzyReasoning,getConsistencyMtx,PseudoDataGenerator_ABC,EntropyWeightGenerator,Manager):
     def __init__(self):
         super().__init__()
+        self.data_dir_dict=self.get_database_dir("NASK")
+        self.trial_timestamp=self.get_timestamp()
+        self.trial_dir_path=self.data_dir_dict["database_dir_path"]+"/"+self.trial_timestamp
+        os.makedirs(self.trial_dir_path,exist_ok=True)
+
         # pseudo_dataが出来ていることを確認
         ic(self.data_dict)
 
@@ -36,7 +45,7 @@ class Master(GraphManager,FuzzyReasoning,getConsistencyMtx,PseudoDataGenerator_A
         ### 実データで決まる
 
         # ネットワークが正しく作成できていることを確認
-        self.visualize()
+        self.visualize_plotly()
 
     def main(self):
         nodes = list(self.G.nodes())[1:]
@@ -81,6 +90,7 @@ class Master(GraphManager,FuzzyReasoning,getConsistencyMtx,PseudoDataGenerator_A
                 self.data_dict[name].loc[i,1000]=self.data_dict[name].loc[i,2000]
 
     def draw_results(self):
+        self.visualize_plotly()
         gs=GridSpec(nrows=3,ncols=1)
         for i,id in enumerate(self.data_dict.keys()):
             plt.subplot(gs[i])
@@ -105,10 +115,20 @@ class Master(GraphManager,FuzzyReasoning,getConsistencyMtx,PseudoDataGenerator_A
         plt.grid()
         plt.show()
 
+    def save(self):
+        pickle_data={"G":self.G}
+        pickle_path=self.trial_dir_path+"/"+self.trial_timestamp+".pickle"
+        self.write_picklelog(output_dict=pickle_data,picklepath=pickle_path)
+        for name in self.data_dict.keys():
+            self.data_dict[name].to_csv(self.trial_dir_path+"/"+self.trial_timestamp+"_"+name+".csv",index=False)
+        
+
+
 if __name__=="__main__":
     cls=Master()
     cls.main()
     cls.draw_results()
+    # cls.save()
 
 # if __name__=="__main__":
 #     cls=Master()

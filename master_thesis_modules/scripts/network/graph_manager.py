@@ -1,6 +1,12 @@
+from icecream import ic
+
 import numpy as np
 import networkx as nx
+
 import matplotlib.pyplot as plt
+import matplotlib.cm as cm
+import matplotlib.colors as mcolors
+import plotly.graph_objects as go
 
 class GraphManager():
     def __init__(self):
@@ -210,8 +216,86 @@ class GraphManager():
                 else:
                     self.nodecolor.append((node["score"],0,0) if node["status"]=="active" else "gray")
             pass
+
+    def visualize_plotly(self):
+        self.colorize()
+        # グラフの情報を取り出しておく
+        nodes = self.G.nodes()
+        pos = self.pos # key: ノード番号, value: [x,y]
+        weights = nx.get_edge_attributes(self.G, 'weight') # key:(node_from,node_to), value: weight
+        # scores = 
+        descriptions = {name:self.node_dict[name]["description"] for name in nodes}
+
+        # 色の準備
+        cmap = cm.get_cmap('jet')
+
+        # ノード描画データ
+        node_x = [pos[node][0] for node in nodes]
+        node_y = [pos[node][1] for node in nodes]
+
+        # エッジ描画データ
+        edge_traces=[]
+        for edge,weight in weights.items():
+            x0, y0 = pos[edge[0]]
+            x1, y1 = pos[edge[1]]
+            edge_x = [x0, x1, None]  # Noneは各エッジの終了を示す
+            edge_y = [y0, y1, None]
+            color=mcolors.rgb2hex(cmap(weight))
+
+            # エッジのトレース
+            edge_trace = go.Scatter(
+                x=edge_x,
+                y=edge_y,
+                line=dict(width=2, color=color),
+                customdata=[weight],
+                hovertemplate="weight: %{customdata:.2f}<extra></extra>",
+                mode='lines'
+            )
+            edge_traces.append(edge_trace)
+
+        node_traces=[]
+        for node,p in pos.items():
+            # ひとつ手前側のエッジの重み情報
+            if node==1000:
+                previous_weight=np.nan
+            else:
+                for node_from in self.weight_dict.keys():
+                    for node_to in self.weight_dict[node_from].keys():
+                        if node_to==node:
+                            previous_weight=np.round(self.weight_dict[node_from][node_to],2)
+                            break
+            # ノードのトレース
+            node_trace = go.Scatter(
+                x=[p[0]],
+                y=[p[1]],
+                mode='markers+text',
+                text=descriptions[node],
+                customdata=[node,descriptions[node]],
+                hovertemplate=f"No. {node}<br>"+
+                                "description: "+descriptions[node]+"<br>"+
+                                f"score: {self.node_dict[node]['score']}<br>"+
+                                f"left weight: {previous_weight}<extra></extra>",
+                marker=dict(
+                    size=30,
+                    color='blue',
+                    showscale=True
+                ),
+                textposition="top center"
+            )
+            node_traces.append(node_trace)
+
+        # グラフを作成
+        fig = go.Figure(data=node_traces+edge_traces)
+        fig.update_layout(
+            showlegend=False,
+            xaxis=dict(showgrid=False, zeroline=False),
+            yaxis=dict(showgrid=False, zeroline=False),
+            plot_bgcolor='white'
+        )
+        fig.show()
+        pass
         
-    def visualize(self):
+    def visualize_matplotlib(self):
         self.colorize()
         weights = nx.get_edge_attributes(self.G, 'weight').values()
         nx.draw(self.G, self.pos, node_color=self.nodecolor, with_labels=True, edge_color = weights, edge_cmap=plt.cm.RdBu_r)
@@ -219,10 +303,11 @@ class GraphManager():
         plt.close()
 
     def main(self):
-        self.colorize(default=False)
-        self.visualize()
-        self.update_lower_layer_status()
-        self.visualize()
+        self.visualize_plotly()
+        # self.colorize(default=False)
+        # self.visualize()
+        # self.update_lower_layer_status()
+        # self.visualize()
 
 if __name__=="__main__":
     cls=GraphManager()

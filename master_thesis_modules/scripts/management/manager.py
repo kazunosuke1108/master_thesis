@@ -10,8 +10,9 @@ import pandas as pd
 
 import matplotlib.pyplot as plt
 
-class management():
+class Manager():
     def __init__(self):
+        super().__init__()
         plt.rcParams["figure.figsize"] = (15,10)
         plt.rcParams["figure.autolayout"] = True
         plt.rcParams["font.size"] = 24
@@ -56,7 +57,7 @@ class management():
                     database_dir_path="/media/hayashide/MasterThesis"
                     pass
         elif strage=="local":
-            database_dir_path=module_dir_path+"/database"        
+            database_dir_path=module_dir_path+"/database"
 
 
         database_dir_dict={
@@ -68,8 +69,6 @@ class management():
             os.makedirs(path,exist_ok=True)
         
         return database_dir_dict
-    
-
 
     def write_csvlog(self,output_data,csvpath,fmt="%s",dim=1):
         if dim==1:
@@ -112,7 +111,13 @@ class management():
         with open(yaml_path,mode="r") as f:
             data=yaml.safe_load(f)
         return data
+    
+    def get_timestamp(self):
+        import datetime
+        current_time=datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+        return current_time
+
 
 if __name__=="__main__":
-    cls=management()
+    cls=Manager()
     cls.get_database_dir("NASK")
