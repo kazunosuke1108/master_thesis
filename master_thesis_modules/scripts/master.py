@@ -79,38 +79,6 @@ class Master(GraphManager,FuzzyReasoning,getConsistencyMtx,PseudoDataGenerator_A
             # 2000 -> 1000
             for i2,name in enumerate(self.data_dict.keys()):
                 self.data_dict[name].loc[i,1000]=self.data_dict[name].loc[i,2000]
-            
-
-    def main_single(self,id="A"):
-        self.data=self.data_dict[id]
-        # スコア計算の実施 (forループ)
-        nodes = list(self.G.nodes())[1:]
-        weights = nx.get_edge_attributes(self.G, 'weight').values()
-        weight_dict={node:weight for node,weight in zip(nodes,weights)}
-        for i,row in self.data.iterrows():
-            # 5000 -> 4000
-            ## 551系
-            w_vector=np.array([weight_dict[key] for key in nodes if str(551) in str(key)])
-            x_vector=self.data.loc[i,[key for key in nodes if str(551) in str(key)]].values
-            self.data.loc[i,4051]=w_vector@x_vector
-            ## 552系
-            w_vector=np.array([weight_dict[key] for key in nodes if str(552) in str(key)])
-            x_vector=self.data.loc[i,[key for key in nodes if str(552) in str(key)]].values
-            self.data.loc[i,4052]=w_vector@x_vector
-
-            # 4000 -> 3000
-            self.data.loc[i,3005]=self.calculate_fuzzy({4051:self.data.loc[i,4051],4052:self.data.loc[i,4052],})
-
-            # 3000 -> 2000 # Entropy Weight Methodに変更予定．（複数候補にするときに．）
-            ## 200系
-            w_vector=np.array([weight_dict[key] for key in nodes if str(300) in str(key)])
-            x_vector=self.data.loc[i,[key for key in nodes if str(300) in str(key)]].values
-            self.data.loc[i,2000]=w_vector@x_vector
-
-            # 2000 -> 1000
-            self.data.loc[i,1000]=self.data.loc[i,2000]
-            pass
-        self.data_dict[id]=self.data
 
     def draw_results(self):
         gs=GridSpec(nrows=3,ncols=1)
