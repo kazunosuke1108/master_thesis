@@ -4,6 +4,7 @@ import pandas as pd
 import networkx as nx
 
 import matplotlib.pyplot as plt
+from matplotlib.gridspec import GridSpec
 
 from network.graph_manager import GraphManager
 from fuzzy.fuzzy_reasoning import FuzzyReasoning
@@ -32,10 +33,9 @@ class Master(GraphManager,FuzzyReasoning,getConsistencyMtx,PseudoDataGenerator_A
         ### 重み不要
         ## lv.2 -> 3 (Entropy)
         ### 実データで決まる
+
         # ネットワークが正しく作成できていることを確認
-        ic(nx.get_edge_attributes(self.G, 'weight').values())
         self.visualize()
-        # raise NotImplementedError
 
     def main(self,id="A"):
         self.data=self.data_dict[id]
@@ -69,7 +69,9 @@ class Master(GraphManager,FuzzyReasoning,getConsistencyMtx,PseudoDataGenerator_A
         self.data_dict[id]=self.data
 
     def draw_results(self):
-        for id in self.data_dict.keys():
+        gs=GridSpec(nrows=3,ncols=1)
+        for i,id in enumerate(self.data_dict.keys()):
+            plt.subplot(gs[i])
             self.data=self.data_dict[id]
             for key in self.data.keys():
                 if key=="timestamp":
@@ -77,13 +79,26 @@ class Master(GraphManager,FuzzyReasoning,getConsistencyMtx,PseudoDataGenerator_A
                 plt.plot(self.data["timestamp"],self.data[key],label=key)
             plt.xlabel("Time [s]")
             plt.ylabel("Risk value")
+            plt.ylim()
             plt.legend()
             plt.grid()
-            plt.show()
+        plt.show()
+
+        for i,id in enumerate(self.data_dict.keys()):
+            self.data=self.data_dict[id]
+            plt.plot(self.data["timestamp"],self.data[1000],label=id)
+        plt.xlabel("Time [s]")
+        plt.ylabel("Risk value")
+        plt.legend()
+        plt.grid()
+        plt.show()
+
 
 if __name__=="__main__":
     cls=Master()
     for id in ["A","B","C"]:
         cls.main(id=id)
     cls.draw_results()
-    ic(cls.data_dict)
+    ic(cls.data_dict["A"])
+    ic(cls.data_dict["B"])
+    ic(cls.data_dict["C"])

@@ -49,11 +49,11 @@ class PseudoDataGenerator_ABC():
             [8,0.6],
         ])
         x_5520=np.array([
-            [0,0.4],
-            [2,0.4],
+            [0,0.7],
+            [2,0.7],
             [4,0.5],
-            [6,0.6],
-            [8,0.4],
+            [6,0.43],
+            [8,0.7],
         ])
         add_risk_curve(x_3002,3002) # イベントカメラの値
         add_risk_curve(x_5510,5510) # 点滴との距離（近さ）
@@ -69,11 +69,11 @@ class PseudoDataGenerator_ABC():
             interpolated_values = np.interp(data["timestamp"], x_values, y_values)
             data[col_name]=interpolated_values
         x_3002=np.array([
-            [0,0.2],
-            [2,0.8],
-            [4,0.6],
-            [6,0.8],
-            [8,0.2],
+            [0,1],
+            [2,1],
+            [4,0.5],
+            [6,0.25],
+            [8,1],
         ])
         x_5510=np.array([
             [0,0.4],
@@ -124,11 +124,11 @@ class PseudoDataGenerator_ABC():
             [8,0.2],
         ])
         x_5520=np.array([
-            [0,0.6],
-            [2,0.6],
+            [0,0.7],
+            [2,0.7],
             [4,0.5],
-            [6,0.6],
-            [8,0.6],
+            [6,0.43],
+            [8,0.7],
         ])
         add_risk_curve(x_3002,3002) # イベントカメラの値
         add_risk_curve(x_5510,5510) # 点滴との距離（近さ）
