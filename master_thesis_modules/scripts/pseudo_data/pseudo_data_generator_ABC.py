@@ -14,7 +14,7 @@ class PseudoDataGenerator_ABC():
         # 無視するデータ群を指定
         killed_columns=[2001,2002,3000,3001,3003,3004,4050,5521,5522]
         for killed_column in killed_columns:
-            data[killed_column]=0
+            data[killed_column]=1e-5
         
         self.data_dict={
             "A":data.copy(),#A

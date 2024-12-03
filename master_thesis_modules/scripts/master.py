@@ -10,8 +10,9 @@ from network.graph_manager import GraphManager
 from fuzzy.fuzzy_reasoning import FuzzyReasoning
 from AHP.get_comparison_mtx import getConsistencyMtx
 from pseudo_data.pseudo_data_generator_ABC import PseudoDataGenerator_ABC
+from entropy.entropy_weight_generator import EntropyWeightGenerator
 
-class Master(GraphManager,FuzzyReasoning,getConsistencyMtx,PseudoDataGenerator_ABC):
+class Master(GraphManager,FuzzyReasoning,getConsistencyMtx,PseudoDataGenerator_ABC,EntropyWeightGenerator):
     def __init__(self):
         super().__init__()
         # pseudo_dataが出来ていることを確認
@@ -37,7 +38,50 @@ class Master(GraphManager,FuzzyReasoning,getConsistencyMtx,PseudoDataGenerator_A
         # ネットワークが正しく作成できていることを確認
         self.visualize()
 
-    def main(self,id="A"):
+    def main(self):
+        nodes = list(self.G.nodes())[1:]
+        weights = nx.get_edge_attributes(self.G, 'weight').values()
+        weight_dict={node:weight for node,weight in zip(nodes,weights)}
+        
+        for i,_ in list(self.data_dict.values())[0].iterrows():
+            # 5000->4000 (AHP)
+            for name in self.data_dict.keys():
+                ## 551系
+                w_vector=np.array([weight_dict[key] for key in nodes if str(551) in str(key)])
+                x_vector=self.data_dict[name].loc[i,[key for key in nodes if str(551) in str(key)]].values
+                self.data_dict[name].loc[i,4051]=w_vector@x_vector
+                ## 552系
+                w_vector=np.array([weight_dict[key] for key in nodes if str(552) in str(key)])
+                x_vector=self.data_dict[name].loc[i,[key for key in nodes if str(552) in str(key)]].values
+                self.data_dict[name].loc[i,4052]=w_vector@x_vector
+
+            # 4000->3000 (Fuzzy reasoning)
+            for name in self.data_dict.keys():
+                self.data_dict[name].loc[i,3005]=self.calculate_fuzzy({4051:self.data_dict[name].loc[i,4051],4052:self.data_dict[name].loc[i,4052],})
+
+            # 3000->2000 (Entropy Weight Method)
+            ## weightの更新
+            w_source_data=self.data_dict[list(self.data_dict.keys())[0]].iloc[i]
+            for i2,name in enumerate(self.data_dict.keys()):
+                if i2==0:
+                    continue
+                w_source_data=pd.concat([w_source_data,self.data_dict[name].iloc[i]],axis=1)
+            w_source_data=w_source_data.T[[key for key in nodes if str(300) in str(key)]]
+            w_dict={2000:self.get_entropy_weight(w_source_data)}
+            self.update_weight(new_weight_dict=w_dict)
+            weights = nx.get_edge_attributes(self.G, 'weight').values()
+            weight_dict={node:weight for node,weight in zip(nodes,weights)}
+            for i2,name in enumerate(self.data_dict.keys()):
+                w_vector=np.array([weight_dict[key] for key in nodes if str(300) in str(key)])
+                x_vector=self.data_dict[name].loc[i,[key for key in nodes if str(300) in str(key)]].values
+                self.data_dict[name].loc[i,2000]=w_vector@x_vector
+
+            # 2000 -> 1000
+            for i2,name in enumerate(self.data_dict.keys()):
+                self.data_dict[name].loc[i,1000]=self.data_dict[name].loc[i,2000]
+            
+
+    def main_single(self,id="A"):
         self.data=self.data_dict[id]
         # スコア計算の実施 (forループ)
         nodes = list(self.G.nodes())[1:]
@@ -93,12 +137,16 @@ class Master(GraphManager,FuzzyReasoning,getConsistencyMtx,PseudoDataGenerator_A
         plt.grid()
         plt.show()
 
-
 if __name__=="__main__":
     cls=Master()
-    for id in ["A","B","C"]:
-        cls.main(id=id)
+    cls.main()
     cls.draw_results()
-    ic(cls.data_dict["A"])
-    ic(cls.data_dict["B"])
-    ic(cls.data_dict["C"])
+
+# if __name__=="__main__":
+#     cls=Master()
+#     for id in ["A","B","C"]:
+#         cls.main_single(id=id)
+#     cls.draw_results()
+#     ic(cls.data_dict["A"])
+#     ic(cls.data_dict["B"])
+#     ic(cls.data_dict["C"])
