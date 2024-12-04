@@ -360,7 +360,12 @@ class GraphManager():
             os.makedirs(trial_temp_dir_path,exist_ok=True)
             print(name)
             for i,frame in enumerate(frames):
-                fig.update(data=frame.data)
+                try:
+                    timestamp=timestamps[i]
+                except IndexError:
+                    timestamp=timestamps[-1]+(timestamps[-1]-timestamps[-2])
+                fig.update(data=frame.data,)
+                fig.update_layout(title_text=f"Person:{name}  Frame:{i+1}  timestamp: {timestamp}")
                 print(i)
                 fig.write_image(f"{trial_temp_dir_path}/{name}_{i:03d}.jpg",format='jpg', engine="auto")
             print("export")

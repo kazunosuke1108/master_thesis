@@ -118,7 +118,7 @@ class Master(GraphManager,FuzzyReasoning,getConsistencyMtx,PseudoDataGenerator_A
         plt.ylabel("Risk value")
         plt.legend()
         plt.grid()
-        plt.show()
+        plt.pause(1)
 
     def save(self):
         self.data_dir_dict=self.get_database_dir("NASK")
