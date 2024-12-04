@@ -201,6 +201,17 @@ class GraphManager():
         self.define_graph(name)
         # self.colorize(default=False)
         
+    def get_left_weight(self,name,node):
+        if node==1000:
+            previous_weight=np.nan
+        else:
+            for node_from in self.graph_dict[name]["weight_dict"].keys():
+                for node_to in self.graph_dict[name]["weight_dict"][node_from].keys():
+                    if node_to==node:
+                        previous_weight=np.round(self.graph_dict[name]["weight_dict"][node_from][node_to],2)
+                        break
+        return previous_weight
+    
     # def update_graph(self,name):
     #     try:
     #         del self.G
@@ -224,14 +235,14 @@ class GraphManager():
     #         pass
 
     def visualize_plotly(self,name="A"):
+        ic(self.graph_dict[name]["node_dict"][5520])
         # self.colorize()
         # グラフの情報を取り出しておく
         nodes = self.graph_dict[name]["G"].nodes()
         pos = self.graph_dict[name]["pos"] # key: ノード番号, value: [x,y]
         weights = nx.get_edge_attributes(self.graph_dict[name]["G"], 'weight') # key:(node_from,node_to), value: weight
-        # scores = 
+        scores = {n:self.graph_dict[name]["node_dict"][n]["score"] for n in nodes}# key: ノード番号, value: 特徴量
         descriptions = {n:self.graph_dict[name]["node_dict"][n]["description"] for n in nodes}
-        ic(descriptions)
 
         # 色の準備
         cmap = cm.get_cmap('jet')
@@ -263,14 +274,9 @@ class GraphManager():
         node_traces=[]
         for node,p in pos.items():
             # ひとつ手前側のエッジの重み情報
-            if node==1000:
-                previous_weight=np.nan
-            else:
-                for node_from in self.weight_dict.keys():
-                    for node_to in self.weight_dict[node_from].keys():
-                        if node_to==node:
-                            previous_weight=np.round(self.weight_dict[node_from][node_to],2)
-                            break
+            previous_weight=self.get_left_weight(name=name,node=node)
+            # ノードの色
+            color=mcolors.rgb2hex(cmap(scores[node]))
             # ノードのトレース
             node_trace = go.Scatter(
                 x=[p[0]],
@@ -284,7 +290,7 @@ class GraphManager():
                                 f"left weight: {previous_weight}<extra></extra>",
                 marker=dict(
                     size=30,
-                    color='blue',
+                    color=color,
                     showscale=True
                 ),
                 textposition="top center"
@@ -295,6 +301,7 @@ class GraphManager():
         fig = go.Figure(data=node_traces+edge_traces)
         fig.update_layout(
             showlegend=False,
+            title=name,
             xaxis=dict(showgrid=False, zeroline=False),
             yaxis=dict(showgrid=False, zeroline=False),
             plot_bgcolor='white'
