@@ -19,9 +19,12 @@ from management.manager import Manager
 class Master(GraphManager,FuzzyReasoning,getConsistencyMtx,PseudoDataGenerator_ABC,EntropyWeightGenerator,Manager):
     def __init__(self):
         super().__init__()
+        # 格納庫
+        self.fig_dict={}
+        for name in self.data_dict.keys():
+            self.fig_dict[name]=[]
 
         # pseudo_dataが出来ていることを確認
-        # ic(self.data_dict)
         # pseudo_dataとgraph_dictのkey(A,B,C...)が合致しているか確認
         if len(list(self.data_dict.keys())) != len(list(self.graph_dict.keys())):
             raise Exception("擬似データの被験者数とグラフの被験者数が合致しません")
@@ -89,34 +92,24 @@ class Master(GraphManager,FuzzyReasoning,getConsistencyMtx,PseudoDataGenerator_A
             for name in list(self.data_dict.keys()):
                 new_score_dict=self.data_dict[name].iloc[i].to_dict()
                 del new_score_dict["timestamp"]
-                ic(name)
                 self.update_score(name=name,new_score_dict=new_score_dict)
-                ic("master")
-                ic(self.graph_dict[name]["node_dict"])
-                # ic(new_score_dict)
-            ic(self.graph_dict["A"]["node_dict"])
-            ic(self.graph_dict["B"]["node_dict"])
-            for name in list(self.data_dict.keys()):
-                ic(id(self.graph_dict[name]["node_dict"]))
+            
+            for name in self.data_dict.keys():
+                fig_data=self.visualize_plotly(name=name)
+                self.fig_dict[name].append(fig_data)
+
 
     def draw_results(self):
         for name in self.data_dict.keys():
-            self.visualize_plotly(name=name)
-        # gs=GridSpec(nrows=3,ncols=1)
-        # for i,id in enumerate(self.data_dict.keys()):
-        #     plt.subplot(gs[i])
-        #     self.data=self.data_dict[id]
-        #     for key in self.data.keys():
-        #         if key=="timestamp":
-        #             continue
-        #         plt.plot(self.data["timestamp"],self.data[key],label=key)
-        #     plt.xlabel("Time [s]")
-        #     plt.ylabel("Risk value")
-        #     plt.ylim()
-        #     plt.legend()
-        #     plt.grid()
-        # plt.show()
+            fig_data=self.visualize_plotly(name=name)
+            self.fig_dict[name].append(fig_data)
+        
+        # anim
+        timestamps=self.data_dict[list(self.data_dict.keys())[0]]["timestamp"].values
+        for name in self.data_dict.keys():
+            self.visualize_animation(name,self.fig_dict[name],timestamps)
 
+        # matplotlibの時系列波形
         for i,id in enumerate(self.data_dict.keys()):
             self.data=self.data_dict[id]
             plt.plot(self.data["timestamp"],self.data[1000],label=id)
@@ -150,12 +143,3 @@ if __name__=="__main__":
     cls.main()
     cls.draw_results()
     # cls.save()
-
-# if __name__=="__main__":
-#     cls=Master()
-#     for id in ["A","B","C"]:
-#         cls.main_single(id=id)
-#     cls.draw_results()
-#     ic(cls.data_dict["A"])
-#     ic(cls.data_dict["B"])
-#     ic(cls.data_dict["C"])

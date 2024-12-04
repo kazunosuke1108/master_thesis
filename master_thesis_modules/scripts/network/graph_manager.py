@@ -187,7 +187,6 @@ class GraphManager():
         for node_code,score in new_score_dict.items():
             self.graph_dict[name]["node_dict"][node_code]["score"]=score
         self.define_graph(name)
-        ic(self.graph_dict[name]["node_dict"]) # ここではちゃんと書き換わってる
 
     def update_weight(self,name,new_weight_dict):
         for node_from in new_weight_dict.keys():
@@ -213,30 +212,7 @@ class GraphManager():
                         break
         return previous_weight
     
-    # def update_graph(self,name):
-    #     try:
-    #         del self.G
-    #     except AttributeError:
-    #         pass
-    #     self.define_graph()
-
-    # def colorize(self,default=True):
-    #     # 色追記
-    #     self.nodecolor=[]
-    #     if default:
-    #         for node_code in self.G.nodes():
-    #             self.nodecolor.append((1,0,0) if self.node_dict[node_code]["status"]=="active" else "gray")
-    #     else:
-    #         for node_code in self.G.nodes():
-    #             node=self.node_dict[node_code]
-    #             if np.isnan(node["score"]):
-    #                 self.nodecolor.append((1,1,1) if node["status"]=="active" else "gray")
-    #             else:
-    #                 self.nodecolor.append((node["score"],0,0) if node["status"]=="active" else "gray")
-    #         pass
-
-    def visualize_plotly(self,name="A"):
-        ic(self.graph_dict[name]["node_dict"][5520])
+    def visualize_plotly(self,name="A",show=False):
         # self.colorize()
         # グラフの情報を取り出しておく
         nodes = self.graph_dict[name]["G"].nodes()
@@ -287,18 +263,22 @@ class GraphManager():
                 customdata=[node,descriptions[node]],
                 hovertemplate=f"No. {node}<br>"+
                                 "description: "+descriptions[node]+"<br>"+
-                                f"score: {self.node_dict[node]['score']}<br>"+
+                                f"score: {np.round(scores[node],2)}<br>"+
                                 f"left weight: {previous_weight}<extra></extra>",
                 marker=dict(
                     size=30,
                     color=color,
-                    showscale=True
+                    showscale=False
                 ),
                 textposition="top center"
             )
             node_traces.append(node_trace)
 
         # グラフを作成
+        try:
+            del fig
+        except UnboundLocalError:
+            pass
         fig = go.Figure(data=node_traces+edge_traces)
         fig.update_layout(
             showlegend=False,
@@ -307,15 +287,61 @@ class GraphManager():
             yaxis=dict(showgrid=False, zeroline=False),
             plot_bgcolor='white'
         )
-        fig.show()
-        pass
+        if show:
+            fig.show()
+        else:
+            pass
+        return fig.data
         
-    # def visualize_matplotlib(self):
-    #     self.colorize()
-    #     weights = nx.get_edge_attributes(self.G, 'weight').values()
-    #     nx.draw(self.G, self.pos, node_color=self.nodecolor, with_labels=True, edge_color = weights, edge_cmap=plt.cm.RdBu_r)
-    #     plt.pause(1)
-    #     plt.close()
+    def visualize_animation(self,name,fig_datas,timestamps):
+        frames=[]
+        for i, fig_data in enumerate(fig_datas):
+            try:
+                timestamp=timestamps[i]
+            except IndexError:
+                timestamp=timestamps[-1]+(timestamps[-1]-timestamps[-2])
+            frames.append(go.Frame(
+                data=fig_data,
+                name=f"frame no.: {i}",
+                layout=go.Layout(
+                    title=f"Person: {name}  Frame: {i+1}  timestamp: {timestamp}"
+                ),
+                ))
+        # レイアウト設定
+        layout = go.Layout(
+            # title="Animation with Multiple Traces per Frame",
+            # xaxis=dict(range=[0, 5]),
+            # yaxis=dict(range=[0, 20]),
+            updatemenus=[{
+                'buttons': [
+                    {
+                        'args': [None, {"frame": {"duration": 500, "redraw": True}, "fromcurrent": True}],
+                        'label': 'Play',
+                        'method': 'animate'
+                    },
+                    {
+                        'args': [[None], {"frame": {"duration": 0, "redraw": True}, "mode": "immediate", "transition": {"duration": 0}}],
+                        'label': 'Pause',
+                        'method': 'animate'
+                    }
+                ],
+                'direction': 'left',
+                'pad': {'r': 10, 't': 87},
+                'showactive': False,
+                'type': 'buttons',
+                'x': 0.1,
+                'xanchor': 'right',
+                'y': 0,
+                'yanchor': 'top'
+            }],
+            showlegend=False,
+        )
+
+        # Figure作成
+        fig = go.Figure(data=fig_datas[0], layout=layout, frames=frames)
+
+        # プロット
+        fig.show()
 
     def main(self):
         self.visualize_plotly(name="C")

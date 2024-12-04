@@ -5,7 +5,7 @@ from icecream import ic
 class PseudoDataGenerator_ABC():
     def __init__(self):
         super().__init__()
-        t=np.arange(0,10,2)
+        t=np.arange(0,10,0.25)
         data=pd.DataFrame(t,columns=["timestamp"])
         columns=[1000,2000,2001,2002,3000,3001,3002,3003,3004,3005,4050,4051,4052,5510,5511,5512,5520,5521,5522]
         for column in columns:
