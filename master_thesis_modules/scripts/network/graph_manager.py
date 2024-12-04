@@ -364,7 +364,7 @@ class GraphManager():
                 print(i)
                 fig.write_image(f"{trial_temp_dir_path}/{name}_{i:03d}.jpg",format='jpg', engine="auto")
             print("export")
-            self.jpg2mp4(sorted(glob(trial_temp_dir_path+"/*")),mp4_path=trial_dir_path+f"/{name}.mp4",fps=0.25)
+            self.jpg2mp4(sorted(glob(trial_temp_dir_path+"/*")),mp4_path=trial_dir_path+f"/{name}.mp4",fps=1)
         return frames
 
     def jpg2mp4(self,image_paths,mp4_path,size=(0,0),fps=30.0):
