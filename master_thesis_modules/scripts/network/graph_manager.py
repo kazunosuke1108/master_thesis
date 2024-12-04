@@ -350,8 +350,13 @@ class GraphManager():
 
         # export
         if save:
+            import shutil
             from glob import glob
             trial_temp_dir_path=trial_dir_path+"/temp"
+            try:
+                shutil.rmtree(trial_temp_dir_path)
+            except FileNotFoundError:
+                pass
             os.makedirs(trial_temp_dir_path,exist_ok=True)
             print(name)
             for i,frame in enumerate(frames):
