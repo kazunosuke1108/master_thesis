@@ -20,6 +20,7 @@ class Master(GraphManager,FuzzyReasoning,getConsistencyMtx,PseudoDataGenerator_A
     def __init__(self):
         super().__init__()
         # 格納庫
+        self.frames_dict={}
         self.fig_dict={}
         for name in self.data_dict.keys():
             self.fig_dict[name]=[]
@@ -134,12 +135,17 @@ class Master(GraphManager,FuzzyReasoning,getConsistencyMtx,PseudoDataGenerator_A
             self.data_dict[name].to_csv(self.trial_dir_path+"/"+self.trial_timestamp+"_"+name+".csv",index=False)
 
         json_data=self.graph_dict
+        for name in self.data_dict.keys():
+            del json_data[name]["G"]
         self.write_json(json_data,self.trial_dir_path+"/"+self.trial_timestamp+".json")
-        
 
+        # animation
+        timestamps=self.data_dict[list(self.data_dict.keys())[0]]["timestamp"].values
+        for name in self.data_dict.keys():
+            self.visualize_animation(name,self.fig_dict[name],timestamps,show=True,save=True,trial_dir_path=self.trial_dir_path)
 
 if __name__=="__main__":
     cls=Master()
     cls.main()
     cls.draw_results()
-    # cls.save()
+    cls.save()

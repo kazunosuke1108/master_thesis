@@ -1,3 +1,5 @@
+# pip install -U kaleido
+import os
 from icecream import ic
 import copy
 import numpy as np
@@ -293,7 +295,7 @@ class GraphManager():
             pass
         return fig.data
         
-    def visualize_animation(self,name,fig_datas,timestamps):
+    def visualize_animation(self,name,fig_datas,timestamps,show=False,save=False,trial_dir_path=""):
         frames=[]
         for i, fig_data in enumerate(fig_datas):
             try:
@@ -309,7 +311,7 @@ class GraphManager():
                 ))
         # レイアウト設定
         layout = go.Layout(
-            # title="Animation with Multiple Traces per Frame",
+            title=f"Person: {name}  Frame: 0  timestamp: 0",
             # xaxis=dict(range=[0, 5]),
             # yaxis=dict(range=[0, 20]),
             updatemenus=[{
@@ -341,7 +343,41 @@ class GraphManager():
         fig = go.Figure(data=fig_datas[0], layout=layout, frames=frames)
 
         # プロット
-        fig.show()
+        if show:
+            fig.show()
+        else:
+            pass
+
+        # export
+        if save:
+            from glob import glob
+            trial_temp_dir_path=trial_dir_path+"/temp"
+            os.makedirs(trial_temp_dir_path,exist_ok=True)
+            print(name)
+            for i,frame in enumerate(frames):
+                fig.update(data=frame.data)
+                print(i)
+                fig.write_image(f"{trial_temp_dir_path}/{name}_{i:03d}.jpg",format='jpg', engine="auto")
+            print("export")
+            self.jpg2mp4(sorted(glob(trial_temp_dir_path+"/*")),mp4_path=trial_dir_path+f"/{name}.mp4",fps=0.25)
+        return frames
+
+    def jpg2mp4(self,image_paths,mp4_path,size=(0,0),fps=30.0):
+        import cv2
+        # get size of the image
+        img=cv2.imread(image_paths[0])
+        if size[0]==0:
+            size=(img.shape[1],img.shape[0])
+        fourcc = cv2.VideoWriter_fourcc('m', 'p', '4', 'v')
+        print("mp4_path",mp4_path)
+        print("fps",fps)
+        print("size",size)
+        video = cv2.VideoWriter(mp4_path,fourcc,fps,size)#(mp4_path,fourcc, fps, size)
+        for idx,image in enumerate(image_paths):
+            img=cv2.imread(image)
+            video.write(img)
+            print(f"now processing: {os.path.basename(image)} {idx}/{len(image_paths)}")
+        video.release()
 
     def main(self):
         self.visualize_plotly(name="C")

@@ -116,7 +116,23 @@ class Manager():
         import datetime
         current_time=datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
         return current_time
-
+    
+    def jpg2mp4(self,image_paths,mp4_path,size=(0,0),fps=30.0):
+        import cv2
+        # get size of the image
+        img=cv2.imread(image_paths[0])
+        if size[0]==0:
+            size=(img.shape[1],img.shape[0])
+        fourcc = cv2.VideoWriter_fourcc('m', 'p', '4', 'v')
+        print("mp4_path",mp4_path)
+        print("fps",fps)
+        print("size",size)
+        video = cv2.VideoWriter(mp4_path,fourcc,fps,size)#(mp4_path,fourcc, fps, size)
+        for idx,image in enumerate(image_paths):
+            img=cv2.imread(image)
+            video.write(img)
+            print(f"now processing: {os.path.basename(image)} {idx}/{len(image_paths)}")
+        video.release()
 
 if __name__=="__main__":
     cls=Manager()
