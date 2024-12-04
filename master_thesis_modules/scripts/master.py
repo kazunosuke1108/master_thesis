@@ -86,11 +86,18 @@ class Master(GraphManager,FuzzyReasoning,getConsistencyMtx,PseudoDataGenerator_A
                 self.data_dict[name].loc[i,1000]=self.data_dict[name].loc[i,2000]
 
             # scoreをグラフに反映
-            for name in self.data_dict.keys():
+            for name in list(self.data_dict.keys()):
                 new_score_dict=self.data_dict[name].iloc[i].to_dict()
-                ic(new_score_dict[5520])
                 del new_score_dict["timestamp"]
+                ic(name)
                 self.update_score(name=name,new_score_dict=new_score_dict)
+                ic("master")
+                ic(self.graph_dict[name]["node_dict"])
+                # ic(new_score_dict)
+            ic(self.graph_dict["A"]["node_dict"])
+            ic(self.graph_dict["B"]["node_dict"])
+            for name in list(self.data_dict.keys()):
+                ic(id(self.graph_dict[name]["node_dict"]))
 
     def draw_results(self):
         for name in self.data_dict.keys():

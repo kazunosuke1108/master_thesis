@@ -1,5 +1,5 @@
 from icecream import ic
-
+import copy
 import numpy as np
 import networkx as nx
 
@@ -154,9 +154,9 @@ class GraphManager():
 
 
         self.graph_dict={
-            "A":{"G":"","node_dict":self.node_dict.copy(),"weight_dict":self.weight_dict.copy(),"pos":""},
-            "B":{"G":"","node_dict":self.node_dict.copy(),"weight_dict":self.weight_dict.copy(),"pos":""},
-            "C":{"G":"","node_dict":self.node_dict.copy(),"weight_dict":self.weight_dict.copy(),"pos":""},
+            "A":{"G":"","node_dict":copy.deepcopy(self.node_dict),"weight_dict":copy.deepcopy(self.weight_dict),"pos":""},
+            "B":{"G":"","node_dict":copy.deepcopy(self.node_dict),"weight_dict":copy.deepcopy(self.weight_dict),"pos":""},
+            "C":{"G":"","node_dict":copy.deepcopy(self.node_dict),"weight_dict":copy.deepcopy(self.weight_dict),"pos":""},
         }
         for name in self.graph_dict.keys():
             self.define_graph(name)
@@ -187,6 +187,7 @@ class GraphManager():
         for node_code,score in new_score_dict.items():
             self.graph_dict[name]["node_dict"][node_code]["score"]=score
         self.define_graph(name)
+        ic(self.graph_dict[name]["node_dict"]) # ここではちゃんと書き換わってる
 
     def update_weight(self,name,new_weight_dict):
         for node_from in new_weight_dict.keys():
