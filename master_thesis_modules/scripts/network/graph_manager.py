@@ -152,86 +152,93 @@ class GraphManager():
             },
         }
 
-        self.define_graph()
+
+        self.graph_dict={
+            "A":{"G":"","node_dict":self.node_dict.copy(),"weight_dict":self.weight_dict.copy(),"pos":""},
+            "B":{"G":"","node_dict":self.node_dict.copy(),"weight_dict":self.weight_dict.copy(),"pos":""},
+            "C":{"G":"","node_dict":self.node_dict.copy(),"weight_dict":self.weight_dict.copy(),"pos":""},
+        }
+        for name in self.graph_dict.keys():
+            self.define_graph(name)
     
-    def define_graph(self):
-        self.G = nx.Graph()
+    def define_graph(self,name):
+        self.graph_dict[name]["G"] = nx.Graph()
         # node定義
-        self.G.add_nodes_from(self.node_dict.keys())
+        self.graph_dict[name]["G"].add_nodes_from(self.graph_dict[name]["node_dict"].keys())
         # edge定義
         for lv in range(5):
-            for node_code_from in [n for n in list(self.node_dict.keys()) if str(n)[0]==str(lv)]:
+            for node_code_from in [n for n in list(self.graph_dict[name]["node_dict"].keys()) if str(n)[0]==str(lv)]:
                 if node_code_from=="description":
                     continue
-                node_codes_to=[k for k in [j for j in list(self.node_dict.keys()) if str(j)[0]==str(lv+1)] if str(node_code_from)[2:] == str(k)[1:3]]
-                self.G.add_edges_from([(node_code_from,node_code_to,{"weight":self.weight_dict[node_code_from][node_code_to]}) for node_code_to in node_codes_to])
+                node_codes_to=[k for k in [j for j in list(self.graph_dict[name]["node_dict"].keys()) if str(j)[0]==str(lv+1)] if str(node_code_from)[2:] == str(k)[1:3]]
+                self.graph_dict[name]["G"].add_edges_from([(node_code_from,node_code_to,{"weight":self.graph_dict[name]["weight_dict"][node_code_from][node_code_to]}) for node_code_to in node_codes_to])
         # 位置追記
-        self.pos={}
+        self.graph_dict[name]["pos"]={}
         previous_layer=0
-        for node_code in self.G.nodes():
+        for node_code in self.graph_dict[name]["G"].nodes():
             if previous_layer!=int(str(node_code)[0]):
                 y=0
             else:
                 y-=1
-            self.pos[node_code]=(int(str(node_code)[0]),y)
+            self.graph_dict[name]["pos"][node_code]=(int(str(node_code)[0]),y)
             previous_layer=int(str(node_code)[0])
 
-    def update_score(self,new_score_dict):
+    def update_score(self,name,new_score_dict):
         for node_code,score in new_score_dict.items():
-            self.node_dict[node_code]["score"]=score
-        self.update_graph()
+            self.graph_dict[name]["node_dict"][node_code]["score"]=score
+        self.define_graph(name)
 
-    def update_weight(self,new_weight_dict):
+    def update_weight(self,name,new_weight_dict):
         for node_from in new_weight_dict.keys():
             for node_to in new_weight_dict[node_from].keys():
-                self.weight_dict[node_from][node_to]=new_weight_dict[node_from][node_to]
-        self.update_graph()
+                self.graph_dict[name]["weight_dict"][node_from][node_to]=new_weight_dict[node_from][node_to]
+        self.define_graph(name)
     
-    def update_lower_layer_status(self,new_status="active"):
-        for node in self.G.nodes():
+    def update_lower_layer_status(self,name,new_status="active"):
+        for node in self.graph_dict[name]["G"].nodes():
             if int(str(node)[0])>=4:
-                self.node_dict[node]["status"]=new_status
-        self.update_graph()
-        self.colorize(default=False)
+                self.graph_dict[name]["node_dict"][node]["status"]=new_status
+        self.define_graph(name)
+        # self.colorize(default=False)
         
-    def update_graph(self):
-        try:
-            del self.G
-        except AttributeError:
-            pass
-        self.define_graph()
+    # def update_graph(self,name):
+    #     try:
+    #         del self.G
+    #     except AttributeError:
+    #         pass
+    #     self.define_graph()
 
-        pass
-    def colorize(self,default=True):
-        # 色追記
-        self.nodecolor=[]
-        if default:
-            for node_code in self.G.nodes():
-                self.nodecolor.append((1,0,0) if self.node_dict[node_code]["status"]=="active" else "gray")
-        else:
-            for node_code in self.G.nodes():
-                node=self.node_dict[node_code]
-                if np.isnan(node["score"]):
-                    self.nodecolor.append((1,1,1) if node["status"]=="active" else "gray")
-                else:
-                    self.nodecolor.append((node["score"],0,0) if node["status"]=="active" else "gray")
-            pass
+    # def colorize(self,default=True):
+    #     # 色追記
+    #     self.nodecolor=[]
+    #     if default:
+    #         for node_code in self.G.nodes():
+    #             self.nodecolor.append((1,0,0) if self.node_dict[node_code]["status"]=="active" else "gray")
+    #     else:
+    #         for node_code in self.G.nodes():
+    #             node=self.node_dict[node_code]
+    #             if np.isnan(node["score"]):
+    #                 self.nodecolor.append((1,1,1) if node["status"]=="active" else "gray")
+    #             else:
+    #                 self.nodecolor.append((node["score"],0,0) if node["status"]=="active" else "gray")
+    #         pass
 
-    def visualize_plotly(self):
-        self.colorize()
+    def visualize_plotly(self,name="A"):
+        # self.colorize()
         # グラフの情報を取り出しておく
-        nodes = self.G.nodes()
-        pos = self.pos # key: ノード番号, value: [x,y]
-        weights = nx.get_edge_attributes(self.G, 'weight') # key:(node_from,node_to), value: weight
+        nodes = self.graph_dict[name]["G"].nodes()
+        pos = self.graph_dict[name]["pos"] # key: ノード番号, value: [x,y]
+        weights = nx.get_edge_attributes(self.graph_dict[name]["G"], 'weight') # key:(node_from,node_to), value: weight
         # scores = 
-        descriptions = {name:self.node_dict[name]["description"] for name in nodes}
+        descriptions = {n:self.graph_dict[name]["node_dict"][n]["description"] for n in nodes}
+        ic(descriptions)
 
         # 色の準備
         cmap = cm.get_cmap('jet')
 
-        # ノード描画データ
-        node_x = [pos[node][0] for node in nodes]
-        node_y = [pos[node][1] for node in nodes]
+        # # ノード描画データ
+        # node_x = [pos[node][0] for node in nodes]
+        # node_y = [pos[node][1] for node in nodes]
 
         # エッジ描画データ
         edge_traces=[]
@@ -295,15 +302,15 @@ class GraphManager():
         fig.show()
         pass
         
-    def visualize_matplotlib(self):
-        self.colorize()
-        weights = nx.get_edge_attributes(self.G, 'weight').values()
-        nx.draw(self.G, self.pos, node_color=self.nodecolor, with_labels=True, edge_color = weights, edge_cmap=plt.cm.RdBu_r)
-        plt.pause(1)
-        plt.close()
+    # def visualize_matplotlib(self):
+    #     self.colorize()
+    #     weights = nx.get_edge_attributes(self.G, 'weight').values()
+    #     nx.draw(self.G, self.pos, node_color=self.nodecolor, with_labels=True, edge_color = weights, edge_cmap=plt.cm.RdBu_r)
+    #     plt.pause(1)
+    #     plt.close()
 
     def main(self):
-        self.visualize_plotly()
+        self.visualize_plotly(name="C")
         # self.colorize(default=False)
         # self.visualize()
         # self.update_lower_layer_status()
@@ -312,4 +319,3 @@ class GraphManager():
 if __name__=="__main__":
     cls=GraphManager()
     cls.main()
-    cls.update_graph()
