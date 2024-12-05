@@ -101,30 +101,33 @@ class Master(GraphManager,FuzzyReasoning,getConsistencyMtx,PseudoDataGenerator_A
 
 
     def draw_results(self):
-        for name in self.data_dict.keys():
-            fig_data=self.visualize_plotly(name=name)
-            self.fig_dict[name].append(fig_data)
-        
+        pass
         # anim
-        timestamps=self.data_dict[list(self.data_dict.keys())[0]]["timestamp"].values
-        for name in self.data_dict.keys():
-            self.visualize_animation(name,self.fig_dict[name],timestamps)
+        # timestamps=self.data_dict[list(self.data_dict.keys())[0]]["timestamp"].values
+        # for name in self.data_dict.keys():
+        #     self.visualize_animation(name,self.fig_dict[name],timestamps)
 
         # matplotlibの時系列波形
-        for i,id in enumerate(self.data_dict.keys()):
-            self.data=self.data_dict[id]
-            plt.plot(self.data["timestamp"],self.data[1000],label=id)
-        plt.xlabel("Time [s]")
-        plt.ylabel("Risk value")
-        plt.legend()
-        plt.grid()
-        plt.pause(1)
 
     def save(self):
         self.data_dir_dict=self.get_database_dir("NASK")
         self.trial_timestamp=self.get_timestamp()
         self.trial_dir_path=self.data_dir_dict["database_dir_path"]+"/"+self.trial_timestamp
         os.makedirs(self.trial_dir_path,exist_ok=True)
+
+        for i,name in enumerate(self.data_dict.keys()):
+            self.data=self.data_dict[name]
+            plt.plot(self.data["timestamp"],self.data[1000],label=name)
+        plt.xlabel("Time [s]")
+        plt.ylabel("Risk value")
+        plt.legend()
+        plt.grid()
+        plt.savefig(self.trial_dir_path+"/"+self.trial_timestamp+".jpg")
+        
+        for name in self.data_dict.keys():
+            fig_data=self.visualize_plotly(name=name)
+            self.fig_dict[name].append(fig_data)
+
         pickle_data={}
         for name in self.data_dict.keys():
             pickle_data[name]=self.graph_dict[name]["G"]

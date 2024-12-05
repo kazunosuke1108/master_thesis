@@ -276,12 +276,14 @@ class GraphManager():
             )
             node_traces.append(node_trace)
 
+
+
         # グラフを作成
         try:
             del fig
         except UnboundLocalError:
             pass
-        fig = go.Figure(data=node_traces+edge_traces)
+        fig = go.Figure(data=edge_traces+node_traces)
         fig.update_layout(
             showlegend=False,
             title=name,
@@ -317,7 +319,7 @@ class GraphManager():
             updatemenus=[{
                 'buttons': [
                     {
-                        'args': [None, {"frame": {"duration": 500, "redraw": True}, "fromcurrent": True}],
+                        'args': [None, {"frame": {"duration": 250, "redraw": True}, "fromcurrent": True}],
                         'label': 'Play',
                         'method': 'animate'
                     },
@@ -369,7 +371,7 @@ class GraphManager():
                 print(i)
                 fig.write_image(f"{trial_temp_dir_path}/{name}_{i:03d}.jpg",format='jpg', engine="auto")
             print("export")
-            self.jpg2mp4(sorted(glob(trial_temp_dir_path+"/*")),mp4_path=trial_dir_path+f"/{name}.mp4",fps=1)
+            self.jpg2mp4(sorted(glob(trial_temp_dir_path+"/*")),mp4_path=trial_dir_path+f"/{name}.mp4",fps=4)
         return frames
 
     def jpg2mp4(self,image_paths,mp4_path,size=(0,0),fps=30.0):

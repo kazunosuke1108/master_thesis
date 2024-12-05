@@ -33,8 +33,8 @@ class PseudoDataGenerator_ABC():
             interpolated_values = np.interp(data["timestamp"], x_values, y_values)
             data[col_name]=interpolated_values
         x_3002=np.array([
-            [0,0.2],
-            [8,0.2]
+            [0,0.4],
+            [8,0.4]
         ])
         x_5510=np.array([
             [0,0.2],
@@ -69,11 +69,12 @@ class PseudoDataGenerator_ABC():
             interpolated_values = np.interp(data["timestamp"], x_values, y_values)
             data[col_name]=interpolated_values
         x_3002=np.array([
-            [0,1],
-            [2,1],
+            [0,0.3],
+            [1,0.3],
+            [2,0.8],
             [4,0.5],
-            [6,0.25],
-            [8,1],
+            [6,0.7],
+            [8,0.3],
         ])
         x_5510=np.array([
             [0,0.4],
@@ -108,12 +109,12 @@ class PseudoDataGenerator_ABC():
             interpolated_values = np.interp(data["timestamp"], x_values, y_values)
             data[col_name]=interpolated_values
         x_3002=np.array([
-            [0,0.2],
-            [8,0.2]
+            [0,0.4],
+            [8,0.4]
         ])
         x_5510=np.array([
-            [0,0.6],
-            [8,0.6],
+            [0,0.9],
+            [8,0.9],
         ])
         x_5511=np.array([
             [0,0.4],
