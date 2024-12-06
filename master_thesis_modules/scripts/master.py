@@ -168,7 +168,7 @@ class Master(GraphManager,FuzzyReasoning,getConsistencyMtx,PseudoDataGenerator_A
         # animation
         timestamps=self.data_dict[list(self.data_dict.keys())[0]]["timestamp"].values
         for name in self.data_dict.keys():
-            self.visualize_animation(name,self.fig_dict[name],timestamps,show=True,save=False,trial_dir_path=self.trial_dir_path)
+            self.visualize_animation(name,self.fig_dict[name],timestamps,show=True,save=True,trial_dir_path=self.trial_dir_path)
 
 if __name__=="__main__":
     cls=Master()
