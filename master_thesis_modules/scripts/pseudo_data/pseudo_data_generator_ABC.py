@@ -155,7 +155,7 @@ class PseudoDataGenerator_ABC():
                     [8,5,2],
                 ])
                 return traj
-            elif name=="nurse":
+            elif name==5520:
                 traj=np.array([
                     [0,5,5],
                     [2,5,5],
@@ -164,19 +164,19 @@ class PseudoDataGenerator_ABC():
                     [8,5,5],
                 ])
                 return traj
-            elif name=="infusion":
+            elif name==5510:
                 traj=np.array([
                     [0,4.5,2.5],
                     [8,4.5,2.5],
                 ])
                 return traj
-            elif name=="wheelchair":
+            elif name==5511:
                 traj=np.array([
                     [0,1.8,2.1],
                     [8,1.8,2.1],
                 ])
                 return traj
-            elif name=="handrail":
+            elif name==5512:
                 traj=np.array([
                     [0,6,3],
                     [8,6,3],
@@ -195,21 +195,49 @@ class PseudoDataGenerator_ABC():
         
         # 
         surroundings_position_dict={}
-        surroundings=["nurse","infusion","wheelchair","handrail"]
+        surroundings=[5520,5510,5511,5512]
         for name in surroundings:
             surrounding_data=pd.DataFrame(self.t,columns=["timestamp"])
             surrounding_data["x"]=self.add_risk_curve(surrounding_data,feature_points=get_sparse_traj(name)[:,[0,1]],col_name="x").values[:,1]
             surrounding_data["y"]=self.add_risk_curve(surrounding_data,feature_points=get_sparse_traj(name)[:,[0,2]],col_name="y").values[:,2]
             surroundings_position_dict[name]=surrounding_data
             del surrounding_data
-        ic(patients_position_dict)
-        ic(surroundings_position_dict)
+        return patients_position_dict,surroundings_position_dict
 
+    def position_to_features(self,patients_position_dict,surroundings_position_dict):
+        def membership_distance(distance):
+            max_val=7
+            if distance>7:
+                return 1
+            else:
+                return distance/7
+        def membership_view(theta):
+            if theta>90:
+                return 1
+            else:
+                return theta/90
+        for patient_name in patients_position_dict.keys():
+            for surrounding_name in surroundings_position_dict.keys():
+                # print(patients_position_dict[patient_name].loc[:,"x"]-surroundings_position_dict[surrounding_name].loc[:,"x"])
+                distance2=(patients_position_dict[patient_name].loc[:,"x"]-surroundings_position_dict[surrounding_name].loc[:,"x"])**2+ \
+                    (patients_position_dict[patient_name].loc[:,"y"]-surroundings_position_dict[surrounding_name].loc[:,"y"])**2
+                distance=np.sqrt(distance2)
+                print(surrounding_name)
+                if surrounding_name==5512:
+                    self.data_dict[patient_name][surrounding_name]=1-np.array(list(map(membership_distance,distance)))
+                else:
+                    self.data_dict[patient_name][surrounding_name]=np.array(list(map(membership_distance,distance)))
+                    ic(self.data_dict[patient_name][surrounding_name])
+                if surrounding_name==5520: # 看護師の距離を算出済みの場合
+                    # 間隔
+                    pass
+        pass
 
         
 
 if __name__=="__main__":
     cls=PseudoDataGenerator_ABC()
-    cls.input_position_history()
+    patients_position_dict,surroundings_position_dict=cls.input_position_history()
+    cls.position_to_features(patients_position_dict,surroundings_position_dict)
     # cls.define_observed_values()
     pass
