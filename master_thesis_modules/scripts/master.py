@@ -25,6 +25,10 @@ class Master(GraphManager,FuzzyReasoning,getConsistencyMtx,PseudoDataGenerator_A
         for name in self.data_dict.keys():
             self.fig_dict[name]=[]
 
+        # params
+        self.active_thre=0.5
+        self.throttling=True
+
         # pseudo_dataが出来ていることを確認
         # pseudo_dataとgraph_dictのkey(A,B,C...)が合致しているか確認
         if len(list(self.data_dict.keys())) != len(list(self.graph_dict.keys())):
@@ -57,14 +61,32 @@ class Master(GraphManager,FuzzyReasoning,getConsistencyMtx,PseudoDataGenerator_A
         for i,_ in list(self.data_dict.values())[0].iterrows():
             # 5000->4000 (AHP)
             for name in self.data_dict.keys():
-                ## 551系
-                w_vector=np.array([self.get_left_weight(name=name,node=key) for key in self.graph_dict[name]["G"].nodes() if str(551) in str(key)])
-                x_vector=self.data_dict[name].loc[i,[key for key in self.graph_dict[name]["G"].nodes() if str(551) in str(key)]].values
-                self.data_dict[name].loc[i,4051]=w_vector@x_vector
-                ## 552系
-                w_vector=np.array([self.get_left_weight(name=name,node=key) for key in self.graph_dict[name]["G"].nodes() if str(552) in str(key)])
-                x_vector=self.data_dict[name].loc[i,[key for key in self.graph_dict[name]["G"].nodes() if str(552) in str(key)]].values
-                self.data_dict[name].loc[i,4052]=w_vector@x_vector
+                # 前iterationの1000がthre以上だった場合にのみ推論
+                if i==0 or not(self.throttling):
+                    ## 551系
+                    w_vector=np.array([self.get_left_weight(name=name,node=key) for key in self.graph_dict[name]["G"].nodes() if str(551) in str(key)])
+                    x_vector=self.data_dict[name].loc[i,[key for key in self.graph_dict[name]["G"].nodes() if str(551) in str(key)]].values
+                    self.data_dict[name].loc[i,4051]=w_vector@x_vector
+                    ## 552系
+                    w_vector=np.array([self.get_left_weight(name=name,node=key) for key in self.graph_dict[name]["G"].nodes() if str(552) in str(key)])
+                    x_vector=self.data_dict[name].loc[i,[key for key in self.graph_dict[name]["G"].nodes() if str(552) in str(key)]].values
+                    self.data_dict[name].loc[i,4052]=w_vector@x_vector
+                    self.data_dict[name].loc[i,"active"]=1
+                elif self.data_dict[name].loc[i-1,1000]>=self.active_thre:
+                    ## 551系
+                    w_vector=np.array([self.get_left_weight(name=name,node=key) for key in self.graph_dict[name]["G"].nodes() if str(551) in str(key)])
+                    x_vector=self.data_dict[name].loc[i,[key for key in self.graph_dict[name]["G"].nodes() if str(551) in str(key)]].values
+                    self.data_dict[name].loc[i,4051]=w_vector@x_vector
+                    ## 552系
+                    w_vector=np.array([self.get_left_weight(name=name,node=key) for key in self.graph_dict[name]["G"].nodes() if str(552) in str(key)])
+                    x_vector=self.data_dict[name].loc[i,[key for key in self.graph_dict[name]["G"].nodes() if str(552) in str(key)]].values
+                    self.data_dict[name].loc[i,4052]=w_vector@x_vector
+                    self.data_dict[name].loc[i,"active"]=1
+                else:
+                    self.data_dict[name].loc[i,4051]=self.data_dict[name].loc[i-1,4051]
+                    self.data_dict[name].loc[i,4052]=self.data_dict[name].loc[i-1,4052]
+                    self.data_dict[name].loc[i,"active"]=0
+
 
             # 4000->3000 (Fuzzy reasoning)
             for name in self.data_dict.keys():
@@ -93,6 +115,7 @@ class Master(GraphManager,FuzzyReasoning,getConsistencyMtx,PseudoDataGenerator_A
             for name in list(self.data_dict.keys()):
                 new_score_dict=self.data_dict[name].iloc[i].to_dict()
                 del new_score_dict["timestamp"]
+                del new_score_dict["active"]
                 self.update_score(name=name,new_score_dict=new_score_dict)
             
             for name in self.data_dict.keys():
@@ -145,7 +168,7 @@ class Master(GraphManager,FuzzyReasoning,getConsistencyMtx,PseudoDataGenerator_A
         # animation
         timestamps=self.data_dict[list(self.data_dict.keys())[0]]["timestamp"].values
         for name in self.data_dict.keys():
-            self.visualize_animation(name,self.fig_dict[name],timestamps,show=True,save=True,trial_dir_path=self.trial_dir_path)
+            self.visualize_animation(name,self.fig_dict[name],timestamps,show=True,save=False,trial_dir_path=self.trial_dir_path)
 
 if __name__=="__main__":
     cls=Master()
