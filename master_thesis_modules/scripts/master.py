@@ -32,7 +32,7 @@ class Master(GraphManager,FuzzyReasoning,getConsistencyMtx,PseudoDataGenerator_A
         # params
         self.active_thre=0.5
         self.throttling=False
-        self.data_from_position=False
+        self.data_from_position=True
 
         # pseudo_dataが出来ていることを確認
         # pseudo_dataとgraph_dictのkey(A,B,C...)が合致しているか確認
@@ -184,7 +184,7 @@ class Master(GraphManager,FuzzyReasoning,getConsistencyMtx,PseudoDataGenerator_A
         # animation
         timestamps=self.data_dict[list(self.data_dict.keys())[0]]["timestamp"].values
         for name in self.data_dict.keys():
-            self.visualize_animation(name,self.fig_dict[name],timestamps,show=True,save=False,trial_dir_path=self.trial_dir_path)
+            self.visualize_animation(name,self.fig_dict[name],timestamps,show=True,save=True,trial_dir_path=self.trial_dir_path)
 
         # 位置データ
         if self.data_from_position:

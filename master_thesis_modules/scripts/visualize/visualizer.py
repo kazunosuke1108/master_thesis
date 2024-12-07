@@ -17,8 +17,8 @@ from scripts.master import Master
 class Visualizer(Master):
     def __init__(self):
         super().__init__()
-        visualize_dir_path=sorted(glob(self.get_database_dir(strage="NASK")["database_dir_path"]+"/*"))[-1]
-        self.data_paths=sorted(glob(visualize_dir_path+"/*"))
+        self.visualize_dir_path=sorted(glob(self.get_database_dir(strage="NASK")["database_dir_path"]+"/*"))[-1]
+        self.data_paths=sorted(glob(self.visualize_dir_path+"/*"))
         
         pass
 
@@ -61,15 +61,15 @@ class Visualizer(Master):
         fig.update_layout(
             scene_camera=camera,  # カメラの視点を設定
             scene=dict(
-                xaxis=dict(title='X'),
-                yaxis=dict(title='Y'),
-                zaxis=dict(title='UnixTime [s]')
+                xaxis=dict(title='X',tickfont=dict(family="Times New Roman",size=18)),
+                yaxis=dict(title='Y',tickfont=dict(family="Times New Roman",size=18)),
+                zaxis=dict(title='UnixTime [s]',tickfont=dict(family="Times New Roman",size=18)),
             )
         )
         return fig
 
     def draw_positions(self):
-        csv_paths=[path for path in self.data_paths if (("position" in path) and (".csv" in path))]
+        csv_paths=[path for path in self.data_paths if (("position" in os.path.basename(path)) and (".csv" in os.path.basename(path)))]
         plot_data=[]
 
         for csv_path in csv_paths:
@@ -83,11 +83,12 @@ class Visualizer(Master):
                 scene_aspectratio=dict(x=5, y=5, z=3),
                 
             )
+        fig.to_html(self.visualize_dir_path+"/positions.html")
         fig.show()
         pass
 
     def draw_features(self):
-        csv_paths=[path for path in self.data_paths if (("feature" in path) and (".csv" in path))]
+        csv_paths=[path for path in self.data_paths if (("feature" in os.path.basename(path)) and (".csv" in os.path.basename(path)))]
         plot_data=[]
 
         for csv_path in csv_paths:
@@ -116,20 +117,21 @@ class Visualizer(Master):
                     text=f"Person: {name}  feature values"
                 ),
             )
-            fig.update_xaxes(title_text="Time [s]",row=len(categories)+1,col=1)
+            fig.update_xaxes(title=dict(text="Time [s]",font=dict(family="Times New Roman",size=18)),row=len(categories),col=1,)
             for i in range(len(categories)):
                 fig.update_yaxes(
-                    title_text=f"Features {categories[i]}",
+                    title=dict(text=f"Features {categories[i]}",font=dict(family="Times New Roman",size=18)),
                     range=[-0.1,1.1],
                     row=i+1,
                     col=1,
                     )
+            fig.write_html(self.visualize_dir_path+f"/features_{name}.html")
             fig.show()
 
         pass
     
     def draw_weight(self):
-        csv_paths=[path for path in self.data_paths if (("weight" in path) and (".csv" in path))]
+        csv_paths=[path for path in self.data_paths if (("weight" in os.path.basename(path)) and (".csv" in os.path.basename(path)))]
         plot_data=[]
 
         for csv_path in csv_paths:
@@ -159,14 +161,15 @@ class Visualizer(Master):
                 ),
 
             )
-            fig.update_xaxes(title_text="Time [s]",row=len(categories)+1,col=1)
+            fig.update_xaxes(title=dict(text="Time [s]",font=dict(family="Times New Roman",size=18)),row=len(categories),col=1,)
             for i in range(len(categories)):
                 fig.update_yaxes(
-                    title_text=f"Weights {categories[i]}",
+                    title=dict(text=f"Weights {categories[i]}",font=dict(family="Times New Roman",size=18)),
                     range=[-0.1,1.1],
                     row=i+1,
                     col=1,
                     )
+            fig.write_html(self.visualize_dir_path+f"/weights_{name}.html")
             fig.show()
 
         pass
@@ -177,7 +180,7 @@ class Visualizer(Master):
 
 if __name__=="__main__":
     cls=Visualizer()
-    # cls.draw_positions()
-    # cls.draw_features()
+    cls.draw_positions()
+    cls.draw_features()
     cls.draw_weight()
     pass
