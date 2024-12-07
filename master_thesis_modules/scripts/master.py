@@ -1,4 +1,8 @@
 import os
+import sys
+sys.path.append(".")
+sys.path.append("..")
+sys.path.append(os.path.expanduser("~")+"/kazu_ws/master_thesis/master_thesis_modules")
 
 from icecream import ic
 import numpy as np
@@ -8,12 +12,12 @@ import networkx as nx
 import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec
 
-from network.graph_manager import GraphManager
-from fuzzy.fuzzy_reasoning import FuzzyReasoning
-from AHP.get_comparison_mtx import getConsistencyMtx
-from pseudo_data.pseudo_data_generator_ABC import PseudoDataGenerator_ABC
-from entropy.entropy_weight_generator import EntropyWeightGenerator
-from management.manager import Manager
+from scripts.network.graph_manager import GraphManager
+from scripts.fuzzy.fuzzy_reasoning import FuzzyReasoning
+from scripts.AHP.get_comparison_mtx import getConsistencyMtx
+from scripts.pseudo_data.pseudo_data_generator_ABC import PseudoDataGenerator_ABC
+from scripts.entropy.entropy_weight_generator import EntropyWeightGenerator
+from scripts.management.manager import Manager
 
 
 class Master(GraphManager,FuzzyReasoning,getConsistencyMtx,PseudoDataGenerator_ABC,EntropyWeightGenerator,Manager):
@@ -27,7 +31,8 @@ class Master(GraphManager,FuzzyReasoning,getConsistencyMtx,PseudoDataGenerator_A
 
         # params
         self.active_thre=0.5
-        self.throttling=True
+        self.throttling=False
+        self.data_from_position=False
 
         # pseudo_dataが出来ていることを確認
         # pseudo_dataとgraph_dictのkey(A,B,C...)が合致しているか確認
@@ -35,8 +40,9 @@ class Master(GraphManager,FuzzyReasoning,getConsistencyMtx,PseudoDataGenerator_A
             raise Exception("擬似データの被験者数とグラフの被験者数が合致しません")
         
         # 位置から作る模擬データ
-        # patients_position_dict,surroundings_position_dict=self.input_position_history()
-        # self.position_to_features(patients_position_dict,surroundings_position_dict)
+        if self.data_from_position:
+            self.patients_position_dict,self.surroundings_position_dict=self.input_position_history()
+            self.position_to_features(self.patients_position_dict,self.surroundings_position_dict)
 
         # 重みの編集
         ## lv.4 -> 5 (AHP)
@@ -162,12 +168,12 @@ class Master(GraphManager,FuzzyReasoning,getConsistencyMtx,PseudoDataGenerator_A
         self.write_picklelog(output_dict=pickle_data,picklepath=pickle_path)
 
         for name in self.data_dict.keys():
-            self.data_dict[name].to_csv(self.trial_dir_path+"/"+self.trial_timestamp+"feature_"+name+".csv",index=False)
+            self.data_dict[name].to_csv(self.trial_dir_path+"/"+self.trial_timestamp+"_feature_"+name+".csv",index=False)
         
         # weightの書き出し
         for name in self.graph_dict.keys():
             self.graph_dict[name]["weight_history"]["timestamp"]=self.data_dict[name]["timestamp"].values
-            self.graph_dict[name]["weight_history"].to_csv(self.trial_dir_path+"/"+self.trial_timestamp+"weight_"+name+".csv",index=False)
+            self.graph_dict[name]["weight_history"].to_csv(self.trial_dir_path+"/"+self.trial_timestamp+"_weight_"+name+".csv",index=False)
 
         json_data=self.graph_dict
         for name in self.data_dict.keys():
@@ -179,6 +185,13 @@ class Master(GraphManager,FuzzyReasoning,getConsistencyMtx,PseudoDataGenerator_A
         timestamps=self.data_dict[list(self.data_dict.keys())[0]]["timestamp"].values
         for name in self.data_dict.keys():
             self.visualize_animation(name,self.fig_dict[name],timestamps,show=True,save=False,trial_dir_path=self.trial_dir_path)
+
+        # 位置データ
+        if self.data_from_position:
+            for name in self.patients_position_dict.keys():
+                self.patients_position_dict[name].to_csv(self.trial_dir_path+"/"+self.trial_timestamp+"_position_"+str(name)+".csv",index=False)
+            for name in self.surroundings_position_dict.keys():
+                self.surroundings_position_dict[name].to_csv(self.trial_dir_path+"/"+self.trial_timestamp+"_position_"+str(name)+".csv",index=False)
 
         
 
