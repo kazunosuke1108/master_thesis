@@ -244,7 +244,7 @@ class PseudoDataGenerator_ABC():
                     theta=np.array(list(map(get_theta,object_vel,relative_pos)))
                     self.data_dict[patient_name][5521]=np.array(list(map(membership_view,theta)))
                     self.data_dict[patient_name][5521].fillna(value=0,inplace=True)
-                    ic(self.data_dict[patient_name])
+                    
         pass
 
         

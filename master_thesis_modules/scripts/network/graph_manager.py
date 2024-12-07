@@ -4,6 +4,7 @@ from icecream import ic
 import copy
 import numpy as np
 import networkx as nx
+import pandas as pd
 
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
@@ -153,16 +154,30 @@ class GraphManager():
                 5522:1/3,
             },
         }
-
+        weight_history={}
+        for node_from in self.weight_dict.keys():
+            for node_to in self.weight_dict[node_from].keys():
+                weight_history[node_to]=self.weight_dict[node_from][node_to]
+        self.weight_history=pd.DataFrame(weight_history,index=[0])
+        ic(self.weight_history)
 
         self.graph_dict={
-            "A":{"G":"","node_dict":copy.deepcopy(self.node_dict),"weight_dict":copy.deepcopy(self.weight_dict),"pos":""},
-            "B":{"G":"","node_dict":copy.deepcopy(self.node_dict),"weight_dict":copy.deepcopy(self.weight_dict),"pos":""},
-            "C":{"G":"","node_dict":copy.deepcopy(self.node_dict),"weight_dict":copy.deepcopy(self.weight_dict),"pos":""},
+            "A":{"G":"","node_dict":copy.deepcopy(self.node_dict),"weight_dict":copy.deepcopy(self.weight_dict),"weight_history":copy.deepcopy(self.weight_history),"pos":""},
+            "B":{"G":"","node_dict":copy.deepcopy(self.node_dict),"weight_dict":copy.deepcopy(self.weight_dict),"weight_history":copy.deepcopy(self.weight_history),"pos":""},
+            "C":{"G":"","node_dict":copy.deepcopy(self.node_dict),"weight_dict":copy.deepcopy(self.weight_dict),"weight_history":copy.deepcopy(self.weight_history),"pos":""},
         }
         for name in self.graph_dict.keys():
             self.define_graph(name)
     
+    def add_weight_history(self,weight_history,weight_dict,timestamp=0):
+        flattened_weight_dict={}
+        for node_from in weight_dict.keys():
+            for node_to in weight_dict[node_from].keys():
+                flattened_weight_dict[node_to]=weight_dict[node_from][node_to]
+        added_weight=pd.DataFrame(flattened_weight_dict,index=[0]).values
+        weight_history.loc[timestamp]=list(added_weight.flatten())
+        return weight_history
+
     def define_graph(self,name):
         self.graph_dict[name]["G"] = nx.Graph()
         # node定義
@@ -190,11 +205,12 @@ class GraphManager():
             self.graph_dict[name]["node_dict"][node_code]["score"]=score
         self.define_graph(name)
 
-    def update_weight(self,name,new_weight_dict):
+    def update_weight(self,name,new_weight_dict,timestamp):
         for node_from in new_weight_dict.keys():
             for node_to in new_weight_dict[node_from].keys():
                 self.graph_dict[name]["weight_dict"][node_from][node_to]=new_weight_dict[node_from][node_to]
         self.define_graph(name)
+        self.graph_dict[name]["weight_history"]=self.add_weight_history(weight_history=self.graph_dict[name]["weight_history"],weight_dict=self.graph_dict[name]["weight_dict"],timestamp=timestamp)
     
     def update_lower_layer_status(self,name,new_status="active"):
         for node in self.graph_dict[name]["G"].nodes():

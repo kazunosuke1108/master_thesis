@@ -33,6 +33,10 @@ class Master(GraphManager,FuzzyReasoning,getConsistencyMtx,PseudoDataGenerator_A
         # pseudo_dataとgraph_dictのkey(A,B,C...)が合致しているか確認
         if len(list(self.data_dict.keys())) != len(list(self.graph_dict.keys())):
             raise Exception("擬似データの被験者数とグラフの被験者数が合致しません")
+        
+        # 位置から作る模擬データ
+        # patients_position_dict,surroundings_position_dict=self.input_position_history()
+        # self.position_to_features(patients_position_dict,surroundings_position_dict)
 
         # 重みの編集
         ## lv.4 -> 5 (AHP)
@@ -41,13 +45,13 @@ class Master(GraphManager,FuzzyReasoning,getConsistencyMtx,PseudoDataGenerator_A
         A_551,eigvals,eigvecs,max_eigval,weights_551,CI_551=self.get_AHP_weight(criteria=[5510,5511,5512],comparison_answer=[7,9,5])
         new_weight_dict={4051:{criterion:w for criterion,w in zip(criteria,weights_551)}}
         for name in self.graph_dict.keys():
-            self.update_weight(name=name,new_weight_dict=new_weight_dict)
+            self.update_weight(name=name,new_weight_dict=new_weight_dict,timestamp=self.data_dict[name].loc[0,"timestamp"])
         ### 552
         criteria=[5520,5521,5522]
         A_552,eigvals,eigvecs,max_eigval,weights_552,CI_552=self.get_AHP_weight(criteria=[5520,5521,5522],comparison_answer=[3,9,3])
         new_weight_dict={4052:{criterion:w for criterion,w in zip(criteria,weights_552)}}
         for name in self.graph_dict.keys():
-            self.update_weight(name=name,new_weight_dict=new_weight_dict)
+            self.update_weight(name=name,new_weight_dict=new_weight_dict,timestamp=self.data_dict[name].loc[0,"timestamp"])
         ## lv.3 -> 4 (Fuzzy)
         ### 重み不要
         ## lv.2 -> 3 (Entropy)
@@ -102,7 +106,7 @@ class Master(GraphManager,FuzzyReasoning,getConsistencyMtx,PseudoDataGenerator_A
             w_source_data=w_source_data.T[[key for key in self.graph_dict[name]["G"].nodes() if str(300) in str(key)]]
             w_dict={2000:self.get_entropy_weight(w_source_data)}
             for i2,name in enumerate(self.data_dict.keys()):
-                self.update_weight(name=name,new_weight_dict=w_dict)
+                self.update_weight(name=name,new_weight_dict=w_dict,timestamp=self.data_dict[name].loc[i,"timestamp"])
                 w_vector=np.array([self.get_left_weight(name=name,node=key) for key in self.graph_dict[name]["G"].nodes() if str(300) in str(key)])
                 x_vector=self.data_dict[name].loc[i,[key for key in self.graph_dict[name]["G"].nodes() if str(300) in str(key)]].values
                 self.data_dict[name].loc[i,2000]=w_vector@x_vector
@@ -158,17 +162,25 @@ class Master(GraphManager,FuzzyReasoning,getConsistencyMtx,PseudoDataGenerator_A
         self.write_picklelog(output_dict=pickle_data,picklepath=pickle_path)
 
         for name in self.data_dict.keys():
-            self.data_dict[name].to_csv(self.trial_dir_path+"/"+self.trial_timestamp+"_"+name+".csv",index=False)
+            self.data_dict[name].to_csv(self.trial_dir_path+"/"+self.trial_timestamp+"feature_"+name+".csv",index=False)
+        
+        # weightの書き出し
+        for name in self.graph_dict.keys():
+            self.graph_dict[name]["weight_history"]["timestamp"]=self.data_dict[name]["timestamp"].values
+            self.graph_dict[name]["weight_history"].to_csv(self.trial_dir_path+"/"+self.trial_timestamp+"weight_"+name+".csv",index=False)
 
         json_data=self.graph_dict
         for name in self.data_dict.keys():
             del json_data[name]["G"]
+            del json_data[name]["weight_history"]
         self.write_json(json_data,self.trial_dir_path+"/"+self.trial_timestamp+".json")
 
         # animation
         timestamps=self.data_dict[list(self.data_dict.keys())[0]]["timestamp"].values
         for name in self.data_dict.keys():
-            self.visualize_animation(name,self.fig_dict[name],timestamps,show=True,save=True,trial_dir_path=self.trial_dir_path)
+            self.visualize_animation(name,self.fig_dict[name],timestamps,show=True,save=False,trial_dir_path=self.trial_dir_path)
+
+        
 
 if __name__=="__main__":
     cls=Master()
