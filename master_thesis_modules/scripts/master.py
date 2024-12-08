@@ -14,13 +14,14 @@ from matplotlib.gridspec import GridSpec
 
 from scripts.network.graph_manager import GraphManager
 from scripts.fuzzy.fuzzy_reasoning import FuzzyReasoning
+from scripts.fuzzy.fuzzy_control import FuzzyControl
 from scripts.AHP.get_comparison_mtx import getConsistencyMtx
 from scripts.pseudo_data.pseudo_data_generator_ABC import PseudoDataGenerator_ABC
 from scripts.entropy.entropy_weight_generator import EntropyWeightGenerator
 from scripts.management.manager import Manager
 
 
-class Master(GraphManager,FuzzyReasoning,getConsistencyMtx,PseudoDataGenerator_ABC,EntropyWeightGenerator,Manager):
+class Master(GraphManager,FuzzyReasoning,FuzzyControl,getConsistencyMtx,PseudoDataGenerator_ABC,EntropyWeightGenerator,Manager):
     def __init__(self):
         super().__init__()
         # 格納庫
@@ -31,7 +32,7 @@ class Master(GraphManager,FuzzyReasoning,getConsistencyMtx,PseudoDataGenerator_A
 
         # params
         self.active_thre=0.5
-        self.throttling_method=True # "off","thre","fuzzy_ctrl"
+        self.throttling_method="fuzzy_ctrl" # "off","thre","fuzzy_ctrl"
         self.data_from_position=True
 
         # pseudo_dataが出来ていることを確認
@@ -68,20 +69,12 @@ class Master(GraphManager,FuzzyReasoning,getConsistencyMtx,PseudoDataGenerator_A
         #     self.visualize_plotly(name=name)
 
     def main(self):
-        def evaluate_4000():
-            ## 551系
-            w_vector=np.array([self.get_left_weight(name=name,node=key) for key in self.graph_dict[name]["G"].nodes() if str(551) in str(key)])
-            x_vector=self.data_dict[name].loc[i,[key for key in self.graph_dict[name]["G"].nodes() if str(551) in str(key)]].values
-            self.data_dict[name].loc[i,4051]=w_vector@x_vector
-            ## 552系
-            w_vector=np.array([self.get_left_weight(name=name,node=key) for key in self.graph_dict[name]["G"].nodes() if str(552) in str(key)])
-            x_vector=self.data_dict[name].loc[i,[key for key in self.graph_dict[name]["G"].nodes() if str(552) in str(key)]].values
-            self.data_dict[name].loc[i,4052]=w_vector@x_vector
-            self.data_dict[name].loc[i,"active"]=1
         for i,_ in list(self.data_dict.values())[0].iterrows():
             # 5000->4000 (AHP)
             for name in self.data_dict.keys():
-                if self.throttling_method=="off":
+                if i==0:
+                    self.data_dict[name].loc[i,"active"]=1
+                elif self.throttling_method=="off":
                     self.data_dict[name].loc[i,"active"]=1
                 elif self.throttling_method=="thre":
                     # 閾値throttlingの場合，ここでi行目が評価すべきものなのか判断
@@ -92,11 +85,16 @@ class Master(GraphManager,FuzzyReasoning,getConsistencyMtx,PseudoDataGenerator_A
                         self.data_dict[name].loc[i,"active"]=1
                     else:
                         self.data_dict[name].loc[i,"active"]=0
-                elif self.throttling_method=="fuzzy_ctrl":
-                    pass
 
                 if self.data_dict[name].loc[i,"active"]>0.5:
-                    evaluate_4000()
+                    ## 551系
+                    w_vector=np.array([self.get_left_weight(name=name,node=key) for key in self.graph_dict[name]["G"].nodes() if str(551) in str(key)])
+                    x_vector=self.data_dict[name].loc[i,[key for key in self.graph_dict[name]["G"].nodes() if str(551) in str(key)]].values
+                    self.data_dict[name].loc[i,4051]=w_vector@x_vector
+                    ## 552系
+                    w_vector=np.array([self.get_left_weight(name=name,node=key) for key in self.graph_dict[name]["G"].nodes() if str(552) in str(key)])
+                    x_vector=self.data_dict[name].loc[i,[key for key in self.graph_dict[name]["G"].nodes() if str(552) in str(key)]].values
+                    self.data_dict[name].loc[i,4052]=w_vector@x_vector
                 else:
                     self.data_dict[name].loc[i,4051]=self.data_dict[name].loc[i-1,4051]
                     self.data_dict[name].loc[i,4052]=self.data_dict[name].loc[i-1,4052]
@@ -126,6 +124,16 @@ class Master(GraphManager,FuzzyReasoning,getConsistencyMtx,PseudoDataGenerator_A
             for i2,name in enumerate(self.data_dict.keys()):
                 self.data_dict[name].loc[i,1000]=self.data_dict[name].loc[i,2000]
 
+            # FPSをfuzzy制御する場合，ここで次の評価のタイミングを決める
+            if self.throttling_method=="fuzzy_ctrl":
+                for name in self.data_dict.keys():
+                    if self.data_dict[name].loc[i,"active"]>0.5:
+                        dfps=self.get_control_input(data=self.data_dict[name],i=i,evaluate_col=1000)
+                        new_fps=self.data_dict[name].loc[i,"fps"]+dfps
+                        ic(name,i,self.data_dict[name].loc[i,1000],dfps,new_fps)
+                        new_fps=np.clip(new_fps,self.fps_clip_dict["min"],self.fps_clip_dict["max"])
+                        self.data_dict[name]=self.update_active(self.data_dict[name],i,new_fps)
+            
             # scoreをグラフに反映
             for name in list(self.data_dict.keys()):
                 new_score_dict=self.data_dict[name].iloc[i].to_dict()
@@ -178,6 +186,8 @@ class Master(GraphManager,FuzzyReasoning,getConsistencyMtx,PseudoDataGenerator_A
         
         # weightの書き出し
         for name in self.graph_dict.keys():
+            ic(self.graph_dict[name]["weight_history"])
+            ic(self.data_dict[name].iloc[-1])
             self.graph_dict[name]["weight_history"]["timestamp"]=self.data_dict[name]["timestamp"].values
             self.graph_dict[name]["weight_history"].to_csv(self.trial_dir_path+"/"+self.trial_timestamp+"_weight_"+name+".csv",index=False)
 

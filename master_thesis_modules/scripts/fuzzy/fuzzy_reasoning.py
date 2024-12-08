@@ -10,7 +10,7 @@ class FuzzyReasoning():
         pass
 
     def define_rules(self):
-        self.rule_dict={
+        self.reasoning_rule_dict={
             405:{
                 405.1:{
                     "conditions":{4051:"up",4052:"up"},
@@ -58,12 +58,12 @@ class FuzzyReasoning():
     def calculate_fuzzy(self,values={4051:0.2,4052:0.6}):
         rule_id=int(str(list(values.keys())[0])[:3])
         reasoning_result=0
-        for proposition_id in self.rule_dict[rule_id]:
+        for proposition_id in self.reasoning_rule_dict[rule_id]:
             height=1
-            for condition in self.rule_dict[rule_id][proposition_id]["conditions"].keys():
-                h=self.membership_func(x=values[condition],type=self.rule_dict[rule_id][proposition_id]["conditions"][condition])
+            for condition in self.reasoning_rule_dict[rule_id][proposition_id]["conditions"].keys():
+                h=self.membership_func(x=values[condition],type=self.reasoning_rule_dict[rule_id][proposition_id]["conditions"][condition])
                 height=height*h
-            peak,height=self.triangle_func(height,result=self.rule_dict[rule_id][proposition_id]["result"])
+            peak,height=self.triangle_func(height,result=self.reasoning_rule_dict[rule_id][proposition_id]["result"])
             # ic(peak,height)
             reasoning_result+=peak*height
         return reasoning_result

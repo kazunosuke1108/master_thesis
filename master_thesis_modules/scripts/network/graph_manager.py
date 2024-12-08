@@ -101,7 +101,7 @@ class GraphManager():
             5520:{
                 "score":np.nan,
                 "status":"inactive",
-                "description":"スタッフのが遠方"
+                "description":"スタッフが遠方"
                 },
             5521:{
                 "score":np.nan,

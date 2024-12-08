@@ -11,7 +11,7 @@ class FuzzyControl():
         pass
 
     def define_control_rules(self):
-        self.rule_dict={# self.rule_dict[s][ds]["result"] -> ans
+        self.control_rule_dict={# self.control_rule_dict[s][ds]["result"] -> ans
             "+":{
                 "+":{
                     "conditions":{"s":"+","ds":"+"},
@@ -60,59 +60,23 @@ class FuzzyControl():
             "o":{"min":1/3,"max":2/3},
             "+":{"min":2/3,"max":1},
         }
+        ds_threshold=0.2*0.25 # thre[/s]*dt[s]
         self.ds_thre_dict={
-            "-":{"min":-np.inf,"max":-0.2},
-            "o":{"min":-0.2,"max":0.2},
-            "+":{"min":0.2,"max":np.inf},
+            "-":{"min":-np.inf,"max":-ds_threshold},
+            "o":{"min":-ds_threshold,"max":ds_threshold},
+            "+":{"min":ds_threshold,"max":np.inf},
         }
         self.dfps_dict={
-            "--":-1,
-            "-":-0.5,
+            "--":-2,
+            "-":-1,
             "o":0,
-            "+":0.5,
-            "++":1,
+            "+":1,
+            "++":2,
         }
         self.fps_clip_dict={
             "min":0.25,
             "max":4,
         }
-
-    def membership_func(self,x,type="up"):
-        def up(x):
-            y=x
-            return y
-        def down(x):
-            y=1-x
-            return y
-        
-        if type=="up":
-            return up(x)
-        elif type=="down":
-            return down(x)
-    
-    def triangle_func(self,height,result):
-        if result=="low":
-            peak=0
-        elif result=="middle":
-            peak=0.5
-        elif result=="high":
-            peak=1
-        else:
-            raise KeyError
-        return (peak,height)
-    
-    def calculate_fuzzy(self,values={4051:0.2,4052:0.6}):
-        rule_id=int(str(list(values.keys())[0])[:3])
-        reasoning_result=0
-        for proposition_id in self.rule_dict[rule_id]:
-            height=1
-            for condition in self.rule_dict[rule_id][proposition_id]["conditions"].keys():
-                h=self.membership_func(x=values[condition],type=self.rule_dict[rule_id][proposition_id]["conditions"][condition])
-                height=height*h
-            peak,height=self.triangle_func(height,result=self.rule_dict[rule_id][proposition_id]["result"])
-            # ic(peak,height)
-            reasoning_result+=peak*height
-        return reasoning_result
 
     def get_control_input(self,data,i,evaluate_col=1000):
         s_value=data.loc[i,evaluate_col]
@@ -126,15 +90,17 @@ class FuzzyControl():
         for key in self.ds_thre_dict.keys():
             if (self.ds_thre_dict[key]["min"]<=ds_value) and (ds_value<=self.ds_thre_dict[key]["max"]):
                 ds=key
-        dfps=self.rule_dict[s][ds]["result"]
+        dfps=self.control_rule_dict[s][ds]["result"]
         dfps_value=self.dfps_dict[dfps]
         return dfps_value
     
     def update_active(self,data,i,fps):
-        next_timestamp=self.data.loc[i,"timestamp"]+1/fps
-        closest_index=np.argmin(abs(self.data["timestamp"]-next_timestamp))
+        next_timestamp=data.loc[i,"timestamp"]+1/fps
+        closest_index=np.argmin(abs(data["timestamp"]-next_timestamp))
+        if closest_index==-1:
+            raise Exception(f"何かおかしい: i={i} next_timestamp={next_timestamp} fps={fps}")
         data.loc[closest_index,"active"]=1
-        data.loc[i,"fps"]=fps
+        data.loc[closest_index,"fps"]=fps
         return data
     
 
@@ -147,7 +113,6 @@ class FuzzyControl():
         self.data["active"]=0
         self.data["fps"]=np.nan
         self.data.loc[0,"active"]=1
-        ic(self.data)
         for i in range(len(self.data)):
             if self.data.loc[i,"active"]==0:
                 continue
@@ -155,7 +120,6 @@ class FuzzyControl():
             fps+=dfps
             fps=np.clip(fps,self.fps_clip_dict["min"],self.fps_clip_dict["max"])
             self.data=self.update_active(self.data,i,fps)
-        ic(self.data)
 
 
 if __name__=="__main__":

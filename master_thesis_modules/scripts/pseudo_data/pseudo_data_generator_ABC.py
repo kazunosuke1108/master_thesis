@@ -8,9 +8,12 @@ class PseudoDataGenerator_ABC():
         self.t=np.arange(0,8.001,0.25)
         data=pd.DataFrame(self.t,columns=["timestamp"])
         columns=[1000,2000,2001,2002,3000,3001,3002,3003,3004,3005,4050,4051,4052,5510,5511,5512,5520,5521,5522]
-        columns=columns+["active"]
+        columns=columns+["active","fps"]
         for column in columns:
             data[column]=np.nan
+        data["active"]=0
+        data.loc[0,"active"]=1
+        data.loc[0,"fps"]=1
         
         # 無視するデータ群を指定
         killed_columns=[2001,2002,3000,3001,3003,3004,4050,5521,5522]
@@ -244,8 +247,6 @@ class PseudoDataGenerator_ABC():
                     theta=np.array(list(map(get_theta,object_vel,relative_pos)))
                     self.data_dict[patient_name][5521]=np.array(list(map(membership_view,theta)))
                     self.data_dict[patient_name][5521].fillna(value=0,inplace=True)
-                    
-        pass
 
         
 
