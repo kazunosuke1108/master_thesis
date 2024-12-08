@@ -95,10 +95,12 @@ class Master(GraphManager,FuzzyReasoning,FuzzyControl,getConsistencyMtx,PseudoDa
                     w_vector=np.array([self.get_left_weight(name=name,node=key) for key in self.graph_dict[name]["G"].nodes() if str(552) in str(key)])
                     x_vector=self.data_dict[name].loc[i,[key for key in self.graph_dict[name]["G"].nodes() if str(552) in str(key)]].values
                     self.data_dict[name].loc[i,4052]=w_vector@x_vector
+                    self.update_lower_layer_status(name=name,new_status="active")
                 else:
                     self.data_dict[name].loc[i,4051]=self.data_dict[name].loc[i-1,4051]
                     self.data_dict[name].loc[i,4052]=self.data_dict[name].loc[i-1,4052]
                     self.data_dict[name].loc[i,"active"]=0
+                    self.update_lower_layer_status(name=name,new_status="inactive")
 
 
             # 4000->3000 (Fuzzy reasoning)

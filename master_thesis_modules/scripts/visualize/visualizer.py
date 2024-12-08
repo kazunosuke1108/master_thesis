@@ -22,11 +22,12 @@ class Visualizer(Master):
         
         pass
 
-    def draw_timeseries(self,data,name):
-        try:
-            label_name=self.node_dict[int(name)]["description"]
-        except ValueError:
-            label_name=name
+    def draw_timeseries(self,data,name,label_name=""):
+        if label_name=="":
+            try:
+                label_name=self.node_dict[int(name)]["description"]
+            except ValueError:
+                label_name=name
         trace=go.Scatter(
             x=data["timestamp"],
             y=data[name],
@@ -67,6 +68,90 @@ class Visualizer(Master):
             )
         )
         return fig
+    
+    def customize_layout(self,fig):
+        fig.update_layout(
+                paper_bgcolor='white',  # 図全体の背景
+                plot_bgcolor='white',   # プロット領域の背景
+                title=dict(
+                    text=f"FPS"
+                ),
+                xaxis=dict(
+                    color='black',
+                    showgrid=True,  # グリッドを表示
+                    gridcolor='lightgray',  # グリッド線の色
+                    linecolor='black',  # 軸線の色
+                    ticks='outside',  # メモリを外側に
+                    tickwidth=1.5,  # メモリの太さ
+                    ticklen=5       # メモリの長さ
+                ),
+                yaxis=dict(
+                    color='black',
+                    showgrid=True,
+                    gridcolor='lightgray',
+                    linecolor='black',
+                    ticks='outside',
+                    tickwidth=1.5,
+                    ticklen=5
+                ),
+                legend=dict(
+                    bgcolor='white',  # 背景色
+                    bordercolor='black',  # 枠線の色
+                    borderwidth=1.5    # 枠線の太さ
+                ),
+                font=dict(
+                    family='Times New Roman',  # 推奨フォント
+                    size=18,  # フォントサイズ
+                    color='black'  # フォント色
+                ),
+                margin=dict(
+                    l=40,  # 左
+                    r=20,  # 右
+                    t=40,  # 上
+                    b=40   # 下
+                ),
+        )
+        return fig
+    
+    def customize_layouts(self,fig):
+        axises=[k for k in list(fig.to_dict()["layout"].keys()) if (("template" not in k) and ("title" not in k))]
+        fig.update_layout(
+                paper_bgcolor='white',  # 図全体の背景
+                plot_bgcolor='white',   # プロット領域の背景
+                title=dict(
+                    text=f"FPS"
+                ),
+                legend=dict(
+                    bgcolor='white',  # 背景色
+                    bordercolor='black',  # 枠線の色
+                    borderwidth=1.5    # 枠線の太さ
+                ),
+                font=dict(
+                    family='Times New Roman',  # 推奨フォント
+                    size=18,  # フォントサイズ
+                    color='black'  # フォント色
+                ),
+                margin=dict(
+                    l=40,  # 左
+                    r=20,  # 右
+                    t=40,  # 上
+                    b=40   # 下
+                ),
+        )
+        for axis in axises:
+            fig.update_layout({
+                axis:dict(
+                    color='black',
+                    showgrid=True,  # グリッドを表示
+                    gridcolor='lightgray',  # グリッド線の色
+                    linecolor='black',  # 軸線の色
+                    ticks='outside',  # メモリを外側に
+                    tickwidth=1.5,  # メモリの太さ
+                    ticklen=5       # メモリの長さ
+                    ),
+                }
+            )
+        return fig
 
     def draw_positions(self):
         csv_paths=[path for path in self.data_paths if (("position" in os.path.basename(path)) and (".csv" in os.path.basename(path)))]
@@ -83,6 +168,7 @@ class Visualizer(Master):
                 scene_aspectratio=dict(x=5, y=5, z=3),
                 
             )
+        fig=self.customize_layout(fig)
         fig.to_html(self.visualize_dir_path+"/positions.html")
         fig.show()
         pass
@@ -94,7 +180,7 @@ class Visualizer(Master):
         for csv_path in csv_paths:
             name=os.path.basename(csv_path)[:-4].split("_")[-1]
             data=pd.read_csv(csv_path,header=0)
-            nodes=[k for k in list(data.keys()) if (("timestamp" not in k) and ("active" not in k))]
+            nodes=[k for k in list(data.keys()) if (("timestamp" not in k) and ("active" not in k) and ("fps" not in k))]
             categories=sorted(list(set([str(k)[:3] for k in nodes])))
             
             plot_data=[[] for i in range(len(categories))]
@@ -125,6 +211,7 @@ class Visualizer(Master):
                     row=i+1,
                     col=1,
                     )
+            fig=self.customize_layouts(fig)
             fig.write_html(self.visualize_dir_path+f"/features_{name}.html")
             fig.show()
 
@@ -169,10 +256,27 @@ class Visualizer(Master):
                     row=i+1,
                     col=1,
                     )
+            fig=self.customize_layouts(fig)
             fig.write_html(self.visualize_dir_path+f"/weights_{name}.html")
             fig.show()
 
-        pass
+    def draw_fps(self):
+        csv_paths=[path for path in self.data_paths if (("feature" in os.path.basename(path)) and (".csv" in os.path.basename(path)))]
+        plot_data=[]
+        # plot_data=[[] for i in range(len(csv_paths))]
+
+        for i,csv_path in enumerate(csv_paths):
+            name=os.path.basename(csv_path)[:-4].split("_")[-1]
+            data=pd.read_csv(csv_path,header=0)
+            data["fps"].interpolate(method="ffill",inplace=True)
+            trace=self.draw_timeseries(data,name="fps",label_name=name)
+            plot_data.append(trace)
+        fig=go.Figure(data=plot_data)
+        fig=self.customize_layout(fig)
+        fig.update_xaxes(title=dict(text="Time [s]",font=dict(family="Times New Roman",size=18)))
+        fig.update_yaxes(title=dict(text="fps [/s]",font=dict(family="Times New Roman",size=18)))
+        fig.write_html(self.visualize_dir_path+f"/fps.html")
+        fig.show()
 
     def main(self):
         pass
@@ -182,4 +286,5 @@ if __name__=="__main__":
     cls.draw_positions()
     cls.draw_features()
     cls.draw_weight()
+    cls.draw_fps()
     pass

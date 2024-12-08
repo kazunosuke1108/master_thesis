@@ -159,7 +159,6 @@ class GraphManager():
             for node_to in self.weight_dict[node_from].keys():
                 weight_history[node_to]=self.weight_dict[node_from][node_to]
         self.weight_history=pd.DataFrame(weight_history,index=[0])
-        ic(self.weight_history)
 
         self.graph_dict={
             "A":{"G":"","node_dict":copy.deepcopy(self.node_dict),"weight_dict":copy.deepcopy(self.weight_dict),"weight_history":copy.deepcopy(self.weight_history),"pos":""},
@@ -232,19 +231,23 @@ class GraphManager():
     
     def visualize_plotly(self,name="A",show=False):
         # self.colorize()
+        symbol_dict={
+            1:"circle",
+            0:"x",
+            np.nan:"x",
+            "active":"circle",
+            "inactive":"x",
+        }
         # グラフの情報を取り出しておく
         nodes = self.graph_dict[name]["G"].nodes()
         pos = self.graph_dict[name]["pos"] # key: ノード番号, value: [x,y]
         weights = nx.get_edge_attributes(self.graph_dict[name]["G"], 'weight') # key:(node_from,node_to), value: weight
+        status = {n:self.graph_dict[name]["node_dict"][n]["status"] for n in nodes}
         scores = {n:self.graph_dict[name]["node_dict"][n]["score"] for n in nodes}# key: ノード番号, value: 特徴量
         descriptions = {n:self.graph_dict[name]["node_dict"][n]["description"] for n in nodes}
 
         # 色の準備
         cmap = cm.get_cmap('jet')
-
-        # # ノード描画データ
-        # node_x = [pos[node][0] for node in nodes]
-        # node_y = [pos[node][1] for node in nodes]
 
         # エッジ描画データ
         edge_traces=[]
@@ -284,15 +287,16 @@ class GraphManager():
                                 f"score: {np.round(scores[node],2)}<br>"+
                                 f"left weight: {previous_weight}<extra></extra>",
                 marker=dict(
+                    symbol=symbol_dict[status[node]],
                     size=30,
+                    line_color="black",
+                    line_width=2,
                     color=color,
                     showscale=False
                 ),
                 textposition="top center"
             )
             node_traces.append(node_trace)
-
-
 
         # グラフを作成
         try:
@@ -408,7 +412,7 @@ class GraphManager():
         video.release()
 
     def main(self):
-        self.visualize_plotly(name="C")
+        self.visualize_plotly(name="C",show=True)
         # self.colorize(default=False)
         # self.visualize()
         # self.update_lower_layer_status()
