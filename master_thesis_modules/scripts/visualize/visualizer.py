@@ -174,7 +174,6 @@ class Visualizer(Master):
 
         pass
 
-
     def main(self):
         pass
 

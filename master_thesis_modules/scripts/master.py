@@ -31,7 +31,7 @@ class Master(GraphManager,FuzzyReasoning,getConsistencyMtx,PseudoDataGenerator_A
 
         # params
         self.active_thre=0.5
-        self.throttling=False
+        self.throttling=True
         self.data_from_position=True
 
         # pseudo_dataが出来ていることを確認

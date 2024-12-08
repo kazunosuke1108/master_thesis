@@ -101,12 +101,12 @@ class GraphManager():
             5520:{
                 "score":np.nan,
                 "status":"inactive",
-                "description":"看護師の不在"
+                "description":"スタッフのが遠方"
                 },
             5521:{
                 "score":np.nan,
                 "status":"inactive",
-                "description":"介護士の不在"
+                "description":"スタッフの視野外"
                 },
             5522:{
                 "score":np.nan,

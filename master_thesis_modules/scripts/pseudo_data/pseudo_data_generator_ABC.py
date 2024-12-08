@@ -232,10 +232,10 @@ class PseudoDataGenerator_ABC():
                     (patients_position_dict[patient_name].loc[:,"y"]-surroundings_position_dict[surrounding_name].loc[:,"y"])**2
                 distance=np.sqrt(distance2)
                 print(surrounding_name)
-                if surrounding_name==5512:
-                    self.data_dict[patient_name][surrounding_name]=1-np.array(list(map(membership_distance,distance)))
-                else:
+                if (surrounding_name==5512) or (surrounding_name==5520): # 手すりと看護師: 遠い方が安全
                     self.data_dict[patient_name][surrounding_name]=np.array(list(map(membership_distance,distance)))
+                else:
+                    self.data_dict[patient_name][surrounding_name]=1-np.array(list(map(membership_distance,distance)))
                     # ic(self.data_dict[patient_name][surrounding_name])
                 if surrounding_name==5520: # 看護師の距離を算出済みの場合
                     # 速度
