@@ -31,7 +31,7 @@ class Master(GraphManager,FuzzyReasoning,getConsistencyMtx,PseudoDataGenerator_A
 
         # params
         self.active_thre=0.5
-        self.throttling=True
+        self.throttling_method=True # "off","thre","fuzzy_ctrl"
         self.data_from_position=True
 
         # pseudo_dataが出来ていることを確認
@@ -68,30 +68,35 @@ class Master(GraphManager,FuzzyReasoning,getConsistencyMtx,PseudoDataGenerator_A
         #     self.visualize_plotly(name=name)
 
     def main(self):
+        def evaluate_4000():
+            ## 551系
+            w_vector=np.array([self.get_left_weight(name=name,node=key) for key in self.graph_dict[name]["G"].nodes() if str(551) in str(key)])
+            x_vector=self.data_dict[name].loc[i,[key for key in self.graph_dict[name]["G"].nodes() if str(551) in str(key)]].values
+            self.data_dict[name].loc[i,4051]=w_vector@x_vector
+            ## 552系
+            w_vector=np.array([self.get_left_weight(name=name,node=key) for key in self.graph_dict[name]["G"].nodes() if str(552) in str(key)])
+            x_vector=self.data_dict[name].loc[i,[key for key in self.graph_dict[name]["G"].nodes() if str(552) in str(key)]].values
+            self.data_dict[name].loc[i,4052]=w_vector@x_vector
+            self.data_dict[name].loc[i,"active"]=1
         for i,_ in list(self.data_dict.values())[0].iterrows():
             # 5000->4000 (AHP)
             for name in self.data_dict.keys():
-                # 前iterationの1000がthre以上だった場合にのみ推論
-                if i==0 or not(self.throttling):
-                    ## 551系
-                    w_vector=np.array([self.get_left_weight(name=name,node=key) for key in self.graph_dict[name]["G"].nodes() if str(551) in str(key)])
-                    x_vector=self.data_dict[name].loc[i,[key for key in self.graph_dict[name]["G"].nodes() if str(551) in str(key)]].values
-                    self.data_dict[name].loc[i,4051]=w_vector@x_vector
-                    ## 552系
-                    w_vector=np.array([self.get_left_weight(name=name,node=key) for key in self.graph_dict[name]["G"].nodes() if str(552) in str(key)])
-                    x_vector=self.data_dict[name].loc[i,[key for key in self.graph_dict[name]["G"].nodes() if str(552) in str(key)]].values
-                    self.data_dict[name].loc[i,4052]=w_vector@x_vector
+                if self.throttling_method=="off":
                     self.data_dict[name].loc[i,"active"]=1
-                elif self.data_dict[name].loc[i-1,1000]>=self.active_thre:
-                    ## 551系
-                    w_vector=np.array([self.get_left_weight(name=name,node=key) for key in self.graph_dict[name]["G"].nodes() if str(551) in str(key)])
-                    x_vector=self.data_dict[name].loc[i,[key for key in self.graph_dict[name]["G"].nodes() if str(551) in str(key)]].values
-                    self.data_dict[name].loc[i,4051]=w_vector@x_vector
-                    ## 552系
-                    w_vector=np.array([self.get_left_weight(name=name,node=key) for key in self.graph_dict[name]["G"].nodes() if str(552) in str(key)])
-                    x_vector=self.data_dict[name].loc[i,[key for key in self.graph_dict[name]["G"].nodes() if str(552) in str(key)]].values
-                    self.data_dict[name].loc[i,4052]=w_vector@x_vector
-                    self.data_dict[name].loc[i,"active"]=1
+                elif self.throttling_method=="thre":
+                    # 閾値throttlingの場合，ここでi行目が評価すべきものなのか判断
+                    # 前iterationの1000がthre以上だった場合にのみ推論
+                    if i==0:
+                        self.data_dict[name].loc[i,"active"]=1
+                    elif self.data_dict[name].loc[i-1,1000]>=self.active_thre:
+                        self.data_dict[name].loc[i,"active"]=1
+                    else:
+                        self.data_dict[name].loc[i,"active"]=0
+                elif self.throttling_method=="fuzzy_ctrl":
+                    pass
+
+                if self.data_dict[name].loc[i,"active"]>0.5:
+                    evaluate_4000()
                 else:
                     self.data_dict[name].loc[i,4051]=self.data_dict[name].loc[i-1,4051]
                     self.data_dict[name].loc[i,4052]=self.data_dict[name].loc[i-1,4052]
@@ -126,6 +131,7 @@ class Master(GraphManager,FuzzyReasoning,getConsistencyMtx,PseudoDataGenerator_A
                 new_score_dict=self.data_dict[name].iloc[i].to_dict()
                 del new_score_dict["timestamp"]
                 del new_score_dict["active"]
+                del new_score_dict["fps"]
                 self.update_score(name=name,new_score_dict=new_score_dict)
             
             for name in self.data_dict.keys():
