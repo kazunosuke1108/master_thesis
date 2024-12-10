@@ -166,7 +166,6 @@ class Visualizer(Master):
         fig.update_layout(
                 scene_aspectmode='manual',
                 scene_aspectratio=dict(x=5, y=5, z=3),
-                
             )
         fig=self.customize_layout(fig)
         fig.to_html(self.visualize_dir_path+"/positions.html")

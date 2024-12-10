@@ -21,97 +21,116 @@ class GraphManager():
             1000:{
                 "score":np.nan,
                 "status":"active",
-                "description":"最も行動が危険な人物の選定"
+                "description":"最も行動が危険な人物の選定",
+                "description_en":"Risk ratio",
                 },
             2000:{
                 "score":np.nan,
                 "status":"active",
-                "description":"転倒事故防止"
+                "description":"転倒事故防止",
+                "description_en":"Prevent accidents",
                 },
             2001:{
                 "score":np.nan,
                 "status":"active",
-                "description":"スタッフの緊張緩和"
+                "description":"スタッフの緊張緩和",
+                "description_en":"Ease burden on staff",
                 },
             2002:{
                 "score":np.nan,
                 "status":"active",
-                "description":"患者の主体性担保"
+                "description":"患者の主体性担保",
+                "description_en":"Maintain independence of patients",
                 },
             3000:{
                 "score":np.nan,
                 "status":"active",
-                "description":"本人の属性"
+                "description":"本人の属性",
+                "description_en":"Who",
                 },
             3001:{
                 "score":np.nan,
                 "status":"active",
-                "description":"本人の動作"
+                "description":"本人の動作",
+                "description_en":"What",
                 },
             3002:{
                 "score":np.nan,
                 "status":"active",
-                "description":"本人の様子"
+                "description":"本人の様子",
+                "description_en":"How",
                 },
             3003:{
                 "score":np.nan,
                 "status":"active",
-                "description":"本人の動機"
+                "description":"本人の動機",
+                "description_en":"Why",
                 },
             3004:{
                 "score":np.nan,
                 "status":"active",
-                "description":"時間的文脈"
+                "description":"時間的文脈",
+                "description_en":"When",
                 },
             3005:{
                 "score":np.nan,
                 "status":"active",
-                "description":"空間的文脈"
+                "description":"空間的文脈",
+                "description_en":"Where",
                 },
             4050:{
                 "score":np.nan,
                 "status":"inactive",
-                "description":"本人の居場所"
+                "description":"本人の居場所",
+                "description_en":"Location of patient",
                 },
             4051:{
                 "score":np.nan,
                 "status":"inactive",
-                "description":"周囲の物体"
+                "description":"周囲の物体",
+                "description_en":"Objects",
                 },
             4052:{
                 "score":np.nan,
                 "status":"inactive",
-                "description":"周囲の人物"
+                "description":"周囲の人物",
+                "description_en":"People",
                 },
             5510:{
                 "score":np.nan,
                 "status":"inactive",
-                "description":"経管栄養・点滴の存在"
+                "description":"経管栄養・点滴の存在",
+                "description_en":"Infusion pole",
                 },
             5511:{
                 "score":np.nan,
                 "status":"inactive",
-                "description":"車椅子の存在"
+                "description":"車椅子の存在",
+                "description_en":"Wheelchair",
                 },
             5512:{
                 "score":np.nan,
                 "status":"inactive",
-                "description":"手すりの不在"
+                "description":"手すりの不在",
+                "description_en":"Handrail",
                 },
             5520:{
                 "score":np.nan,
                 "status":"inactive",
-                "description":"スタッフが遠方"
+                "description":"スタッフが遠方",
+                "description_en":"Distance from staff",
                 },
             5521:{
                 "score":np.nan,
                 "status":"inactive",
-                "description":"スタッフの視野外"
+                "description":"スタッフの視野外",
+                "description_en":"Gaze of staff",
                 },
             5522:{
                 "score":np.nan,
                 "status":"inactive",
-                "description":"面会者の存在"
+                "description":"面会者の存在",
+                "description_en":"Distance from others",
                 },
         }
 
@@ -244,7 +263,7 @@ class GraphManager():
         weights = nx.get_edge_attributes(self.graph_dict[name]["G"], 'weight') # key:(node_from,node_to), value: weight
         status = {n:self.graph_dict[name]["node_dict"][n]["status"] for n in nodes}
         scores = {n:self.graph_dict[name]["node_dict"][n]["score"] for n in nodes}# key: ノード番号, value: 特徴量
-        descriptions = {n:self.graph_dict[name]["node_dict"][n]["description"] for n in nodes}
+        descriptions = {n:self.graph_dict[name]["node_dict"][n]["description_en"] for n in nodes}
 
         # 色の準備
         cmap = cm.get_cmap('jet')
@@ -309,7 +328,17 @@ class GraphManager():
             title=name,
             xaxis=dict(showgrid=False, zeroline=False),
             yaxis=dict(showgrid=False, zeroline=False),
-            plot_bgcolor='white'
+            plot_bgcolor='white',
+            legend=dict(
+                bgcolor='white',  # 背景色
+                bordercolor='black',  # 枠線の色
+                borderwidth=1.5    # 枠線の太さ
+            ),
+            font=dict(
+                family='Times New Roman',  # 推奨フォント
+                size=18,  # フォントサイズ
+                color='black'  # フォント色
+            ),
         )
         if show:
             fig.show()
@@ -334,8 +363,8 @@ class GraphManager():
         # レイアウト設定
         layout = go.Layout(
             title=f"Person: {name}  Frame: 0  timestamp: 0",
-            # xaxis=dict(range=[0, 5]),
-            # yaxis=dict(range=[0, 20]),
+            xaxis=dict(showticklabels=False),  # X軸のメモリを非表示
+            yaxis=dict(showticklabels=False),   # Y軸のメモリを非表示
             updatemenus=[{
                 'buttons': [
                     {
@@ -359,6 +388,17 @@ class GraphManager():
                 'yanchor': 'top'
             }],
             showlegend=False,
+            plot_bgcolor='white',
+            legend=dict(
+                bgcolor='white',  # 背景色
+                bordercolor='black',  # 枠線の色
+                borderwidth=1.5    # 枠線の太さ
+            ),
+            font=dict(
+                family='Times New Roman',  # 推奨フォント
+                size=18,  # フォントサイズ
+                color='black'  # フォント色
+            ),
         )
 
         # Figure作成
