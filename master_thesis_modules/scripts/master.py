@@ -164,7 +164,7 @@ class Master(GraphManager,FuzzyReasoning,FuzzyControl,getConsistencyMtx,PseudoDa
 
         for i,name in enumerate(self.data_dict.keys()):
             self.data=self.data_dict[name]
-            plt.plot(self.data["timestamp"],self.data[1000],label=name)
+            plt.plot(self.data["timestamp"],self.data[1000],label=name,linewidth=3)
         plt.xlabel("Time [s]")
         plt.ylabel("Risk value")
         plt.legend()
