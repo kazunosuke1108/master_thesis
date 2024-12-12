@@ -414,7 +414,7 @@ class GraphManager():
         if save:
             import shutil
             from glob import glob
-            trial_temp_dir_path=trial_dir_path+"/temp"
+            trial_temp_dir_path=trial_dir_path+f"/temp_{name}"
             try:
                 shutil.rmtree(trial_temp_dir_path)
             except FileNotFoundError:

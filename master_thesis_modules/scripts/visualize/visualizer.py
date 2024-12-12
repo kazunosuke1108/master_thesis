@@ -17,7 +17,7 @@ from scripts.master import Master
 class Visualizer(Master):
     def __init__(self):
         super().__init__()
-        self.visualize_dir_path=sorted(glob(self.get_database_dir(strage="NASK")["database_dir_path"]+"/*"))[-1]
+        self.visualize_dir_path=sorted(glob(self.get_database_dir(strage="NASK")["database_dir_path"]+"/*"))[-3]
         self.data_paths=sorted(glob(self.visualize_dir_path+"/*"))
         
         pass
@@ -25,7 +25,7 @@ class Visualizer(Master):
     def draw_timeseries(self,data,name,label_name=""):
         if label_name=="":
             try:
-                label_name=self.node_dict[int(name)]["description"]
+                label_name=self.node_dict[int(name)]["description_en"]
             except ValueError:
                 label_name=name
         trace=go.Scatter(
@@ -73,9 +73,9 @@ class Visualizer(Master):
         fig.update_layout(
                 paper_bgcolor='white',  # 図全体の背景
                 plot_bgcolor='white',   # プロット領域の背景
-                title=dict(
-                    text=f"FPS"
-                ),
+                # title=dict(
+                #     text=f"FPS"
+                # ),
                 xaxis=dict(
                     color='black',
                     showgrid=True,  # グリッドを表示
@@ -122,9 +122,14 @@ class Visualizer(Master):
                     text=f"FPS"
                 ),
                 legend=dict(
+                    # x=0.01,          # ①：X座標
+                    # y=-0.2,          # ①：Y座標
                     bgcolor='white',  # 背景色
                     bordercolor='black',  # 枠線の色
-                    borderwidth=1.5    # 枠線の太さ
+                    borderwidth=1.5,    # 枠線の太さ
+                    # xanchor='left',
+                    # yanchor='top',
+                    # orientation='h',
                 ),
                 font=dict(
                     family='Times New Roman',  # 推奨フォント
@@ -202,7 +207,8 @@ class Visualizer(Master):
                     text=f"Person: {name}  feature values"
                 ),
             )
-            fig.update_xaxes(title=dict(text="Time [s]",font=dict(family="Times New Roman",size=18)),row=len(categories),col=1,)
+            for i in range(len(categories)):
+                fig.update_xaxes(title=dict(text="Time [s]",font=dict(family="Times New Roman",size=18)),row=i+1,col=1,)
             for i in range(len(categories)):
                 fig.update_yaxes(
                     title=dict(text=f"Features {categories[i]}",font=dict(family="Times New Roman",size=18)),
@@ -217,6 +223,50 @@ class Visualizer(Master):
         pass
     
     def draw_weight(self):
+        csv_paths=[path for path in self.data_paths if (("weight" in os.path.basename(path)) and (".csv" in os.path.basename(path)))]
+        plot_data=[]
+
+        for csv_path in csv_paths:
+            name=os.path.basename(csv_path)[:-4].split("_")[-1]
+            data=pd.read_csv(csv_path,header=0)
+            nodes=[k for k in list(data.keys()) if (("timestamp" not in k) and ("active" not in k))]
+            categories=sorted(list(set([str(k)[:3] for k in nodes])))
+            
+            plot_data=[[] for i in range(len(categories))]
+            fig=sp.make_subplots(rows=len(categories), cols=1,  # 2行1列
+                        shared_xaxes=False,  # x軸を共有
+                        vertical_spacing=0.1)  # グラフ間の間隔
+            
+            for node in nodes:
+                row_no=categories.index(str(node)[:3])
+                trace=self.draw_timeseries(data=data,name=node)
+                plot_data[row_no].append(trace)
+            
+            for i,traces in enumerate(plot_data):
+                for trace in traces:
+                    fig.add_trace(trace,row=i+1,col=1)
+
+            # layout
+            fig.update_layout(    
+                title=dict(
+                    text=f"Person: {name}  Weights"
+                ),
+
+            )
+            for i in range(len(categories)):
+                fig.update_xaxes(title=dict(text="Time [s]",font=dict(family="Times New Roman",size=18)),row=i+1,col=1,)
+            for i in range(len(categories)):
+                fig.update_yaxes(
+                    title=dict(text=f"Weights <i>w</i><sub>{categories[i]}X</sub>",font=dict(family="Times New Roman",size=18)),
+                    range=[-0.1,1.1],
+                    row=i+1,
+                    col=1,
+                    )
+            fig=self.customize_layouts(fig)
+            fig.write_html(self.visualize_dir_path+f"/weights_{name}.html")
+            fig.show()
+    
+    def draw_weights(self):
         csv_paths=[path for path in self.data_paths if (("weight" in os.path.basename(path)) and (".csv" in os.path.basename(path)))]
         plot_data=[]
 

@@ -32,7 +32,7 @@ class Master(GraphManager,FuzzyReasoning,FuzzyControl,getConsistencyMtx,PseudoDa
 
         # params
         self.active_thre=0.5
-        self.throttling_method="fuzzy_ctrl" # "off","thre","fuzzy_ctrl"
+        self.throttling_method="off" # "off","thre","fuzzy_ctrl"
         self.data_from_position=True
 
         # pseudo_dataが出来ていることを確認
