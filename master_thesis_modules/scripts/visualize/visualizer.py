@@ -22,7 +22,7 @@ class Visualizer(Master):
         
         pass
 
-    def draw_timeseries(self,data,name,label_name=""):
+    def draw_timeseries(self,data,name,label_name="",symbol=""):
         if label_name=="":
             try:
                 label_name=self.node_dict[int(name)]["description_en"]
@@ -34,7 +34,7 @@ class Visualizer(Master):
             xaxis="x",
             yaxis="y",
             mode="markers+lines",
-            name=str(name)+":"+label_name,
+            name=f"<i>{symbol}</i><sub>"+str(name)+"</sub>"#+" : "+label_name,
         )
         return trace
 
@@ -118,9 +118,9 @@ class Visualizer(Master):
         fig.update_layout(
                 paper_bgcolor='white',  # 図全体の背景
                 plot_bgcolor='white',   # プロット領域の背景
-                title=dict(
-                    text=f"FPS"
-                ),
+                # title=dict(
+                #     text=f"FPS"
+                # ),
                 legend=dict(
                     # x=0.01,          # ①：X座標
                     # y=-0.2,          # ①：Y座標
@@ -194,7 +194,7 @@ class Visualizer(Master):
             
             for node in nodes:
                 row_no=categories.index(str(node)[:3])
-                trace=self.draw_timeseries(data=data,name=node)
+                trace=self.draw_timeseries(data=data,name=node,symbol="x<sup>i</sup>")
                 plot_data[row_no].append(trace)
             
             for i,traces in enumerate(plot_data):
@@ -239,7 +239,7 @@ class Visualizer(Master):
             
             for node in nodes:
                 row_no=categories.index(str(node)[:3])
-                trace=self.draw_timeseries(data=data,name=node)
+                trace=self.draw_timeseries(data=data,name=node,symbol="w")
                 plot_data[row_no].append(trace)
             
             for i,traces in enumerate(plot_data):
@@ -283,7 +283,7 @@ class Visualizer(Master):
             
             for node in nodes:
                 row_no=categories.index(str(node)[:3])
-                trace=self.draw_timeseries(data=data,name=node)
+                trace=self.draw_timeseries(data=data,name=node,symbol="w")
                 plot_data[row_no].append(trace)
             
             for i,traces in enumerate(plot_data):
@@ -332,8 +332,8 @@ class Visualizer(Master):
 
 if __name__=="__main__":
     cls=Visualizer()
-    cls.draw_positions()
+    # cls.draw_positions()
     cls.draw_features()
-    cls.draw_weight()
-    cls.draw_fps()
+    # cls.draw_weight()
+    # cls.draw_fps()
     pass
