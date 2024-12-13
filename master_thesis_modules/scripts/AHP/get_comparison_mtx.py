@@ -64,25 +64,29 @@ class getConsistencyMtx():
 
 if __name__=="__main__":
     cls=getConsistencyMtx()
+    A=cls.get_comparison_mtx(criteria=["a","b","c"])
+    eigvals,eigvecs,max_eigval,weights,CI=cls.evaluate_mtx(A)
+    print(A)
+    print(eigvals,eigvecs,max_eigval,weights,CI)
     # 比較行列
-    A=cls.input_comparison_mtx()
-    _,_,_,weights_cmpr,_=cls.evaluate_mtx(A)
-    print(weights_cmpr)
-    # 評価基準A（点滴）に対する重み
-    distances=np.array([4,2,0.5])
-    F=cls.input_feature_mtx(features=distances)
-    _,_,_,weights_A,_=cls.evaluate_mtx(F)
-    print(weights_A)
-    # 評価基準B（手すり）に対する重み
-    distances=np.array([6,6,2])
-    distances=1/distances
-    F=cls.input_feature_mtx(features=distances)
-    _,_,_,weights_B,_=cls.evaluate_mtx(F)
-    print(weights_B)
-    # 評価基準C（車椅子）に対する重み
-    distances=np.array([3.5,0.1,2.5])
-    F=cls.input_feature_mtx(features=distances)
-    _,_,_,weights_C,_=cls.evaluate_mtx(F)
-    print(weights_C)
-    W=np.vstack((weights_A,weights_B,weights_C)).T
-    print(W@weights_cmpr)
+    # A=cls.input_comparison_mtx()
+    # _,_,_,weights_cmpr,_=cls.evaluate_mtx(A)
+    # print(weights_cmpr)
+    # # 評価基準A（点滴）に対する重み
+    # distances=np.array([4,2,0.5])
+    # F=cls.input_feature_mtx(features=distances)
+    # _,_,_,weights_A,_=cls.evaluate_mtx(F)
+    # print(weights_A)
+    # # 評価基準B（手すり）に対する重み
+    # distances=np.array([6,6,2])
+    # distances=1/distances
+    # F=cls.input_feature_mtx(features=distances)
+    # _,_,_,weights_B,_=cls.evaluate_mtx(F)
+    # print(weights_B)
+    # # 評価基準C（車椅子）に対する重み
+    # distances=np.array([3.5,0.1,2.5])
+    # F=cls.input_feature_mtx(features=distances)
+    # _,_,_,weights_C,_=cls.evaluate_mtx(F)
+    # print(weights_C)
+    # W=np.vstack((weights_A,weights_B,weights_C)).T
+    # print(W@weights_cmpr)
