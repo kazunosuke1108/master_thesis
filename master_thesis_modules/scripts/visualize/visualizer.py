@@ -46,7 +46,8 @@ class Visualizer(Master):
                 color=color,
                 size=20,
             ),
-            name=f"<i>{symbol}</i><sub>"+str(name)+"</sub>"#+" : "+label_name,
+            name=label_name
+            # name=f"<i>{symbol}</i><sub>"+str(name)+"</sub>"#+" : "+label_name,
         )
         return trace
 
@@ -344,8 +345,9 @@ class Visualizer(Master):
     def draw_nActive(self):
         indexes=["①","②","③"]
         data=[99,40,51]
+        colors=["blue","blue","red"]
         fig=go.Figure()
-        trace=go.Bar(x=indexes,y=data)
+        trace=go.Bar(x=indexes,y=data,marker_color=colors)
         fig.add_trace(trace)
         fig=self.customize_layout(fig)
         fig.update_xaxes(title=dict(text="Method",font=dict(family="Times New Roman",size=36)))
@@ -360,6 +362,6 @@ if __name__=="__main__":
     # cls.draw_positions()
     # cls.draw_features()
     # cls.draw_weight()
-    cls.draw_fps()
-    # cls.draw_nActive()
+    # cls.draw_fps()
+    cls.draw_nActive()
     pass
