@@ -17,7 +17,7 @@ from scripts.master import Master
 class Visualizer(Master):
     def __init__(self):
         super().__init__()
-        self.visualize_dir_path=sorted(glob(self.get_database_dir(strage="NASK")["database_dir_path"]+"/*"))[-3]
+        self.visualize_dir_path=sorted(glob(self.get_database_dir(strage="NASK")["database_dir_path"]+"/*"))[-5]
         self.data_paths=sorted(glob(self.visualize_dir_path+"/*"))
         
         pass
@@ -28,12 +28,23 @@ class Visualizer(Master):
                 label_name=self.node_dict[int(name)]["description_en"]
             except ValueError:
                 label_name=name
+        if label_name=="A":
+            color="blue"
+        elif label_name=="B":
+            color="orange"
+        elif label_name=="C":
+            color="green"
+        else:
+            color="black"
         trace=go.Scatter(
             x=data["timestamp"],
             y=data[name],
             xaxis="x",
             yaxis="y",
             mode="markers+lines",
+            marker=dict(
+                color=color
+            ),
             name=f"<i>{symbol}</i><sub>"+str(name)+"</sub>"#+" : "+label_name,
         )
         return trace
@@ -316,6 +327,8 @@ class Visualizer(Master):
 
         for i,csv_path in enumerate(csv_paths):
             name=os.path.basename(csv_path)[:-4].split("_")[-1]
+            print(name)
+            
             data=pd.read_csv(csv_path,header=0)
             data["fps"].interpolate(method="ffill",inplace=True)
             trace=self.draw_timeseries(data,name="fps",label_name=name)
@@ -333,7 +346,7 @@ class Visualizer(Master):
 if __name__=="__main__":
     cls=Visualizer()
     # cls.draw_positions()
-    cls.draw_features()
+    # cls.draw_features()
     # cls.draw_weight()
-    # cls.draw_fps()
+    cls.draw_fps()
     pass
