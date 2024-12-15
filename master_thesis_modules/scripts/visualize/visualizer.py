@@ -17,7 +17,7 @@ from scripts.master import Master
 class Visualizer(Master):
     def __init__(self):
         super().__init__()
-        self.visualize_dir_path=sorted(glob(self.get_database_dir(strage="NASK")["database_dir_path"]+"/*"))[-3]
+        self.visualize_dir_path=sorted(glob(self.get_database_dir(strage="NASK")["database_dir_path"]+"/*"))[-5]
         self.data_paths=sorted(glob(self.visualize_dir_path+"/*"))
         
         pass
@@ -34,6 +34,9 @@ class Visualizer(Master):
             xaxis="x",
             yaxis="y",
             mode="markers+lines",
+            marker=dict(
+                size=20,
+            ),
             name=str(name)+":"+label_name,
         )
         return trace
@@ -62,9 +65,9 @@ class Visualizer(Master):
         fig.update_layout(
             scene_camera=camera,  # カメラの視点を設定
             scene=dict(
-                xaxis=dict(title='X',tickfont=dict(family="Times New Roman",size=18)),
-                yaxis=dict(title='Y',tickfont=dict(family="Times New Roman",size=18)),
-                zaxis=dict(title='UnixTime [s]',tickfont=dict(family="Times New Roman",size=18)),
+                xaxis=dict(title='X',tickfont=dict(family="Times New Roman",size=36)),
+                yaxis=dict(title='Y',tickfont=dict(family="Times New Roman",size=36)),
+                zaxis=dict(title='UnixTime [s]',tickfont=dict(family="Times New Roman",size=36)),
             )
         )
         return fig
@@ -101,7 +104,7 @@ class Visualizer(Master):
                 ),
                 font=dict(
                     family='Times New Roman',  # 推奨フォント
-                    size=18,  # フォントサイズ
+                    size=36,  # フォントサイズ
                     color='black'  # フォント色
                 ),
                 margin=dict(
@@ -133,7 +136,7 @@ class Visualizer(Master):
                 ),
                 font=dict(
                     family='Times New Roman',  # 推奨フォント
-                    size=18,  # フォントサイズ
+                    size=36,  # フォントサイズ
                     color='black'  # フォント色
                 ),
                 margin=dict(
@@ -208,10 +211,10 @@ class Visualizer(Master):
                 ),
             )
             for i in range(len(categories)):
-                fig.update_xaxes(title=dict(text="Time [s]",font=dict(family="Times New Roman",size=18)),row=i+1,col=1,)
+                fig.update_xaxes(title=dict(text="Time [s]",font=dict(family="Times New Roman",size=36)),row=i+1,col=1,)
             for i in range(len(categories)):
                 fig.update_yaxes(
-                    title=dict(text=f"Features {categories[i]}",font=dict(family="Times New Roman",size=18)),
+                    title=dict(text=f"Features {categories[i]}",font=dict(family="Times New Roman",size=36)),
                     range=[-0.1,1.1],
                     row=i+1,
                     col=1,
@@ -254,10 +257,10 @@ class Visualizer(Master):
 
             )
             for i in range(len(categories)):
-                fig.update_xaxes(title=dict(text="Time [s]",font=dict(family="Times New Roman",size=18)),row=i+1,col=1,)
+                fig.update_xaxes(title=dict(text="Time [s]",font=dict(family="Times New Roman",size=36)),row=i+1,col=1,)
             for i in range(len(categories)):
                 fig.update_yaxes(
-                    title=dict(text=f"Weights <i>w</i><sub>{categories[i]}X</sub>",font=dict(family="Times New Roman",size=18)),
+                    title=dict(text=f"Weights <i>w</i><sub>{categories[i]}X</sub>",font=dict(family="Times New Roman",size=36)),
                     range=[-0.1,1.1],
                     row=i+1,
                     col=1,
@@ -297,10 +300,10 @@ class Visualizer(Master):
                 ),
 
             )
-            fig.update_xaxes(title=dict(text="Time [s]",font=dict(family="Times New Roman",size=18)),row=len(categories),col=1,)
+            fig.update_xaxes(title=dict(text="Time [s]",font=dict(family="Times New Roman",size=36)),row=len(categories),col=1,)
             for i in range(len(categories)):
                 fig.update_yaxes(
-                    title=dict(text=f"Weights {categories[i]}",font=dict(family="Times New Roman",size=18)),
+                    title=dict(text=f"Weights {categories[i]}",font=dict(family="Times New Roman",size=36)),
                     range=[-0.1,1.1],
                     row=i+1,
                     col=1,
@@ -322,9 +325,20 @@ class Visualizer(Master):
             plot_data.append(trace)
         fig=go.Figure(data=plot_data)
         fig=self.customize_layout(fig)
-        fig.update_xaxes(title=dict(text="Time [s]",font=dict(family="Times New Roman",size=18)))
-        fig.update_yaxes(title=dict(text="fps [/s]",font=dict(family="Times New Roman",size=18)))
+        fig.update_xaxes(title=dict(text="Time [s]",font=dict(family="Times New Roman",size=36)))
+        fig.update_yaxes(title=dict(text="fps [/s]",font=dict(family="Times New Roman",size=36)))
         fig.write_html(self.visualize_dir_path+f"/fps.html")
+        fig.show()
+
+    def draw_nActive(self):
+        indexes=["①","②","③"]
+        data=[99,40,51]
+        fig=go.Figure()
+        trace=go.Bar(x=indexes,y=data)
+        fig.add_trace(trace)
+        fig=self.customize_layout(fig)
+        fig.update_xaxes(title=dict(text="Method",font=dict(family="Times New Roman",size=36)))
+        fig.update_yaxes(title=dict(text="Number of feature observation",font=dict(family="Times New Roman",size=36)))
         fig.show()
 
     def main(self):
@@ -332,8 +346,9 @@ class Visualizer(Master):
 
 if __name__=="__main__":
     cls=Visualizer()
-    cls.draw_positions()
-    cls.draw_features()
-    cls.draw_weight()
+    # cls.draw_positions()
+    # cls.draw_features()
+    # cls.draw_weight()
     cls.draw_fps()
+    # cls.draw_nActive()
     pass
