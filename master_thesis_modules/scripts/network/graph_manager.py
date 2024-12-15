@@ -281,7 +281,7 @@ class GraphManager():
             edge_trace = go.Scatter(
                 x=edge_x,
                 y=edge_y,
-                line=dict(width=2, color=color),
+                line=dict(width=5, color=color),
                 customdata=[weight],
                 hovertemplate="weight: %{customdata:.2f}<extra></extra>",
                 mode='lines'
@@ -307,7 +307,7 @@ class GraphManager():
                                 f"left weight: {previous_weight}<extra></extra>",
                 marker=dict(
                     symbol=symbol_dict[status[node]],
-                    size=30,
+                    size=60,
                     line_color="black",
                     line_width=2,
                     color=color,
