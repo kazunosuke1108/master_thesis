@@ -56,9 +56,9 @@ class FuzzyControl():
             }
         }
         self.s_thre_dict={
-            "-":{"min":0,"max":1/3},
+            "-":{"min":-np.inf,"max":1/3},
             "o":{"min":1/3,"max":2/3},
-            "+":{"min":2/3,"max":1},
+            "+":{"min":2/3,"max":np.inf},
         }
         ds_threshold=0.2*0.25 # thre[/s]*dt[s]
         self.ds_thre_dict={

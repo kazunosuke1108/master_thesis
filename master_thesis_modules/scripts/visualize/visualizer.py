@@ -17,7 +17,7 @@ from scripts.master import Master
 class Visualizer(Master):
     def __init__(self):
         super().__init__()
-        self.visualize_dir_path=sorted(glob(self.get_database_dir(strage="NASK")["database_dir_path"]+"/*"))[-5]
+        self.visualize_dir_path=sorted(glob(self.get_database_dir(strage="NASK")["database_dir_path"]+"/*"))[-1]
         self.data_paths=sorted(glob(self.visualize_dir_path+"/*"))
         
         pass
@@ -28,14 +28,14 @@ class Visualizer(Master):
                 label_name=self.node_dict[int(name)]["description_en"]
             except ValueError:
                 label_name=name
-        if label_name=="A":
-            color="blue"
-        elif label_name=="B":
-            color="orange"
-        elif label_name=="C":
-            color="green"
-        else:
-            color="black"
+        # if label_name=="A":
+        #     color="blue"
+        # elif label_name=="B":
+        #     color="orange"
+        # elif label_name=="C":
+        #     color="green"
+        # else:
+        #     color="black"
         trace=go.Scatter(
             x=data["timestamp"],
             y=data[name],
@@ -43,7 +43,7 @@ class Visualizer(Master):
             yaxis="y",
             mode="markers+lines",
             marker=dict(
-                color=color,
+                # color=color,
                 size=20,
             ),
             name=label_name
@@ -359,9 +359,9 @@ class Visualizer(Master):
 
 if __name__=="__main__":
     cls=Visualizer()
-    # cls.draw_positions()
-    # cls.draw_features()
-    # cls.draw_weight()
-    # cls.draw_fps()
-    cls.draw_nActive()
+    cls.draw_positions()
+    cls.draw_features()
+    cls.draw_weight()
+    cls.draw_fps()
+    # cls.draw_nActive()
     pass

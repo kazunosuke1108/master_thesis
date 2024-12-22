@@ -32,8 +32,10 @@ class Master(GraphManager,FuzzyReasoning,FuzzyControl,getConsistencyMtx,PseudoDa
 
         # params
         self.active_thre=0.5
-        self.throttling_method="fuzzy_ctrl" # "off","thre","fuzzy_ctrl"
+        self.throttling_method="off" # "off","thre","fuzzy_ctrl"
         self.data_from_position=True
+        self.ewm_direction="patient" # "patient"
+        self.ewm_window=5 # EWMを時間軸方向に適用する場合の，エントロピー算出で考慮するウィンドウ幅
 
         # pseudo_dataが出来ていることを確認
         # pseudo_dataとgraph_dictのkey(A,B,C...)が合致しているか確認
@@ -44,6 +46,14 @@ class Master(GraphManager,FuzzyReasoning,FuzzyControl,getConsistencyMtx,PseudoDa
         if self.data_from_position:
             self.patients_position_dict,self.surroundings_position_dict=self.input_position_history()
             self.position_to_features(self.patients_position_dict,self.surroundings_position_dict)
+
+            # for name in self.data_dict.keys():
+            #     print(self.data_dict[name].keys())
+            #     noise_col=[col for col in list(self.data_dict[name].keys()) if (("timestamp" not in str(col)) and ("active" not in str(col)) and ("fps" not in str(col)))]
+            #     noise=np.random.normal(0,0.01,self.data_dict[name][noise_col].shape)
+            #     print(noise)
+            #     self.data_dict[name][noise_col]=self.data_dict[name][noise_col]+noise
+            
 
         # 重みの編集
         ## lv.4 -> 5 (AHP)
@@ -109,18 +119,36 @@ class Master(GraphManager,FuzzyReasoning,FuzzyControl,getConsistencyMtx,PseudoDa
 
             # 3000->2000 (Entropy Weight Method)
             ## weightの更新
-            w_source_data=self.data_dict[list(self.data_dict.keys())[0]].iloc[i]
-            for i2,name in enumerate(self.data_dict.keys()):
-                if i2==0:
-                    continue
-                w_source_data=pd.concat([w_source_data,self.data_dict[name].iloc[i]],axis=1)
-            w_source_data=w_source_data.T[[key for key in self.graph_dict[name]["G"].nodes() if str(300) in str(key)]]
-            w_dict={2000:self.get_entropy_weight(w_source_data)}
-            for i2,name in enumerate(self.data_dict.keys()):
-                self.update_weight(name=name,new_weight_dict=w_dict,timestamp=self.data_dict[name].loc[i,"timestamp"])
-                w_vector=np.array([self.get_left_weight(name=name,node=key) for key in self.graph_dict[name]["G"].nodes() if str(300) in str(key)])
-                x_vector=self.data_dict[name].loc[i,[key for key in self.graph_dict[name]["G"].nodes() if str(300) in str(key)]].values
-                self.data_dict[name].loc[i,2000]=w_vector@x_vector
+            if self.ewm_direction=="patient":
+                w_source_data=self.data_dict[list(self.data_dict.keys())[0]].iloc[i]
+                for i2,name in enumerate(self.data_dict.keys()):
+                    if i2==0:
+                        continue
+                    w_source_data=pd.concat([w_source_data,self.data_dict[name].iloc[i]],axis=1)
+                w_source_data=w_source_data.T[[key for key in self.graph_dict[name]["G"].nodes() if str(300) in str(key)]]
+                w_dict={2000:self.get_entropy_weight(w_source_data)}
+                ic(w_dict)
+                # raise NotImplementedError
+                for i2,name in enumerate(self.data_dict.keys()):
+                    self.update_weight(name=name,new_weight_dict=w_dict,timestamp=self.data_dict[name].loc[i,"timestamp"])
+                    w_vector=np.array([self.get_left_weight(name=name,node=key) for key in self.graph_dict[name]["G"].nodes() if str(300) in str(key)])
+                    x_vector=self.data_dict[name].loc[i,[key for key in self.graph_dict[name]["G"].nodes() if str(300) in str(key)]].values
+                    self.data_dict[name].loc[i,2000]=w_vector@x_vector
+            elif self.ewm_direction=="time":
+                for i2,name in enumerate(self.data_dict.keys()):
+                    i_window_start=max(0,i-self.ewm_window)
+                    score_df=self.data_dict[name].loc[i_window_start:i,[col for col in list(self.data_dict[name].keys()) if "300" in str(col)]]
+                    w=self.get_entropy_weight(score_df=score_df)
+                    w_dict={2000:w}
+                    ic(w_dict)
+                    # raise NotImplementedError
+                    self.update_weight(name=name,new_weight_dict=w_dict,timestamp=self.data_dict[name].loc[i,"timestamp"])
+                    w_vector=np.array([self.get_left_weight(name=name,node=key) for key in self.graph_dict[name]["G"].nodes() if str(300) in str(key)])
+                    x_vector=self.data_dict[name].loc[i,[key for key in self.graph_dict[name]["G"].nodes() if str(300) in str(key)]].values
+                    self.data_dict[name].loc[i,2000]=w_vector@x_vector
+
+
+                
 
             # 2000 -> 1000
             for i2,name in enumerate(self.data_dict.keys()):
@@ -188,8 +216,7 @@ class Master(GraphManager,FuzzyReasoning,FuzzyControl,getConsistencyMtx,PseudoDa
         
         # weightの書き出し
         for name in self.graph_dict.keys():
-            ic(self.graph_dict[name]["weight_history"])
-            ic(self.data_dict[name].iloc[-1])
+            ic(self.data_dict[name]["timestamp"].values)
             self.graph_dict[name]["weight_history"]["timestamp"]=self.data_dict[name]["timestamp"].values
             self.graph_dict[name]["weight_history"].to_csv(self.trial_dir_path+"/"+self.trial_timestamp+"_weight_"+name+".csv",index=False)
 
