@@ -313,13 +313,15 @@ class DataImporter():
         traces=[]
         for id_name in self.id_names:
             trace=go.Scatter(
-                x=self.data_dict[id_name]["timestamp"],
-                y=self.data_dict[id_name][5521],
+                x=self.data_dict[id_name]["timestamp"]-self.data_dict[id_name].loc[0,"timestamp"],
+                y=self.data_dict[id_name][5520],
                 name=id_name,
             )
             traces.append(trace)
         pass
         fig.add_traces(traces)
+        fig.update_xaxes(title=dict(text="Time [s]",font=dict(family="Times New Roman",size=18)))
+        fig.update_yaxes(title=dict(text="Normalized risk value",font=dict(family="Times New Roman",size=18)))
         fig.show()
 
 if __name__=="__main__":
