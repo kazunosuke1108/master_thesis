@@ -46,6 +46,8 @@ class Master(Manager,GraphManager):
     def define_scenario(self):
         start_timestamp=0
         end_timestamp=10
+        xrange=[0,6]
+        yrange=[0,6]
         fps=20
         patients=list(self.graph_dicts.keys())
         general_dict={
@@ -53,6 +55,8 @@ class Master(Manager,GraphManager):
             "end_timestamp":end_timestamp,
             "fps":fps,
             "patients":patients,
+            "xrange":xrange,
+            "yrange":yrange,
         }
         zokusei_dict={
             "A":{
@@ -139,13 +143,13 @@ class Master(Manager,GraphManager):
             }
         }
         surrounding_objects={
-            "A":["wheelchair"],
-            "B":["wheelchair","ivPole"],
-            "C":[],
+            "A":["wheelchair",],
+            "B":["wheelchair",],
+            "C":["ivPole","wheelchair",],
         }
 
         cls_PDG=PseudoDataGenerator(trial_name=self.trial_name,strage=self.strage)
-        cls_PDG.get_pseudo_data(
+        self.data_dicts=cls_PDG.get_pseudo_data(
             graph_dicts=self.graph_dicts,
             general_dict=general_dict,
             zokusei_dict=zokusei_dict,
@@ -161,7 +165,9 @@ class Master(Manager,GraphManager):
         for patient in self.patients:
             del self.graph_dicts[patient]["G"]
         self.write_json(self.graph_dicts,self.data_dir_dict["trial_dir_path"]+"/graph_dicts.json")
-
+        print("# DataFrame 保存 #")
+        for patient in self.patients:
+            self.data_dicts[patient].to_csv(self.data_dir_dict["trial_dir_path"]+"/data_"+patient+".csv",index=False)
 
     def main(self):
         pass
