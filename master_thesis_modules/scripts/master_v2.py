@@ -33,6 +33,39 @@ class Master(Manager,GraphManager):
         for patient in self.patients:
             self.graph_dicts[patient]=copy.deepcopy(default_graph)
 
+        # 危険動作の事前定義
+        self.risky_motion_dict={
+            40000010:{
+                "label":"standUp",
+                "features":np.array([1,         1,      np.nan, 1]),
+                },
+            40000011:{
+                "label":"releaseBrake",
+                "features":np.array([0,         1,      1,      0]),
+                },
+            40000012:{
+                "label":"moveWheelchair",
+                "features":np.array([0,         0,      1,      0]),
+                },
+            40000013:{
+                "label":"loseBalance",
+                "features":np.array([0,         1,      np.nan, np.nan]),
+                },
+            40000014:{
+                "label":"moveHand",
+                "features":np.array([np.nan,    np.nan, 1,      np.nan]),
+                },
+            40000015:{
+                "label":"coughUp",
+                "features":np.array([np.nan,    1,      0,      0]),
+                },
+            40000016:{
+                "label":"touchFace",
+                "features":np.array([np.nan,    0,      0,      np.nan]),
+            },
+        }
+
+
         # シナリオの定義・DataFrameの生成
         self.data_dicts=self.define_scenario()
         
@@ -191,6 +224,18 @@ class Master(Manager,GraphManager):
         
         pass
 
+    def pose_similarity(self):
+        def get_similarity(risk,row):
+            row=row[1]
+            similarity=np.nanmean(abs(self.risky_motion_dict[risk]["features"]-row[[50000100,50000101,50000102,50000103]]))
+            return similarity
+        for patient in self.data_dicts.keys():
+            for risk in self.risky_motion_dict.keys():
+                self.data_dicts[patient][risk]=list(map(get_similarity,[risk for i in range(len(self.data_dicts[patient]))],self.data_dicts[patient].iterrows()))
+            print(patient,risk)
+            
+        pass
+
 
     def save_session(self):
         print("# graph保存 #")
@@ -207,7 +252,7 @@ class Master(Manager,GraphManager):
         # 内的・静的
         self.fuzzy_logic()
         # 内的・動的
-
+        self.pose_similarity()
         # 外的・静的
 
         # 外的・動的
