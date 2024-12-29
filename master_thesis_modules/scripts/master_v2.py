@@ -34,16 +34,10 @@ class Master(Manager,GraphManager):
             self.graph_dicts[patient]=copy.deepcopy(default_graph)
 
         # シナリオの定義・DataFrameの生成
-        self.define_scenario()
+        self.data_dicts=self.define_scenario()
         
-
-        # DataFrameを定義
-        print("# DataFrame 定義 #")
-        # self.data_dicts={}
-        # for patient in self.patients:
-        #     self.data_dicts[patient]="hoge"
-
     def define_scenario(self):
+        print("# シナリオ生成 #")
         start_timestamp=0
         end_timestamp=10
         xrange=[0,6]
@@ -154,7 +148,7 @@ class Master(Manager,GraphManager):
         }
 
         cls_PDG=PseudoDataGenerator(trial_name=self.trial_name,strage=self.strage)
-        self.data_dicts=cls_PDG.get_pseudo_data(
+        data_dicts=cls_PDG.get_pseudo_data(
             graph_dicts=self.graph_dicts,
             general_dict=general_dict,
             zokusei_dict=zokusei_dict,
@@ -162,8 +156,42 @@ class Master(Manager,GraphManager):
             action_dict=action_dict,
             surrounding_objects=surrounding_objects,
         )
+        return data_dicts
+
+    def fuzzy_logic(self):
+        def mu_yes():
+            return (0.4,0.7,1.0)
+        def mu_no():
+            return (0.0,0.3,0.6)
+        def mu_young():
+            return (0.0,0.25,0.5)
+        def mu_middle():
+            return (0.25,0.5,0.75)
+        def mu_old():
+            return (0.5,0.75,1.0)
+        def patient_or_not(val):
+            if val=="yes":
+                return mu_yes()
+            elif val=="no":
+                return mu_no()
+            else:
+                raise Exception(f"Unexpected value in 内的・静的・患者判別: {val}")
+        def age(val):
+            if val=="young":
+                return mu_young()
+            elif val=="middle":
+                return mu_middle()
+            elif val=="old":
+                return mu_old()
+            else:
+                raise Exception(f"Unexpected value in 内的・静的・年齢: {val}")
+        for patient in self.data_dicts.keys():
+            self.data_dicts[patient][40000000]=list(map(patient_or_not,self.data_dicts[patient][50000000]))
+            self.data_dicts[patient][40000001]=list(map(age,self.data_dicts[patient][50000010]))
         
-    
+        pass
+
+
     def save_session(self):
         print("# graph保存 #")
         self.write_picklelog(self.graph_dicts,self.data_dir_dict["trial_dir_path"]+"/graph_dicts.pickle")
@@ -175,6 +203,14 @@ class Master(Manager,GraphManager):
             self.data_dicts[patient].to_csv(self.data_dir_dict["trial_dir_path"]+"/data_"+patient+".csv",index=False)
 
     def main(self):
+        print("# 5 -> 4層推論 #")
+        # 内的・静的
+        self.fuzzy_logic()
+        # 内的・動的
+
+        # 外的・静的
+
+        # 外的・動的
         pass
 
 if __name__=="__main__":
