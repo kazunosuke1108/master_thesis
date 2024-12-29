@@ -33,6 +33,9 @@ class Master(Manager,GraphManager):
         for patient in self.patients:
             self.graph_dicts[patient]=copy.deepcopy(default_graph)
 
+        # parameters
+        self.spatial_normalization_param=np.sqrt(2)*6
+
         # 危険動作の事前定義
         self.risky_motion_dict={
             40000010:{
@@ -234,8 +237,54 @@ class Master(Manager,GraphManager):
                 self.data_dicts[patient][risk]=list(map(get_similarity,[risk for i in range(len(self.data_dicts[patient]))],self.data_dicts[patient].iterrows()))
             print(patient,risk)
             
-        pass
+    def object_risk(self):
+        for patient in self.data_dicts.keys():
+            # 点滴
+            self.data_dicts[patient][40000100]=1-np.clip(np.sqrt(
+                (self.data_dicts[patient][50001000]-self.data_dicts[patient][60010000])**2+\
+                (self.data_dicts[patient][50001001]-self.data_dicts[patient][60010001])**2
+            )/self.spatial_normalization_param,0,1)
 
+            # 車椅子
+            self.data_dicts[patient][40000101]=1-np.clip(np.sqrt(
+                (self.data_dicts[patient][50001010]-self.data_dicts[patient][60010000])**2+\
+                (self.data_dicts[patient][50001011]-self.data_dicts[patient][60010001])**2
+            )/self.spatial_normalization_param,0,1)
+
+            # 手すり (逆数ではない)
+            self.data_dicts[patient][40000102]=np.clip(np.sqrt(
+                (self.data_dicts[patient][50001020]-self.data_dicts[patient][60010000])**2+\
+                (self.data_dicts[patient][50001021]-self.data_dicts[patient][60010001])**2
+            )/self.spatial_normalization_param,0,1)
+
+    def staff_risk(self):
+        def direction_risk(patient_x,patient_y,staff_x,staff_y,staff_vx,staff_vy):
+            relative_pos=np.array([patient_x-staff_x,patient_y-staff_y])
+            relative_vel=np.array([staff_vx,staff_vy])
+            cos_theta=np.dot(relative_pos,relative_vel)/(np.linalg.norm(relative_pos)*np.linalg.norm(relative_vel))
+            if cos_theta>1:
+                val=0
+            elif cos_theta<0:
+                val=1
+            else:
+                val=1-cos_theta
+            return val
+        for patient in self.data_dicts.keys():
+            # 距離リスク
+            self.data_dicts[patient][40000110]=np.clip(np.sqrt(
+                (self.data_dicts[patient][50001100]-self.data_dicts[patient][60010000])**2+\
+                (self.data_dicts[patient][50001101]-self.data_dicts[patient][60010001])**2
+            )/self.spatial_normalization_param,0,1)
+            # 向きリスク
+            self.data_dicts[patient][40000111]=list(map(direction_risk,
+                                                        self.data_dicts[patient][60010000],
+                                                        self.data_dicts[patient][60010001],
+                                                        self.data_dicts[patient][50001100],
+                                                        self.data_dicts[patient][50001101],
+                                                        self.data_dicts[patient][50001110],
+                                                        self.data_dicts[patient][50001111],
+                                                        ))
+            pass
 
     def save_session(self):
         print("# graph保存 #")
@@ -254,8 +303,9 @@ class Master(Manager,GraphManager):
         # 内的・動的
         self.pose_similarity()
         # 外的・静的
-
+        self.object_risk()
         # 外的・動的
+        self.staff_risk()
         pass
 
 if __name__=="__main__":
