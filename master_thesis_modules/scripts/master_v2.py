@@ -296,6 +296,9 @@ class Master(Manager,GraphManager):
         for patient in self.patients:
             self.data_dicts[patient].to_csv(self.data_dir_dict["trial_dir_path"]+"/data_"+patient+".csv",index=False)
 
+    def fuzzy_multiply(self):
+        
+        pass
     def main(self):
         print("# 5 -> 4層推論 #")
         # 内的・静的
@@ -306,6 +309,13 @@ class Master(Manager,GraphManager):
         self.object_risk()
         # 外的・動的
         self.staff_risk()
+
+        print("# 4 -> 3層推論 #")
+        # 内定・静的
+
+        # 内的・動的
+        # 外的・静的
+        # 外的・動的
         pass
 
 if __name__=="__main__":
