@@ -49,7 +49,7 @@ class PseudoDataGenerator(Manager):
         return df
 
     def get_pseudo_data(self,graph_dicts,general_dict,zokusei_dict,position_dict,action_dict,surrounding_objects):
-        people=list(graph_dicts.keys())
+        people=list(zokusei_dict.keys())
         patients=[p for p in people if zokusei_dict[p]["patient"]=="yes"]
         non_patients=[p for p in people if zokusei_dict[p]["patient"]=="no"]
         
@@ -127,11 +127,38 @@ class PseudoDataGenerator(Manager):
                 data_dicts[patient][50001020]=position_dict[patient][0]
                 data_dicts[patient][50001021]=general_dict["yrange"][1]
         # 看護師の軌道情報の生成
-        if len(non_patients):
+        if len(non_patients)>1:
             raise NotImplementedError("現在対応可能な非患者数は1です")
         non_patient=non_patients[0]
+        for a_dict in action_dict[non_patient].values():
+            start=a_dict["start_timestamp"]
+            end=a_dict["end_timestamp"]
+            label=a_dict["label"]
+            extract_index=(data_dicts[patient]["timestamp"]>=start) & (data_dicts[patient]["timestamp"]<=end)
+
+            if "_" in label:
+                l,p=label.split("_")
+                print(l,p)
+                if l=="approach":
+                    traj_x=np.interp(data_dicts[patient]["timestamp"][extract_index],[start,end],[position_dict[non_patient][0],position_dict[p][0]])
+                    traj_y=np.interp(data_dicts[patient]["timestamp"][extract_index],[start,end],[position_dict[non_patient][1],position_dict[p][1]])
+                elif l=="work":
+                    traj_x=np.interp(data_dicts[patient]["timestamp"][extract_index],[start,end],[position_dict[p][0],position_dict[p][0]])
+                    traj_y=np.interp(data_dicts[patient]["timestamp"][extract_index],[start,end],[position_dict[p][1],position_dict[p][1]])
+                elif l=="leave":
+                    traj_x=np.interp(data_dicts[patient]["timestamp"][extract_index],[start,end],[position_dict[p][0],position_dict[non_patient][0]])
+                    traj_y=np.interp(data_dicts[patient]["timestamp"][extract_index],[start,end],[position_dict[p][1],position_dict[non_patient][1]])
+                for patient in patients:
+                    data_dicts[patient][50001100][extract_index]=traj_x
+                    data_dicts[patient][50001101][extract_index]=traj_y
+            else:
+                for patient in patients:
+                    data_dicts[patient][50001100][extract_index]=position_dict[non_patient][0]
+                    data_dicts[patient][50001101][extract_index]=position_dict[non_patient][1]
+            pass
         for patient in patients:
-            data_dicts[patient][50001100]
+            data_dicts[patient][50001110]=data_dicts[patient][50001100].diff().values
+            data_dicts[patient][50001111]=data_dicts[patient][50001101].diff().values
         return data_dicts
     
 

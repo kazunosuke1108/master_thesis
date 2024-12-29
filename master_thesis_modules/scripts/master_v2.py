@@ -71,7 +71,7 @@ class Master(Manager,GraphManager):
                 "patient":"yes",
                 "age":"old",
             },
-            "D":{
+            "NS":{
                 "patient":"no",
                 "age":"middle"
             }
@@ -131,12 +131,17 @@ class Master(Manager,GraphManager):
                     "end_timestamp":2,
                 },
                 2:{
-                    "label":"start_B",
+                    "label":"approach_B",
                     "start_timestamp":2,
-                    "end_timestamp":8,
+                    "end_timestamp":5,
                     },
+                5:{
+                    "label":"work_B",
+                    "start_timestamp":5,
+                    "end_timestamp":8,
+                },
                 8:{
-                    "label":"end_B",
+                    "label":"leave_B",
                     "start_timestamp":8,
                     "end_timestamp":end_timestamp,
                     }
