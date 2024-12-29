@@ -41,7 +41,7 @@ class Manager():
         
         return module_dir_path
 
-    def get_database_dir(self,strage="NASK"):
+    def get_database_dir(self,trial_name="NoTrialNameGiven",strage="NASK"):
         module_dir_path=self.get_module_path()
 
         if (strage=="NASK") or (strage=="nask"):
@@ -59,10 +59,12 @@ class Manager():
         elif strage=="local":
             database_dir_path=module_dir_path+"/database"
 
+        trial_dir_path=database_dir_path+"/"+trial_name
 
         database_dir_dict={
             "module_dir_path":module_dir_path,
             "database_dir_path":database_dir_path,
+            "trial_dir_path":trial_dir_path,
         }
 
         for path in database_dir_dict.values():
@@ -100,7 +102,11 @@ class Manager():
 
     def load_picklelog(self,picklepath):
         with open(picklepath,mode="rb") as f:
-            data=pickle.load(f)
+            try:
+                data=pickle.load(f)
+            except ModuleNotFoundError:
+                # python2系列で書かれた場合
+                data=pickle.load(f,fix_imports=True)
         return data        
     
     def write_yaml(self,dict_data,yaml_path):

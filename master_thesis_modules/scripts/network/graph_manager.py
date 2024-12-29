@@ -16,176 +16,423 @@ class GraphManager():
         # define network
         super().__init__()
         
+    def get_default_graph(self):
         # node定義
-        self.node_dict={
-            1000:{
-                "score":np.nan,
-                "status":"active",
-                "description":"最も行動が危険な人物の選定",
-                "description_en":"Risk ratio",
-                },
-            2000:{
-                "score":np.nan,
-                "status":"active",
-                "description":"転倒事故防止",
-                "description_en":"Prevent accidents",
-                },
-            2001:{
-                "score":np.nan,
-                "status":"active",
-                "description":"スタッフの緊張緩和",
-                "description_en":"Ease burden on staff",
-                },
-            2002:{
-                "score":np.nan,
-                "status":"active",
-                "description":"患者の主体性担保",
-                "description_en":"Maintain independence of patients",
-                },
-            3000:{
-                "score":np.nan,
-                "status":"active",
-                "description":"本人の属性",
-                "description_en":"Who",
-                },
-            3001:{
-                "score":np.nan,
-                "status":"active",
-                "description":"本人の動作",
-                "description_en":"What",
-                },
-            3002:{
-                "score":np.nan,
-                "status":"active",
-                "description":"本人の様子",
-                "description_en":"How",
-                },
-            3003:{
-                "score":np.nan,
-                "status":"active",
-                "description":"本人の動機",
-                "description_en":"Why",
-                },
-            3004:{
-                "score":np.nan,
-                "status":"active",
-                "description":"時間的文脈",
-                "description_en":"When",
-                },
-            3005:{
-                "score":np.nan,
-                "status":"active",
-                "description":"空間的文脈",
-                "description_en":"Where",
-                },
-            4050:{
-                "score":np.nan,
-                "status":"inactive",
-                "description":"本人の居場所",
-                "description_en":"Location of patient",
-                },
-            4051:{
-                "score":np.nan,
-                "status":"inactive",
-                "description":"周囲の物体",
-                "description_en":"Objects",
-                },
-            4052:{
-                "score":np.nan,
-                "status":"inactive",
-                "description":"周囲の人物",
-                "description_en":"People",
-                },
-            5510:{
-                "score":np.nan,
-                "status":"inactive",
-                "description":"経管栄養・点滴の存在",
-                "description_en":"Infusion pole",
-                },
-            5511:{
-                "score":np.nan,
-                "status":"inactive",
-                "description":"車椅子の存在",
-                "description_en":"Wheelchair",
-                },
-            5512:{
-                "score":np.nan,
-                "status":"inactive",
-                "description":"手すりの不在",
-                "description_en":"Handrail",
-                },
-            5520:{
-                "score":np.nan,
-                "status":"inactive",
-                "description":"スタッフが遠方",
-                "description_en":"Distance from staff",
-                },
-            5521:{
-                "score":np.nan,
-                "status":"inactive",
-                "description":"スタッフの視野外",
-                "description_en":"Gaze of staff",
-                },
-            5522:{
-                "score":np.nan,
-                "status":"inactive",
-                "description":"面会者の存在",
-                "description_en":"Distance from others",
-                },
+        node_dict={
+            10000000:{
+                    "score":np.nan,
+                    "status":"active",
+                    "description_en":"Risk ratio",
+                    "layer":1,
+                    "node_code_to":[20000000,20000001]
+                    },
+            20000000:{
+                    "score":np.nan,
+                    "status":"active",
+                    "description_en":"Risk ratio",
+                    "layer":2,
+                    "node_code_to":[30000000,30000001]
+                    },
+            20000001:{
+                    "score":np.nan,
+                    "status":"active",
+                    "description_en":"Risk ratio",
+                    "layer":2,
+                    "node_code_to":[30000010,30000011]
+                    },
+            30000000:{
+                    "score":np.nan,
+                    "status":"active",
+                    "description_en":"Risk ratio",
+                    "layer":3,
+                    "node_code_to":[40000000,40000001]
+                    },
+            30000001:{
+                    "score":np.nan,
+                    "status":"active",
+                    "description_en":"Risk ratio",
+                    "layer":3,
+                    "node_code_to":[40000010,40000011,40000012,40000013,40000014,40000015,40000016]
+                    },
+            30000010:{
+                    "score":np.nan,
+                    "status":"active",
+                    "description_en":"Risk ratio",
+                    "layer":3,
+                    "node_code_to":[40000100,40000101,40000102]
+                    },
+            30000011:{
+                    "score":np.nan,
+                    "status":"active",
+                    "description_en":"Risk ratio",
+                    "layer":3,
+                    "node_code_to":[40000110,40000111]
+                    },
+            40000000:{
+                    "score":np.nan,
+                    "status":"active",
+                    "description_en":"Risk ratio",
+                    "layer":4,
+                    "node_code_to":[50000000,50000001]
+                    },
+            40000001:{
+                    "score":np.nan,
+                    "status":"active",
+                    "description_en":"Risk ratio",
+                    "layer":4,
+                    "node_code_to":[50000010,50000011]
+                    },
+            40000010:{
+                    "score":np.nan,
+                    "status":"active",
+                    "description_en":"Risk ratio",
+                    "layer":4,
+                    "node_code_to":[50000100,50000101,50000102,50000103]
+                    },
+            40000011:{
+                    "score":np.nan,
+                    "status":"active",
+                    "description_en":"Risk ratio",
+                    "layer":4,
+                    "node_code_to":[50000100,50000101,50000102,50000103],
+                    },
+            40000012:{
+                    "score":np.nan,
+                    "status":"active",
+                    "description_en":"Risk ratio",
+                    "layer":4,
+                    "node_code_to":[50000100,50000101,50000102,50000103],
+                    },
+            40000013:{
+                    "score":np.nan,
+                    "status":"active",
+                    "description_en":"Risk ratio",
+                    "layer":4,
+                    "node_code_to":[50000100,50000101,50000102,50000103],
+                    },
+            40000014:{
+                    "score":np.nan,
+                    "status":"active",
+                    "description_en":"Risk ratio",
+                    "layer":4,
+                    "node_code_to":[50000100,50000101,50000102,50000103],
+                    },
+            40000015:{
+                    "score":np.nan,
+                    "status":"active",
+                    "description_en":"Risk ratio",
+                    "layer":4,
+                    "node_code_to":[50000100,50000101,50000102,50000103],
+                    },
+            40000016:{
+                    "score":np.nan,
+                    "status":"active",
+                    "description_en":"Risk ratio",
+                    "layer":4,
+                    "node_code_to":[50000100,50000101,50000102,50000103],
+                    },
+            40000100:{
+                    "score":np.nan,
+                    "status":"active",
+                    "description_en":"Risk ratio",
+                    "layer":4,
+                    "node_code_to":[50001000,50001001,50001002,50001003,60010000],
+                    },
+            40000101:{
+                    "score":np.nan,
+                    "status":"active",
+                    "description_en":"Risk ratio",
+                    "layer":4,
+                    "node_code_to":[50001000,50001001,50001002,50001003,60010000],
+                    },
+            40000102:{
+                    "score":np.nan,
+                    "status":"active",
+                    "description_en":"Risk ratio",
+                    "layer":4,
+                    "node_code_to":[50001000,50001001,50001002,50001003,60010000],
+                    },
+            40000110:{
+                    "score":np.nan,
+                    "status":"active",
+                    "description_en":"Risk ratio",
+                    "layer":4,
+                    "node_code_to":[50001100,50001101,60010000,60010001],
+                    },
+            40000111:{
+                    "score":np.nan,
+                    "status":"active",
+                    "description_en":"Risk ratio",
+                    "layer":4,
+                    "node_code_to":[50001100,50001101,50001110,50001111,60010000,60010001],
+                    },
+            50000000:{
+                    "score":np.nan,
+                    "status":"active",
+                    "description_en":"Risk ratio",
+                    "layer":5,
+                    "node_code_to":[]
+                    },
+            50000001:{
+                    "score":np.nan,
+                    "status":"active",
+                    "description_en":"Risk ratio",
+                    "layer":5,
+                    "node_code_to":[]
+                    },
+            50000010:{
+                    "score":np.nan,
+                    "status":"active",
+                    "description_en":"Risk ratio",
+                    "layer":5,
+                    "node_code_to":[]
+                    },
+            50000011:{
+                    "score":np.nan,
+                    "status":"active",
+                    "description_en":"Risk ratio",
+                    "layer":5,
+                    "node_code_to":[]
+                    },
+            50000100:{
+                    "score":np.nan,
+                    "status":"active",
+                    "description_en":"Risk ratio",
+                    "layer":5,
+                    "node_code_to":[]
+                    },
+            50000101:{
+                    "score":np.nan,
+                    "status":"active",
+                    "description_en":"Risk ratio",
+                    "layer":5,
+                    "node_code_to":[]
+                    },
+            50000102:{
+                    "score":np.nan,
+                    "status":"active",
+                    "description_en":"Risk ratio",
+                    "layer":5,
+                    "node_code_to":[]
+                    },
+            50000103:{
+                    "score":np.nan,
+                    "status":"active",
+                    "description_en":"Risk ratio",
+                    "layer":5,
+                    "node_code_to":[]
+                    },
+            50001000:{
+                    "score":np.nan,
+                    "status":"active",
+                    "description_en":"Risk ratio",
+                    "layer":5,
+                    "node_code_to":[]
+                    },
+            50001001:{
+                    "score":np.nan,
+                    "status":"active",
+                    "description_en":"Risk ratio",
+                    "layer":5,
+                    "node_code_to":[]
+                    },
+            50001002:{
+                    "score":np.nan,
+                    "status":"active",
+                    "description_en":"Risk ratio",
+                    "layer":5,
+                    "node_code_to":[]
+                    },
+            50001003:{
+                    "score":np.nan,
+                    "status":"active",
+                    "description_en":"Risk ratio",
+                    "layer":5,
+                    "node_code_to":[]
+                    },
+            50001010:{
+                    "score":np.nan,
+                    "status":"active",
+                    "description_en":"Risk ratio",
+                    "layer":5,
+                    "node_code_to":[]
+                    },
+            50001011:{
+                    "score":np.nan,
+                    "status":"active",
+                    "description_en":"Risk ratio",
+                    "layer":5,
+                    "node_code_to":[]
+                    },
+            50001012:{
+                    "score":np.nan,
+                    "status":"active",
+                    "description_en":"Risk ratio",
+                    "layer":5,
+                    "node_code_to":[]
+                    },
+            50001013:{
+                    "score":np.nan,
+                    "status":"active",
+                    "description_en":"Risk ratio",
+                    "layer":5,
+                    "node_code_to":[]
+                    },
+            50001020:{
+                    "score":np.nan,
+                    "status":"active",
+                    "description_en":"Risk ratio",
+                    "layer":5,
+                    "node_code_to":[]
+                    },
+            50001021:{
+                    "score":np.nan,
+                    "status":"active",
+                    "description_en":"Risk ratio",
+                    "layer":5,
+                    "node_code_to":[]
+                    },
+            50001022:{
+                    "score":np.nan,
+                    "status":"active",
+                    "description_en":"Risk ratio",
+                    "layer":5,
+                    "node_code_to":[]
+                    },
+            50001023:{
+                    "score":np.nan,
+                    "status":"active",
+                    "description_en":"Risk ratio",
+                    "layer":5,
+                    "node_code_to":[]
+                    },
+            50001100:{
+                    "score":np.nan,
+                    "status":"active",
+                    "description_en":"Risk ratio",
+                    "layer":5,
+                    "node_code_to":[]
+                    },
+            50001101:{
+                    "score":np.nan,
+                    "status":"active",
+                    "description_en":"Risk ratio",
+                    "layer":5,
+                    "node_code_to":[]
+                    },
+            50001110:{
+                    "score":np.nan,
+                    "status":"active",
+                    "description_en":"Risk ratio",
+                    "layer":5,
+                    "node_code_to":[]
+                    },
+            50001111:{
+                    "score":np.nan,
+                    "status":"active",
+                    "description_en":"Risk ratio",
+                    "layer":5,
+                    "node_code_to":[]
+                    },
+            60010000:{
+                    "score":np.nan,
+                    "status":"active",
+                    "description_en":"Risk ratio",
+                    "layer":6,
+                    "node_code_to":[]
+                    },
+            60010001:{
+                    "score":np.nan,
+                    "status":"active",
+                    "description_en":"Risk ratio",
+                    "layer":6,
+                    "node_code_to":[]
+                    },
         }
 
         # 重み定義
-        self.weight_dict={
-            1000:{
-                2000:1/3,
-                2001:1/3,
-                2002:1/3,
-            },
-            2000:{
-                3000:1/6,
-                3001:1/6,
-                3002:1/6,
-                3003:1/6,
-                3004:1/6,
-                3005:1/6,
-            },
-            # 2001:{},
-            # 2002:{},
-            # 3000:{},
-            # 3001:{},
-            # 3002:{},
-            # 3003:{},
-            # 3004:{},
-            3005:{
-                4050:1/3,
-                4051:1/3,
-                4052:1/3,
-            },
-            # 4050:{},
-            4051:{
-                5510:1/3,
-                5511:1/3,
-                5512:1/3,
-            },
-            4052:{
-                5520:1/3,
-                5521:1/3,
-                5522:1/3,
-            },
+        weight_dict={
         }
-        weight_history={}
-        for node_from in self.weight_dict.keys():
-            for node_to in self.weight_dict[node_from].keys():
-                weight_history[node_to]=self.weight_dict[node_from][node_to]
-        self.weight_history=pd.DataFrame(weight_history,index=[0])
+        for node in node_dict.keys():
+            node_code_from=node
+            weight_dict[node_code_from]={}
+            node_codes_to=node_dict[node_code_from]["node_code_to"]
+            for node_code_to in node_codes_to:
+                weight_dict[node_code_from][node_code_to]=1/len(node_codes_to)         
 
-        self.graph_dict={
-            "A":{"G":"","node_dict":copy.deepcopy(self.node_dict),"weight_dict":copy.deepcopy(self.weight_dict),"weight_history":copy.deepcopy(self.weight_history),"pos":""},
-            "B":{"G":"","node_dict":copy.deepcopy(self.node_dict),"weight_dict":copy.deepcopy(self.weight_dict),"weight_history":copy.deepcopy(self.weight_history),"pos":""},
-            "C":{"G":"","node_dict":copy.deepcopy(self.node_dict),"weight_dict":copy.deepcopy(self.weight_dict),"weight_history":copy.deepcopy(self.weight_history),"pos":""},
+        G = nx.Graph()
+        # node定義
+        G.add_nodes_from(node_dict.keys())
+        # edge定義
+        for node in node_dict.keys():
+            node_code_from=node
+            node_codes_to=node_dict[node_code_from]["node_code_to"]
+            G.add_edges_from([(node_code_from,node_code_to,{"weight":weight_dict[node_code_from][node_code_to]}) for node_code_to in node_codes_to])
+        # 位置追記
+        pos_dict={}
+        previous_layer=0
+        max_layer=int(str(max(list(node_dict.keys())))[0])
+        n_node_per_layer_dict={
+            1:len([n for n in node_dict.keys() if node_dict[n] ["layer"]==1]),
+            2:len([n for n in node_dict.keys() if node_dict[n] ["layer"]==2]),
+            3:len([n for n in node_dict.keys() if node_dict[n] ["layer"]==3]),
+            4:len([n for n in node_dict.keys() if node_dict[n] ["layer"]==4]),
+            5:len([n for n in node_dict.keys() if node_dict[n] ["layer"]==5]),
+            6:len([n for n in node_dict.keys() if node_dict[n] ["layer"]==6]),
         }
-        for name in self.graph_dict.keys():
-            self.define_graph(name)
+        graph_height=50
+        # print(n_node_per_layer_dict)
+        # raise NotImplementedError
+        for node in node_dict.keys():
+            h=graph_height/(n_node_per_layer_dict[node_dict[node]["layer"]]+1)
+            if previous_layer!=node_dict[node]["layer"]:
+                y=-h
+            else:
+                y-=h
+            x=max_layer-node_dict[node]["layer"]
+            pos_dict[node]=(x,y)
+            previous_layer=node_dict[node]["layer"]
+
+        graph_dict={
+            "G":G,
+            "node_dict":node_dict,
+            "weight_dict":weight_dict,
+            "pos_dict":pos_dict,
+        }
+        return graph_dict
+
+
+        # for lv in range(5):
+        #     for node_code_from in [n for n in list(graph_dict[name]["node_dict"].keys()) if str(n)[0]==str(lv)]:
+        #         if node_code_from=="description":
+        #             continue
+        #         node_codes_to=[k for k in [j for j in list(self.graph_dict[name]["node_dict"].keys()) if str(j)[0]==str(lv+1)] if str(node_code_from)[2:] == str(k)[1:3]]
+        #         self.G.add_edges_from([(node_code_from,node_code_to,{"weight":self.graph_dict[name]["weight_dict"][node_code_from][node_code_to]}) for node_code_to in node_codes_to])
+        # # 位置追記
+        # self.graph_dict[name]["pos"]={}
+        # previous_layer=0
+        # for node_code in self.G.nodes():
+        #     if previous_layer!=int(str(node_code)[0]):
+        #         y=0
+        #     else:
+        #         y-=1
+        #     self.graph_dict[name]["pos"][node_code]=(int(str(node_code)[0]),y)
+        #     previous_layer=int(str(node_code)[0])
+
+
+        # weight_history={}
+        # # for node_from in weight_dict.keys():
+        # #     for node_to in weight_dict[node_from].keys():
+        # #         weight_history[node_to]=weight_dict[node_from][node_to]
+        # self.weight_history=pd.DataFrame(weight_history,index=[0])
+
+        # self.graph_dict={
+        #     "A":{"G":"","node_dict":copy.deepcopy(self.node_dict),"weight_dict":copy.deepcopy(weight_dict),"weight_history":copy.deepcopy(self.weight_history),"pos":""},
+        #     "B":{"G":"","node_dict":copy.deepcopy(self.node_dict),"weight_dict":copy.deepcopy(weight_dict),"weight_history":copy.deepcopy(self.weight_history),"pos":""},
+        #     "C":{"G":"","node_dict":copy.deepcopy(self.node_dict),"weight_dict":copy.deepcopy(weight_dict),"weight_history":copy.deepcopy(self.weight_history),"pos":""},
+        # }
+        # for name in self.graph_dict.keys():
+        #     self.define_graph(name)
     
     def add_weight_history(self,weight_history,weight_dict,timestamp=0):
         flattened_weight_dict={}
@@ -196,27 +443,27 @@ class GraphManager():
         weight_history.loc[timestamp]=list(added_weight.flatten())
         return weight_history
 
-    def define_graph(self,name):
-        self.graph_dict[name]["G"] = nx.Graph()
-        # node定義
-        self.graph_dict[name]["G"].add_nodes_from(self.graph_dict[name]["node_dict"].keys())
-        # edge定義
-        for lv in range(5):
-            for node_code_from in [n for n in list(self.graph_dict[name]["node_dict"].keys()) if str(n)[0]==str(lv)]:
-                if node_code_from=="description":
-                    continue
-                node_codes_to=[k for k in [j for j in list(self.graph_dict[name]["node_dict"].keys()) if str(j)[0]==str(lv+1)] if str(node_code_from)[2:] == str(k)[1:3]]
-                self.graph_dict[name]["G"].add_edges_from([(node_code_from,node_code_to,{"weight":self.graph_dict[name]["weight_dict"][node_code_from][node_code_to]}) for node_code_to in node_codes_to])
-        # 位置追記
-        self.graph_dict[name]["pos"]={}
-        previous_layer=0
-        for node_code in self.graph_dict[name]["G"].nodes():
-            if previous_layer!=int(str(node_code)[0]):
-                y=0
-            else:
-                y-=1
-            self.graph_dict[name]["pos"][node_code]=(int(str(node_code)[0]),y)
-            previous_layer=int(str(node_code)[0])
+    # def define_graph(self,name):
+    #     self.graph_dict[name]["G"] = nx.Graph()
+    #     # node定義
+    #     self.graph_dict[name]["G"].add_nodes_from(self.graph_dict[name]["node_dict"].keys())
+    #     # edge定義
+    #     for lv in range(5):
+    #         for node_code_from in [n for n in list(self.graph_dict[name]["node_dict"].keys()) if str(n)[0]==str(lv)]:
+    #             if node_code_from=="description":
+    #                 continue
+    #             node_codes_to=[k for k in [j for j in list(self.graph_dict[name]["node_dict"].keys()) if str(j)[0]==str(lv+1)] if str(node_code_from)[2:] == str(k)[1:3]]
+    #             self.graph_dict[name]["G"].add_edges_from([(node_code_from,node_code_to,{"weight":self.graph_dict[name]["weight_dict"][node_code_from][node_code_to]}) for node_code_to in node_codes_to])
+    #     # 位置追記
+    #     self.graph_dict[name]["pos"]={}
+    #     previous_layer=0
+    #     for node_code in self.graph_dict[name]["G"].nodes():
+    #         if previous_layer!=int(str(node_code)[0]):
+    #             y=0
+    #         else:
+    #             y-=1
+    #         self.graph_dict[name]["pos"][node_code]=(int(str(node_code)[0]),y)
+    #         previous_layer=int(str(node_code)[0])
 
     def update_score(self,name,new_score_dict):
         for node_code,score in new_score_dict.items():
@@ -465,4 +712,5 @@ class GraphManager():
 
 if __name__=="__main__":
     cls=GraphManager()
-    cls.main()
+    # cls.main()
+    cls.get_default_graph()

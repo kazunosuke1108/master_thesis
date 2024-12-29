@@ -5,22 +5,226 @@ sys.path.append("..")
 sys.path.append(os.path.expanduser("~")+"/kazu_ws/master_thesis/master_thesis_modules")
 
 from icecream import ic
+from pprint import pprint
 from glob import glob
 
 import numpy as np
 import pandas as pd
 import plotly.subplots as sp
 import plotly.graph_objects as go
+import matplotlib.cm as cm
+import matplotlib.colors as mcolors
 
-from scripts.master import Master
 
-class Visualizer(Master):
-    def __init__(self):
+from scripts.management.manager import Manager
+
+class Visualizer(Manager):
+    def __init__(self,trial_name,strage):
         super().__init__()
+        self.trial_name=trial_name
+        self.strage=strage
         self.visualize_dir_path=sorted(glob(self.get_database_dir(strage="NASK")["database_dir_path"]+"/*"))[-1]
         self.data_paths=sorted(glob(self.visualize_dir_path+"/*"))
-        
         pass
+
+    def visualize_graph(self,trial_name="20241229BuildSimulator",strage="NASK",name="A",show=False):
+        import networkx as nx
+        # self.colorize()
+        symbol_dict={
+            1:"circle",
+            0:"x",
+            np.nan:"x",
+            "active":"circle",
+            "inactive":"x",
+        }
+        self.data_dir_dict=self.get_database_dir(trial_name=trial_name,strage=strage)
+        self.graph_dicts=self.load_picklelog(self.data_dir_dict["trial_dir_path"]+"/graph_dicts.pickle")
+        # pprint(pkl_data)
+        # raise NotImplementedError
+        self.graph_dict=self.graph_dicts[name]
+
+        # グラフの情報を取り出しておく
+        nodes = self.graph_dict["G"].nodes()
+        pos = self.graph_dict["pos_dict"] # key: ノード番号, value: [x,y]
+        weights = nx.get_edge_attributes(self.graph_dict["G"], 'weight') # key:(node_from,node_to), value: weight
+        status = {n:self.graph_dict["node_dict"][n]["status"] for n in nodes}
+        scores = {n:self.graph_dict["node_dict"][n]["score"] for n in nodes}# key: ノード番号, value: 特徴量
+        descriptions = {n:self.graph_dict["node_dict"][n]["description_en"] for n in nodes}
+
+        # 色の準備
+        cmap = cm.get_cmap('jet')
+
+        # エッジ描画データ
+        edge_traces=[]
+        for edge,weight in weights.items():
+            x0, y0 = pos[edge[0]]
+            x1, y1 = pos[edge[1]]
+            edge_x = [x0, x1, None]  # Noneは各エッジの終了を示す
+            edge_y = [y0, y1, None]
+            color=mcolors.rgb2hex(cmap(weight))
+
+            # エッジのトレース
+            edge_trace = go.Scatter(
+                x=edge_x,
+                y=edge_y,
+                line=dict(width=5, color=color),
+                customdata=[weight],
+                hovertemplate="weight: %{customdata:.2f}<extra></extra>",
+                mode='lines'
+            )
+            edge_traces.append(edge_trace)
+
+        node_traces=[]
+        for node,p in pos.items():
+            # ひとつ手前側のエッジの重み情報
+            previous_weight=np.nan#self.get_left_weight(name=name,node=node)
+            # ノードの色
+            color=mcolors.rgb2hex(cmap(scores[node]))
+            # ノードのトレース
+            node_trace = go.Scatter(
+                x=[p[0]],
+                y=[p[1]],
+                mode='markers+text',
+                text=descriptions[node],
+                customdata=[node,descriptions[node]],
+                hovertemplate=f"No. {node}<br>"+
+                                "description: "+descriptions[node]+"<br>"+
+                                f"score: {np.round(scores[node],2)}<br>"+
+                                f"left weight: {previous_weight}<extra></extra>",
+                marker=dict(
+                    symbol=symbol_dict[status[node]],
+                    size=10,
+                    line_color="black",
+                    line_width=2,
+                    color=color,
+                    showscale=False
+                ),
+                textposition="top center"
+            )
+            node_traces.append(node_trace)
+
+        # グラフを作成
+        try:
+            del fig
+        except UnboundLocalError:
+            pass
+        fig = go.Figure(data=edge_traces+node_traces)
+        fig.update_layout(
+            showlegend=False,
+            title=name,
+            xaxis=dict(showgrid=False, zeroline=False),
+            yaxis=dict(showgrid=False, zeroline=False),
+            plot_bgcolor='white',
+            legend=dict(
+                bgcolor='white',  # 背景色
+                bordercolor='black',  # 枠線の色
+                borderwidth=1.5    # 枠線の太さ
+            ),
+            font=dict(
+                family='Times New Roman',  # 推奨フォント
+                size=18,  # フォントサイズ
+                color='black'  # フォント色
+            ),
+        )
+        if show:
+            fig.show()
+        else:
+            pass
+        return fig.data
+        
+    def visualize_animation(self,name,fig_datas,timestamps,show=False,save=False,trial_dir_path=""):
+        frames=[]
+        for i, fig_data in enumerate(fig_datas):
+            try:
+                timestamp=timestamps[i]
+            except IndexError:
+                timestamp=timestamps[-1]+(timestamps[-1]-timestamps[-2])
+            frames.append(go.Frame(
+                data=fig_data,
+                name=f"frame no.: {i}",
+                layout=go.Layout(
+                    title=f"Person: {name}  Frame: {i+1}  timestamp: {timestamp}"
+                ),
+                ))
+        # レイアウト設定
+        layout = go.Layout(
+            title=f"Person: {name}  Frame: 0  timestamp: 0",
+            xaxis=dict(showticklabels=False),  # X軸のメモリを非表示
+            yaxis=dict(showticklabels=False),   # Y軸のメモリを非表示
+            updatemenus=[{
+                'buttons': [
+                    {
+                        'args': [None, {"frame": {"duration": 250, "redraw": True}, "fromcurrent": True}],
+                        'label': 'Play',
+                        'method': 'animate'
+                    },
+                    {
+                        'args': [[None], {"frame": {"duration": 0, "redraw": True}, "mode": "immediate", "transition": {"duration": 0}}],
+                        'label': 'Pause',
+                        'method': 'animate'
+                    }
+                ],
+                'direction': 'left',
+                'pad': {'r': 10, 't': 87},
+                'showactive': False,
+                'type': 'buttons',
+                'x': 0.1,
+                'xanchor': 'right',
+                'y': 0,
+                'yanchor': 'top'
+            }],
+            showlegend=False,
+            plot_bgcolor='white',
+            legend=dict(
+                bgcolor='white',  # 背景色
+                bordercolor='black',  # 枠線の色
+                borderwidth=1.5    # 枠線の太さ
+            ),
+            font=dict(
+                family='Times New Roman',  # 推奨フォント
+                size=18,  # フォントサイズ
+                color='black'  # フォント色
+            ),
+        )
+
+        # Figure作成
+        fig = go.Figure(data=fig_datas[0], layout=layout, frames=frames)
+
+        # プロット
+        if show:
+            fig.show()
+        else:
+            pass
+
+        # export
+        if save:
+            import shutil
+            from glob import glob
+            trial_temp_dir_path=trial_dir_path+f"/temp_{name}"
+            try:
+                shutil.rmtree(trial_temp_dir_path)
+            except FileNotFoundError:
+                pass
+            os.makedirs(trial_temp_dir_path,exist_ok=True)
+            print(name)
+            for i,frame in enumerate(frames):
+                try:
+                    timestamp=timestamps[i]
+                except IndexError:
+                    timestamp=timestamps[-1]+(timestamps[-1]-timestamps[-2])
+                fig.update(data=frame.data,)
+                fig.update_layout(
+                    title_text=f"Person:{name}  Frame:{i+1}  timestamp: {timestamp}",
+                    autosize=False,
+                    width=int(640*2),
+                    height=int(480*1.5),
+                    )
+                print(i)
+                fig.write_image(f"{trial_temp_dir_path}/{name}_{i:03d}.jpg",format='jpg', engine="auto")
+            print("export")
+            self.jpg2mp4(sorted(glob(trial_temp_dir_path+"/*")),mp4_path=trial_dir_path+f"/{name}.mp4",fps=4)
+        return frames
+
 
     def draw_timeseries(self,data,name,label_name="",symbol=""):
         if label_name=="":
@@ -358,10 +562,13 @@ class Visualizer(Master):
         pass
 
 if __name__=="__main__":
-    cls=Visualizer()
-    cls.draw_positions()
-    cls.draw_features()
-    cls.draw_weight()
-    cls.draw_fps()
+    trial_name="20241229BuildSimulator"
+    strage="NASK"
+    cls=Visualizer(trial_name=trial_name,strage=strage)
+    cls.visualize_graph(trial_name="20241229BuildSimulator",strage="NASK",name="A",show=True)
+    # cls.draw_positions()
+    # cls.draw_features()
+    # cls.draw_weight()
+    # cls.draw_fps()
     # cls.draw_nActive()
     pass
