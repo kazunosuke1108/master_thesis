@@ -16,33 +16,42 @@ class PseudoDataGenerator(Manager):
         self.strage=strage
         self.data_dir_dict=self.get_database_dir(trial_name=self.trial_name,strage=self.strage)
 
-        # DataFrameの定義
-        self.t=np.arange(0,8.001,0.25)
-        data=pd.DataFrame(self.t,columns=["timestamp"])
-
-        columns=[1000,2000,2001,2002,3000,3001,3002,3003,3004,3005,4050,4051,4052,5510,5511,5512,5520,5521,5522]
-        columns=columns+["active","fps"]
-        for column in columns:
-            data[column]=np.nan
-        data["active"]=0
-        data.loc[0,"active"]=1
-        data.loc[0,"fps"]=1
-        
-        # 無視するデータ群を指定
-        killed_columns=[2001,2002,3000,3001,3003,3004,4050,5521,5522]
-        for killed_column in killed_columns:
-            data[killed_column]=1e-5
-        
-        self.data_dict={
-            "A":data.copy(),#A
-            "B":data.copy(),#B
-            "C":data.copy(),#C
-        }        
-
-
-    def main(self):
+    def action_to_pose(self,df,action_dict):# 患者ごとに切り出したデータを食わせる
         
         pass
+
+    def get_pseudo_data(self,graph_dicts,general_dict,zokusei_dict,position_dict,action_dict,surrounding_objects):
+        people=list(graph_dicts.keys())
+        patients=[p for p in people if zokusei_dict[p]["patient"]=="yes"]
+        
+        # DataFrameの作成
+        data_dicts={}
+        t=np.arange(general_dict["start_timestamp"],general_dict["end_timestamp"]+1e-4,step=1/general_dict["fps"])
+        for person in patients:
+            df=pd.DataFrame(t,columns=["timestamp"])
+            for node in graph_dicts[person]["node_dict"].keys():
+                df[node]=np.nan
+            data_dicts[person]=df
+
+        # 属性情報の入力
+        for patient in patients:
+            data_dicts[patient][50000000]=zokusei_dict[patient]["patient"]
+            data_dicts[patient][50000001]=1
+            data_dicts[patient][50000010]=zokusei_dict[patient]["age"]
+            data_dicts[patient][50000011]=1
+
+        # 患者の軌道を生成
+        for patient in patients:
+            data_dicts[patient][60010000]=position_dict[patient][0]
+            data_dicts[patient][60010001]=position_dict[patient][1]
+
+        # 患者の姿勢情報の生成
+        for patient in patients:
+            data_dicts[patient]=self.action_to_pose(data_dicts[patient],action_dict[patient])
+
+
+        # 看護師の軌道情報の生成
+        return data_dicts
     
 
 if __name__=="__main__":
