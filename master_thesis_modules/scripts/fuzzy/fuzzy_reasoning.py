@@ -49,6 +49,60 @@ class FuzzyReasoning():
                     "result":"low",
                 },
             },
+            20000000:{
+                1:{
+                    "conditions":{30000000:"high",30000001:"high"},
+                    "result":"high",
+                },
+                2:{
+                    "conditions":{30000000:"high",30000001:"low"},
+                    "result":"high",
+                },
+                3:{
+                    "conditions":{30000000:"low",30000001:"high"},
+                    "result":"middle",
+                },
+                4:{
+                    "conditions":{30000000:"low",30000001:"low"},
+                    "result":"low",
+                },
+            },
+            20000001:{
+                1:{
+                    "conditions":{30000010:"high",30000011:"high"},
+                    "result":"high",
+                },
+                2:{
+                    "conditions":{30000010:"high",30000011:"low"},
+                    "result":"middle",
+                },
+                3:{
+                    "conditions":{30000010:"low",30000011:"high"},
+                    "result":"middle",
+                },
+                4:{
+                    "conditions":{30000010:"low",30000011:"low"},
+                    "result":"low",
+                },
+            },
+            10000000:{
+                1:{
+                    "conditions":{20000000:"high",20000001:"high"},
+                    "result":"high",
+                },
+                2:{
+                    "conditions":{20000000:"high",20000001:"low"},
+                    "result":"middle",
+                },
+                3:{
+                    "conditions":{20000000:"low",20000001:"high"},
+                    "result":"middle",
+                },
+                4:{
+                    "conditions":{20000000:"low",20000001:"low"},
+                    "result":"low",
+                },
+            },
         }
 
     def membership_func(self,x,type="high"):
@@ -96,9 +150,6 @@ class FuzzyReasoning():
             # ic(peak,height)
             reasoning_result+=peak*height
         return reasoning_result
-
-
-    
 
     def main(self):
         ans=self.calculate_fuzzy(input_nodes={40000110:0.5,40000111:0.5},output_node=30000011)

@@ -15,9 +15,10 @@ sys.path.append(os.path.expanduser("~")+"/kazu_ws/master_thesis/master_thesis_mo
 from scripts.management.manager import Manager
 from scripts.network.graph_manager import GraphManager
 from scripts.AHP.get_comparison_mtx import getConsistencyMtx
+from scripts.fuzzy.fuzzy_reasoning import FuzzyReasoning
 from scripts.pseudo_data.pseudo_data_generator import PseudoDataGenerator
 
-class Master(Manager,GraphManager):
+class Master(Manager,GraphManager,FuzzyReasoning):
     def __init__(self,trial_name,strage):
         super().__init__()
         print("# Master開始 #")
@@ -330,6 +331,15 @@ class Master(Manager,GraphManager):
         for patient in self.data_dicts.keys():
             self.data_dicts[patient][output_node_code]=list(map(weight_sum,self.data_dicts[patient][input_node_codes].iterrows()))
         pass
+    
+    def fuzzy_reasoning_master(self,input_node_codes,output_node_code):
+        def ask_risk_to_calculator(row):
+            features=row[1].fillna(0)
+            input_nodes=features.to_dict()
+            risk=self.calculate_fuzzy(input_nodes=input_nodes,output_node=output_node_code)
+            return risk
+        for patient in self.data_dicts.keys():
+            self.data_dicts[patient][output_node_code]=list(map(ask_risk_to_calculator,self.data_dicts[patient][input_node_codes].iterrows()))
 
     def main(self):
         print("# 5 -> 4層推論 #")
@@ -345,12 +355,21 @@ class Master(Manager,GraphManager):
         print("# 4 -> 3層推論 #")
         # 内定・静的
         self.fuzzy_multiply()
-
         # 内的・動的
         self.AHP_weight_sum(input_node_codes=[40000010,40000011,40000012,40000013,40000014,40000015,40000016],output_node_code=30000001)
         # 外的・静的
         self.AHP_weight_sum(input_node_codes=[40000100,40000101,40000102],output_node_code=30000010)
         # 外的・動的
+        self.fuzzy_reasoning_master(input_node_codes=[40000110,40000111],output_node_code=30000011)
+
+        print("# 3 -> 2層推論 #")
+        # 内的
+        self.fuzzy_reasoning_master(input_node_codes=[30000000,30000001],output_node_code=20000000)
+        # 外的
+        self.fuzzy_reasoning_master(input_node_codes=[30000010,30000011],output_node_code=20000001)
+        
+        print("# 2 -> 1層推論 #")
+        self.fuzzy_reasoning_master(input_node_codes=[20000000,20000001],output_node_code=10000000)
         pass
 
 if __name__=="__main__":
