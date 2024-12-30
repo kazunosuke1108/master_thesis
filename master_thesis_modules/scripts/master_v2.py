@@ -39,18 +39,48 @@ class Master(Manager,GraphManager,FuzzyReasoning):
         self.spatial_normalization_param=np.sqrt(2)*6
 
         # 危険動作の事前定義
+        # self.risky_motion_dict={
+        #     40000010:{
+        #         "label":"standUp",
+        #         "features":np.array([1,         1,      np.nan, 1]),
+        #         },
+        #     40000011:{
+        #         "label":"releaseBrake",
+        #         "features":np.array([0,         1,      1,      0]),
+        #         },
+        #     40000012:{
+        #         "label":"moveWheelchair",
+        #         "features":np.array([0,         0,      1,      0]),
+        #         },
+        #     40000013:{
+        #         "label":"loseBalance",
+        #         "features":np.array([0,         1,      np.nan, np.nan]),
+        #         },
+        #     40000014:{
+        #         "label":"moveHand",
+        #         "features":np.array([np.nan,    np.nan, 1,      np.nan]),
+        #         },
+        #     40000015:{
+        #         "label":"coughUp",
+        #         "features":np.array([np.nan,    1,      0,      0]),
+        #         },
+        #     40000016:{
+        #         "label":"touchFace",
+        #         "features":np.array([np.nan,    0,      1,      np.nan]),
+        #     },
+        # }
         self.risky_motion_dict={
             40000010:{
                 "label":"standUp",
-                "features":np.array([1,         1,      np.nan, 1]),
+                "features":np.array([1,         0,      0,      1]),
                 },
             40000011:{
                 "label":"releaseBrake",
-                "features":np.array([0,         1,      1,      0]),
+                "features":np.array([0,         0.5,    0.5,      0.5]),
                 },
             40000012:{
                 "label":"moveWheelchair",
-                "features":np.array([0,         0,      1,      0]),
+                "features":np.array([0,         0.5,      0.5,      0.5]),
                 },
             40000013:{
                 "label":"loseBalance",
@@ -58,15 +88,15 @@ class Master(Manager,GraphManager,FuzzyReasoning):
                 },
             40000014:{
                 "label":"moveHand",
-                "features":np.array([np.nan,    np.nan, 1,      np.nan]),
+                "features":np.array([np.nan,    0,      1,      np.nan]),
                 },
             40000015:{
                 "label":"coughUp",
-                "features":np.array([np.nan,    1,      0,      0]),
+                "features":np.array([np.nan,    0.5,      0.5,      np.nan]),
                 },
             40000016:{
                 "label":"touchFace",
-                "features":np.array([np.nan,    0,      0,      np.nan]),
+                "features":np.array([np.nan,    0,      0.5,      np.nan]),
             },
         }
 
@@ -162,29 +192,29 @@ class Master(Manager,GraphManager,FuzzyReasoning):
                 0:{
                     "label":"work",
                     "start_timestamp":0,
-                    "end_timestamp":2,
-                },
-                2:{
-                    "label":"approach_B",
-                    "start_timestamp":2,
                     "end_timestamp":5,
-                    },
-                5:{
-                    "label":"work_B",
-                    "start_timestamp":5,
-                    "end_timestamp":8,
                 },
-                8:{
+                5:{
+                    "label":"approach_B",
+                    "start_timestamp":5,
+                    "end_timestamp":7,
+                    },
+                7:{
+                    "label":"work_B",
+                    "start_timestamp":7,
+                    "end_timestamp":9,
+                },
+                9:{
                     "label":"leave_B",
-                    "start_timestamp":8,
+                    "start_timestamp":9,
                     "end_timestamp":end_timestamp,
                     }
             }
         }
         surrounding_objects={
-            "A":["wheelchair",],
+            "A":[],
             "B":["wheelchair",],
-            "C":["ivPole","wheelchair",],
+            "C":["ivPole",],
         }
 
         cls_PDG=PseudoDataGenerator(trial_name=self.trial_name,strage=self.strage)
@@ -235,6 +265,7 @@ class Master(Manager,GraphManager,FuzzyReasoning):
         def get_similarity(risk,row):
             row=row[1]
             similarity=1-np.nanmean(abs(self.risky_motion_dict[risk]["features"]-row[[50000100,50000101,50000102,50000103]]))
+            similarity=similarity**4
             return similarity
         for patient in self.data_dicts.keys():
             for risk in self.risky_motion_dict.keys():
@@ -266,12 +297,13 @@ class Master(Manager,GraphManager,FuzzyReasoning):
             relative_pos=np.array([patient_x-staff_x,patient_y-staff_y])
             relative_vel=np.array([staff_vx,staff_vy])
             cos_theta=np.dot(relative_pos,relative_vel)/(np.linalg.norm(relative_pos)*np.linalg.norm(relative_vel))
-            if cos_theta>1:
-                val=0
-            elif cos_theta<0:
-                val=1
-            else:
-                val=1-cos_theta
+            val=1-(cos_theta/2+0.5)
+            # if cos_theta>1:
+            #     val=0
+            # elif cos_theta<0:
+            #     val=1
+            # else:
+            #     val=1-cos_theta
             return val
         for patient in self.data_dicts.keys():
             # 距離リスク
@@ -288,6 +320,8 @@ class Master(Manager,GraphManager,FuzzyReasoning):
                                                         self.data_dicts[patient][50001110],
                                                         self.data_dicts[patient][50001111],
                                                         ))
+            self.data_dicts[patient][40000111].fillna(method="ffill",inplace=True)
+            self.data_dicts[patient][40000111].fillna(method="bfill",inplace=True)
             pass
 
     def save_session(self):

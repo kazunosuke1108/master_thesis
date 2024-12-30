@@ -23,8 +23,10 @@ class Visualizer(Manager):
         super().__init__()
         self.trial_name=trial_name
         self.strage=strage
-        self.visualize_dir_path=sorted(glob(self.get_database_dir(strage="NASK")["database_dir_path"]+"/*"))[-1]
-        self.data_paths=sorted(glob(self.visualize_dir_path+"/*"))
+        self.data_dir_dict=self.get_database_dir(trial_name=trial_name,strage=strage)
+        
+        # self.visualize_dir_path=sorted(glob(self.get_database_dir(strage="NASK")["database_dir_path"]+"/*"))[-1]
+        # self.data_paths=sorted(glob(self.visualize_dir_path+"/*"))
         pass
 
     def visualize_graph(self,trial_name="20241229BuildSimulator",strage="NASK",name="A",show=False):
@@ -85,7 +87,7 @@ class Visualizer(Manager):
                 x=[p[0]],
                 y=[p[1]],
                 mode='markers+text',
-                text=descriptions[node],
+                text=node,
                 customdata=[node,descriptions[node]],
                 hovertemplate=f"No. {node}<br>"+
                                 "description: "+descriptions[node]+"<br>"+
@@ -230,6 +232,8 @@ class Visualizer(Manager):
         if label_name=="":
             try:
                 label_name=self.node_dict[int(name)]["description_en"]
+            except AttributeError:
+                label_name=name
             except ValueError:
                 label_name=name
         # if label_name=="A":
@@ -248,7 +252,7 @@ class Visualizer(Manager):
             mode="markers+lines",
             marker=dict(
                 # color=color,
-                size=20,
+                size=10,
             ),
             name=label_name
             # name=f"<i>{symbol}</i><sub>"+str(name)+"</sub>"#+" : "+label_name,
@@ -350,7 +354,7 @@ class Visualizer(Manager):
                 ),
                 font=dict(
                     family='Times New Roman',  # 推奨フォント
-                    size=36,  # フォントサイズ
+                    size=18,  # フォントサイズ
                     color='black'  # フォント色
                 ),
                 margin=dict(
@@ -395,14 +399,15 @@ class Visualizer(Manager):
         pass
 
     def draw_features(self):
-        csv_paths=[path for path in self.data_paths if (("feature" in os.path.basename(path)) and (".csv" in os.path.basename(path)))]
+        # csv_paths=[path for path in self.data_paths if (("feature" in os.path.basename(path)) and (".csv" in os.path.basename(path)))]
+        csv_paths=sorted(glob(self.data_dir_dict["trial_dir_path"]+"/*.csv"))
         plot_data=[]
 
         for csv_path in csv_paths:
             name=os.path.basename(csv_path)[:-4].split("_")[-1]
             data=pd.read_csv(csv_path,header=0)
             nodes=[k for k in list(data.keys()) if (("timestamp" not in k) and ("active" not in k) and ("fps" not in k))]
-            categories=sorted(list(set([str(k)[:3] for k in nodes])))
+            categories=sorted(list(set([str(k)[:1] for k in nodes])))
             
             plot_data=[[] for i in range(len(categories))]
             fig=sp.make_subplots(rows=len(categories), cols=1,  # 2行1列
@@ -410,7 +415,7 @@ class Visualizer(Manager):
                         vertical_spacing=0.1)  # グラフ間の間隔
             
             for node in nodes:
-                row_no=categories.index(str(node)[:3])
+                row_no=categories.index(str(node)[:1])
                 trace=self.draw_timeseries(data=data,name=node,symbol="x<sup>i</sup>")
                 plot_data[row_no].append(trace)
             
@@ -434,7 +439,7 @@ class Visualizer(Manager):
                     col=1,
                     )
             fig=self.customize_layouts(fig)
-            fig.write_html(self.visualize_dir_path+f"/features_{name}.html")
+            fig.write_html(self.data_dir_dict["trial_dir_path"]+f"/features_{name}.html")
             fig.show()
 
         pass
@@ -558,6 +563,36 @@ class Visualizer(Manager):
         fig.update_yaxes(title=dict(text="Number of feature observation",font=dict(family="Times New Roman",size=36)))
         fig.show()
 
+    def plot_matplotlib(self):
+        import matplotlib.pyplot as plt
+        csv_paths=sorted(glob(self.data_dir_dict["trial_dir_path"]+"/*csv"))
+        for csv_path in csv_paths:
+            data=pd.read_csv(csv_path,header=0)
+            print(data)
+            plt.plot(data["timestamp"],data["30000000"],"-x",label="zokusei")
+            plt.plot(data["timestamp"],data["30000001"],"-^",label="motion")
+            plt.plot(data["timestamp"],data["30000010"],"-^",label="objects")
+            plt.plot(data["timestamp"],data["30000011"],"-^",label="staff")
+            # plt.plot(data["timestamp"],data["40000102"],"-o",label="handrail")
+
+            # plt.plot(data["timestamp"],data["40000010"],"-x",label="standup")
+            # plt.plot(data["timestamp"],data["40000011"],"-^",label="releaseBrake")
+            # plt.plot(data["timestamp"],data["40000012"],"-s",label="moveWheelchair")
+            # plt.plot(data["timestamp"],data["40000013"],"-o",label="loseBalance")
+            # plt.plot(data["timestamp"],data["40000014"],label="MoveHand")
+            # plt.plot(data["timestamp"],data["40000015"],label="cough")
+            # plt.plot(data["timestamp"],data["40000016"],label="touchFace")
+            
+            # plt.plot(data["timestamp"],data["50001110"],label="pose2")
+            # plt.plot(data["timestamp"],data["50001111"],label="pose3")
+            plt.legend()
+            plt.show()
+
+        for csv_path in csv_paths:
+            data=pd.read_csv(csv_path,header=0)
+            plt.plot(data["timestamp"],data["10000000"],label=os.path.basename(csv_path))
+        plt.legend()
+        plt.show()
     def main(self):
         pass
 
@@ -565,7 +600,8 @@ if __name__=="__main__":
     trial_name="20241229BuildSimulator"
     strage="NASK"
     cls=Visualizer(trial_name=trial_name,strage=strage)
-    cls.visualize_graph(trial_name="20241229BuildSimulator",strage="NASK",name="A",show=True)
+    # cls.visualize_graph(trial_name="20241229BuildSimulator",strage="NASK",name="A",show=True)
+    cls.plot_matplotlib()
     # cls.draw_positions()
     # cls.draw_features()
     # cls.draw_weight()

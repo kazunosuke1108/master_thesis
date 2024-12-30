@@ -24,25 +24,27 @@ class PseudoDataGenerator(Manager):
             if label=="sit":
                 df[50000100][(df["timestamp"]>=start) & (df["timestamp"]<=end)]=0
                 df[50000101][(df["timestamp"]>=start) & (df["timestamp"]<=end)]=0
-                df[50000102][(df["timestamp"]>=start) & (df["timestamp"]<=end)]=np.nan
+                df[50000102][(df["timestamp"]>=start) & (df["timestamp"]<=end)]=0
                 df[50000103][(df["timestamp"]>=start) & (df["timestamp"]<=end)]=0.5
             elif label=="stand":
                 df[50000100][(df["timestamp"]>=start) & (df["timestamp"]<=end)]=1
                 df[50000101][(df["timestamp"]>=start) & (df["timestamp"]<=end)]=0
-                df[50000102][(df["timestamp"]>=start) & (df["timestamp"]<=end)]=np.nan
+                df[50000102][(df["timestamp"]>=start) & (df["timestamp"]<=end)]=0
                 df[50000103][(df["timestamp"]>=start) & (df["timestamp"]<=end)]=1
             elif label=="standup":
                 df[50000100][(df["timestamp"]>=start) & (df["timestamp"]<=end)]=\
                 np.interp(df["timestamp"][(df["timestamp"]>=start) & (df["timestamp"]<=end)],[start,end],[0,1])
-                df[50000101][(df["timestamp"]>=start) & (df["timestamp"]<=end)]=0.5
-                df[50000102][(df["timestamp"]>=start) & (df["timestamp"]<=end)]=np.nan
+                df[50000101][(df["timestamp"]>=start) & (df["timestamp"]<=end)]=\
+                np.interp(df["timestamp"][(df["timestamp"]>=start) & (df["timestamp"]<=end)],[start,(start+end)/2,end],[0,0.3,0])
+                df[50000102][(df["timestamp"]>=start) & (df["timestamp"]<=end)]=0
                 df[50000103][(df["timestamp"]>=start) & (df["timestamp"]<=end)]=\
                 np.interp(df["timestamp"][(df["timestamp"]>=start) & (df["timestamp"]<=end)],[start,end],[0.5,1])
             elif label=="sitdown":
                 df[50000100][(df["timestamp"]>=start) & (df["timestamp"]<=end)]=\
                 np.interp(df["timestamp"][(df["timestamp"]>=start) & (df["timestamp"]<=end)],[start,end],[1,0])
-                df[50000101][(df["timestamp"]>=start) & (df["timestamp"]<=end)]=0.5
-                df[50000102][(df["timestamp"]>=start) & (df["timestamp"]<=end)]=np.nan
+                df[50000101][(df["timestamp"]>=start) & (df["timestamp"]<=end)]=\
+                np.interp(df["timestamp"][(df["timestamp"]>=start) & (df["timestamp"]<=end)],[start,(start+end)/2,end],[0,0.3,0])
+                df[50000102][(df["timestamp"]>=start) & (df["timestamp"]<=end)]=0
                 df[50000103][(df["timestamp"]>=start) & (df["timestamp"]<=end)]=\
                 np.interp(df["timestamp"][(df["timestamp"]>=start) & (df["timestamp"]<=end)],[start,end],[1,0.5])
                                 
@@ -159,6 +161,10 @@ class PseudoDataGenerator(Manager):
         for patient in patients:
             data_dicts[patient][50001110]=data_dicts[patient][50001100].diff().values
             data_dicts[patient][50001111]=data_dicts[patient][50001101].diff().values
+            # data_dicts[patient][50001110].fillna(method="ffill",inplace=True)
+            # data_dicts[patient][50001110].fillna(method="bfill",inplace=True)
+            # data_dicts[patient][50001111].fillna(method="ffill",inplace=True)
+            # data_dicts[patient][50001111].fillna(method="bfill",inplace=True)
         return data_dicts
     
 

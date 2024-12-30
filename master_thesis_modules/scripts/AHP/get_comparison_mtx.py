@@ -91,6 +91,7 @@ class getConsistencyMtx(Manager):
         AHP_dict[30000001]["weights"]=weights
         data=pd.DataFrame(data)
         data.to_csv(csv_path,index=False,header=False)
+        print(weights)
         
         # 外的・静的（物体）30000010
         AHP_dict[30000010]={}
@@ -107,7 +108,6 @@ class getConsistencyMtx(Manager):
         AHP_dict[30000010]["A"]=data
         AHP_dict[30000010]["CI"]=CI
         AHP_dict[30000010]["weights"]=weights
-        print(CI)
         data=pd.DataFrame(data)
         data.to_csv(csv_path,index=False,header=False)
         
