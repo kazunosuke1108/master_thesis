@@ -11,38 +11,67 @@ class FuzzyReasoning():
 
     def define_rules(self):
         self.reasoning_rule_dict={
-            405:{
-                405.1:{
-                    "conditions":{4051:"up",4052:"up"},
+            30000011:{
+                1:{
+                    "conditions":{40000110:"high",40000111:"high"},
                     "result":"high",
                 },
-                405.2:{
-                    "conditions":{4051:"up",4052:"down"},
+                # 2:{
+                #     "conditions":{40000110:"middle",40000111:"high"},
+                #     "result":"high",
+                # },
+                3:{
+                    "conditions":{40000110:"low",40000111:"high"},
+                    "result":"high",
+                },
+                # 4:{
+                #     "conditions":{40000110:"high",40000111:"middle"},
+                #     "result":"middle",
+                # },
+                # 5:{
+                #     "conditions":{40000110:"middle",40000111:"middle"},
+                #     "result":"middle",
+                # },
+                # 6:{
+                #     "conditions":{40000110:"low",40000111:"middle"},
+                #     "result":"low",
+                # },
+                7:{
+                    "conditions":{40000110:"high",40000111:"low"},
                     "result":"middle",
                 },
-                405.3:{
-                    "conditions":{4051:"down",4052:"up"},
-                    "result":"middle",
-                },
-                405.4:{
-                    "conditions":{4051:"down",4052:"down"},
+                # 8:{
+                #     "conditions":{40000110:"middle",40000111:"low"},
+                #     "result":"low",
+                # },
+                9:{
+                    "conditions":{40000110:"low",40000111:"low"},
                     "result":"low",
                 },
-            }
+            },
         }
 
-    def membership_func(self,x,type="up"):
-        def up(x):
+    def membership_func(self,x,type="high"):
+        def high(x):
             y=x
             return y
-        def down(x):
+        # def middle(x):
+        #     if x<=0.5:
+        #         y=2*x
+        #         return y
+        #     elif x>0.5:
+        #         y=-2*x+2
+        #         return y
+        def low(x):
             y=1-x
             return y
         
-        if type=="up":
-            return up(x)
-        elif type=="down":
-            return down(x)
+        if type=="high":
+            return high(x)
+        # elif type=="middle":
+        #     return middle(x)
+        elif type=="low":
+            return low(x)
     
     def triangle_func(self,height,result):
         if result=="low":
@@ -55,13 +84,13 @@ class FuzzyReasoning():
             raise KeyError
         return (peak,height)
     
-    def calculate_fuzzy(self,values={4051:0.2,4052:0.6}):
-        rule_id=int(str(list(values.keys())[0])[:3])
+    def calculate_fuzzy(self,input_nodes={40000110:0.5,40000111:0.5},output_node=30000011):
+        rule_id=output_node
         reasoning_result=0
         for proposition_id in self.reasoning_rule_dict[rule_id]:
             height=1
             for condition in self.reasoning_rule_dict[rule_id][proposition_id]["conditions"].keys():
-                h=self.membership_func(x=values[condition],type=self.reasoning_rule_dict[rule_id][proposition_id]["conditions"][condition])
+                h=self.membership_func(x=input_nodes[condition],type=self.reasoning_rule_dict[rule_id][proposition_id]["conditions"][condition])
                 height=height*h
             peak,height=self.triangle_func(height,result=self.reasoning_rule_dict[rule_id][proposition_id]["result"])
             # ic(peak,height)
@@ -72,7 +101,8 @@ class FuzzyReasoning():
     
 
     def main(self):
-        self.calculate_fuzzy(values={4051:0.2,4052:0.6})
+        ans=self.calculate_fuzzy(input_nodes={40000110:0.5,40000111:0.5},output_node=30000011)
+        print(ans)
         pass
 
 

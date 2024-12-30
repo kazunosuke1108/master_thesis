@@ -60,11 +60,13 @@ class Manager():
             database_dir_path=module_dir_path+"/database"
 
         trial_dir_path=database_dir_path+"/"+trial_name
+        common_dir_path=database_dir_path+"/common"
 
         database_dir_dict={
             "module_dir_path":module_dir_path,
             "database_dir_path":database_dir_path,
             "trial_dir_path":trial_dir_path,
+            "common_dir_path":common_dir_path,
         }
 
         for path in database_dir_dict.values():

@@ -1,6 +1,15 @@
+import os
+import sys
 import numpy as np
+import pandas as pd
+from pprint import pprint
 
-class getConsistencyMtx():
+sys.path.append(".")
+sys.path.append("..")
+sys.path.append(os.path.expanduser("~")+"/kazu_ws/master_thesis/master_thesis_modules")
+from scripts.management.manager import Manager
+
+class getConsistencyMtx(Manager):
     def __init__(self) -> None:
         super().__init__()
         pass
@@ -60,14 +69,59 @@ class getConsistencyMtx():
         A=self.get_comparison_mtx(criteria=criteria,comparison_answer=comparison_answer)
         eigvals,eigvecs,max_eigval,weights,CI=self.evaluate_mtx(A)
         return A,eigvals,eigvecs,max_eigval,weights,CI
+    
+    def get_all_comparison_mtx_and_weight(self,trial_name,strage):
+        # 内的・動的（動作）30000001
+        AHP_dict={}
+        self.data_dir_dict=self.get_database_dir(trial_name=trial_name,strage=strage)
+        
+        AHP_dict[30000001]={}
+        csv_path=self.data_dir_dict["common_dir_path"]+"/comparison_mtx_30000001.csv"
+        data=pd.read_csv(csv_path,header=None).values
+        for i in range(data.shape[0]):
+            for j in range(data.shape[1]):
+                if i==j:
+                    data[i,j]=1
+                    continue
+                elif i>j:
+                    data[i,j]=1/data[j,i]
+        eigvals,eigvecs,max_eigval,weights,CI=self.evaluate_mtx(data)
+        AHP_dict[30000001]["A"]=data
+        AHP_dict[30000001]["CI"]=CI
+        AHP_dict[30000001]["weights"]=weights
+        data=pd.DataFrame(data)
+        data.to_csv(csv_path,index=False,header=False)
+        
+        # 外的・静的（物体）30000010
+        AHP_dict[30000010]={}
+        csv_path=self.data_dir_dict["common_dir_path"]+"/comparison_mtx_30000010.csv"
+        data=pd.read_csv(csv_path,header=None).values
+        for i in range(data.shape[0]):
+            for j in range(data.shape[1]):
+                if i==j:
+                    data[i,j]=1
+                    continue
+                elif i>j:
+                    data[i,j]=1/data[j,i]
+        eigvals,eigvecs,max_eigval,weights,CI=self.evaluate_mtx(data)
+        AHP_dict[30000010]["A"]=data
+        AHP_dict[30000010]["CI"]=CI
+        AHP_dict[30000010]["weights"]=weights
+        print(CI)
+        data=pd.DataFrame(data)
+        data.to_csv(csv_path,index=False,header=False)
+        
+        return AHP_dict
 
 
 if __name__=="__main__":
     cls=getConsistencyMtx()
-    A=cls.get_comparison_mtx(criteria=["a","b","c"])
-    eigvals,eigvecs,max_eigval,weights,CI=cls.evaluate_mtx(A)
-    print(A)
-    print(eigvals,eigvecs,max_eigval,weights,CI)
+    cls.get_all_comparison_mtx_and_weight(trial_name="20241229BuildSimulator",strage="NASK")
+
+    # A=cls.get_comparison_mtx(criteria=["a","b","c"])
+    # eigvals,eigvecs,max_eigval,weights,CI=cls.evaluate_mtx(A)
+    # print(A)
+    # print(eigvals,eigvecs,max_eigval,weights,CI)
     # 比較行列
     # A=cls.input_comparison_mtx()
     # _,_,_,weights_cmpr,_=cls.evaluate_mtx(A)

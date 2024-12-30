@@ -14,6 +14,7 @@ sys.path.append("..")
 sys.path.append(os.path.expanduser("~")+"/kazu_ws/master_thesis/master_thesis_modules")
 from scripts.management.manager import Manager
 from scripts.network.graph_manager import GraphManager
+from scripts.AHP.get_comparison_mtx import getConsistencyMtx
 from scripts.pseudo_data.pseudo_data_generator import PseudoDataGenerator
 
 class Master(Manager,GraphManager):
@@ -68,6 +69,8 @@ class Master(Manager,GraphManager):
             },
         }
 
+        # AHP 一対比較行列の作成
+        self.AHP_dict=getConsistencyMtx().get_all_comparison_mtx_and_weight(trial_name=self.trial_name,strage=self.strage)
 
         # シナリオの定義・DataFrameの生成
         self.data_dicts=self.define_scenario()
@@ -230,7 +233,7 @@ class Master(Manager,GraphManager):
     def pose_similarity(self):
         def get_similarity(risk,row):
             row=row[1]
-            similarity=np.nanmean(abs(self.risky_motion_dict[risk]["features"]-row[[50000100,50000101,50000102,50000103]]))
+            similarity=1-np.nanmean(abs(self.risky_motion_dict[risk]["features"]-row[[50000100,50000101,50000102,50000103]]))
             return similarity
         for patient in self.data_dicts.keys():
             for risk in self.risky_motion_dict.keys():
@@ -297,8 +300,37 @@ class Master(Manager,GraphManager):
             self.data_dicts[patient].to_csv(self.data_dir_dict["trial_dir_path"]+"/data_"+patient+".csv",index=False)
 
     def fuzzy_multiply(self):
-        
+        def judge_left_or_right(tri1,tri2):
+            if tri1[1]<tri2[1]:
+                return tri1,tri2
+            else:
+                return tri2,tri1
+        def calc_cross_point(left_tri,right_tri):
+            x_cross=1/((right_tri[1]-right_tri[0])+(left_tri[2]-left_tri[1]))*(left_tri[2]*(right_tri[1]-right_tri[0])+right_tri[0]*(left_tri[2]-left_tri[1]))
+            return x_cross
+        for patient in self.data_dicts.keys():
+            # 三角形の左右判別
+            sort_tri=np.array(list(map(judge_left_or_right,self.data_dicts[patient][40000000],self.data_dicts[patient][40000001])))
+            left_tri,right_tri=sort_tri[:,0,:],sort_tri[:,1,:]
+            
+            # 交点の計算
+            x_cross=np.array(list(map(calc_cross_point,left_tri,right_tri)))
+
+            # 重心の算出
+            x_gravity=(left_tri[:,2]+right_tri[:,0]+x_cross)/3
+            print(x_gravity)
+            self.data_dicts[patient][30000000]=x_gravity
         pass
+
+    def AHP_weight_sum(self,input_node_codes,output_node_code):
+        def weight_sum(row):
+            features=np.nan_to_num(row[1].values)
+            w_sum=self.AHP_dict[output_node_code]["weights"]@features
+            return w_sum
+        for patient in self.data_dicts.keys():
+            self.data_dicts[patient][output_node_code]=list(map(weight_sum,self.data_dicts[patient][input_node_codes].iterrows()))
+        pass
+
     def main(self):
         print("# 5 -> 4層推論 #")
         # 内的・静的
@@ -312,9 +344,12 @@ class Master(Manager,GraphManager):
 
         print("# 4 -> 3層推論 #")
         # 内定・静的
+        self.fuzzy_multiply()
 
         # 内的・動的
+        self.AHP_weight_sum(input_node_codes=[40000010,40000011,40000012,40000013,40000014,40000015,40000016],output_node_code=30000001)
         # 外的・静的
+        self.AHP_weight_sum(input_node_codes=[40000100,40000101,40000102],output_node_code=30000010)
         # 外的・動的
         pass
 
