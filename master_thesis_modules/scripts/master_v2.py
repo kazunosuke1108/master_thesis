@@ -376,6 +376,14 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
         for patient in self.data_dicts.keys():
             self.data_dicts[patient][output_node_code]=list(map(weight_sum,self.data_dicts[patient][input_node_codes].iterrows()))
         pass
+
+    def simple_weight_sum(self,input_node_codes,output_node_code,weights):
+        def weight_sum(row):
+            features=np.nan_to_num(row[1].values)
+            w_sum=np.array(weights)@features
+            return w_sum
+        for patient in self.data_dicts.keys():
+            self.data_dicts[patient][output_node_code]=list(map(weight_sum,self.data_dicts[patient][input_node_codes].iterrows()))
     
     def fuzzy_reasoning_master(self,input_node_codes,output_node_code):
         def ask_risk_to_calculator(row):
@@ -386,20 +394,32 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
         for patient in self.data_dicts.keys():
             self.data_dicts[patient][output_node_code]=list(map(ask_risk_to_calculator,self.data_dicts[patient][input_node_codes].iterrows()))
 
-    def ewm_master(self,input_node_codes,output_node_code):
+    def ewm_master(self,input_node_codes,output_node_code,dim="t"):
         horizon=100
-        for patient in self.data_dicts.keys():
-            for i,row in self.data_dicts[patient].iterrows():
-                score_df=self.data_dicts[patient].loc[np.max(i-horizon,0):i,input_node_codes]
-                weight=self.get_entropy_weight_t(score_df=score_df)
+        if dim=="t":
+            for patient in self.data_dicts.keys():
+                for i,row in self.data_dicts[patient].iterrows():
+                    score_df=self.data_dicts[patient].loc[np.max(i-horizon,0):i,input_node_codes]
+                    weight=self.get_entropy_weight_t(score_df=score_df)
+                    self.data_dicts[patient].loc[i,output_node_code]=np.array(list(weight.values()))@self.data_dicts[patient].loc[i,input_node_codes].values
+                    if self.data_dicts[patient].loc[i,output_node_code]>1:
+                        raise Exception("なんかおかしい")
+                    # print(weight)
+                    # if i>105 and patient=="B":
+                    #     raise NotImplementedError
+                    pass
+        elif dim=="p": # patient間
+            for i,_ in self.data_dicts[list(self.data_dicts.keys())[0]].iterrows():
+                score_df=pd.DataFrame()
+                for patient in self.data_dicts.keys():
+                    score_df=pd.concat([score_df,self.data_dicts[patient].loc[i,input_node_codes]],axis=1)
+                score_df=score_df.T
+                weight=self.get_entropy_weight(score_df=score_df)
                 self.data_dicts[patient].loc[i,output_node_code]=np.array(list(weight.values()))@self.data_dicts[patient].loc[i,input_node_codes].values
                 if self.data_dicts[patient].loc[i,output_node_code]>1:
                     raise Exception("なんかおかしい")
-                # print(weight)
-                # if i>105 and patient=="B":
-                #     raise NotImplementedError
-                pass
-        pass
+
+            pass
 
     def main(self):
         print("# 5 -> 4層推論 #")
@@ -424,8 +444,9 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
 
         print("# 3 -> 2層推論 #")
         # 内的
-        # self.ewm_master(input_node_codes=[30000000,30000001],output_node_code=20000000)
-        self.fuzzy_reasoning_master(input_node_codes=[30000000,30000001],output_node_code=20000000)
+        # self.ewm_master(input_node_codes=[30000000,30000001],output_node_code=20000000,dim="p")
+        # self.fuzzy_reasoning_master(input_node_codes=[30000000,30000001],output_node_code=20000000)
+        self.simple_weight_sum(input_node_codes=[30000000,30000001],output_node_code=20000000,weights=[0.1,0.9])
         # 外的
         # self.ewm_master(input_node_codes=[30000010,30000011],output_node_code=20000001)
         self.fuzzy_reasoning_master(input_node_codes=[30000010,30000011],output_node_code=20000001)
