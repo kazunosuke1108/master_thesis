@@ -38,38 +38,9 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
 
         # parameters
         self.spatial_normalization_param=np.sqrt(2)*6
+        self.throttling=True
 
         # 危険動作の事前定義
-        # self.risky_motion_dict={
-        #     40000010:{
-        #         "label":"standUp",
-        #         "features":np.array([1,         1,      np.nan, 1]),
-        #         },
-        #     40000011:{
-        #         "label":"releaseBrake",
-        #         "features":np.array([0,         1,      1,      0]),
-        #         },
-        #     40000012:{
-        #         "label":"moveWheelchair",
-        #         "features":np.array([0,         0,      1,      0]),
-        #         },
-        #     40000013:{
-        #         "label":"loseBalance",
-        #         "features":np.array([0,         1,      np.nan, np.nan]),
-        #         },
-        #     40000014:{
-        #         "label":"moveHand",
-        #         "features":np.array([np.nan,    np.nan, 1,      np.nan]),
-        #         },
-        #     40000015:{
-        #         "label":"coughUp",
-        #         "features":np.array([np.nan,    1,      0,      0]),
-        #         },
-        #     40000016:{
-        #         "label":"touchFace",
-        #         "features":np.array([np.nan,    0,      1,      np.nan]),
-        #     },
-        # }
         self.risky_motion_dict={
             40000010:{
                 "label":"standUp",
@@ -106,7 +77,134 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
 
         # シナリオの定義・DataFrameの生成
         self.data_dicts=self.define_scenario()
+
+    def pseudo_throttling(self,data_dicts):
+        initial_fps=20
+        entropy_window=5
+        convert_dict={
+            50000000:{"yes":1,"no":0},
+            50000010:{"old":2,"middle":1,"young":0},
+            }
+        control_rule_dict={# control_rule_dict[s][ds]["result"] -> ans
+            "+":{
+                "+":{
+                    "conditions":{"s":"+","ds":"+"},
+                    "result":"++",
+                },
+                "o":{
+                    "conditions":{"s":"+","ds":"o"},
+                    "result":"+",
+                },
+                "-":{
+                    "conditions":{"s":"+","ds":"-"},
+                    "result":"o",
+                },
+            },
+            "o":{
+                "+":{
+                    "conditions":{"s":"middle","ds":"+"},
+                    "result":"+",
+                },
+                "o":{
+                    "conditions":{"s":"middle","ds":"o"},
+                    "result":"o",
+                },
+                "-":{
+                    "conditions":{"s":"middle","ds":"-"},
+                    "result":"-",
+                },
+            },
+            "-":{
+                "+":{
+                    "conditions":{"s":"-","ds":"+"},
+                    "result":"o",
+                },
+                "o":{
+                    "conditions":{"s":"-","ds":"o"},
+                    "result":"-",
+                },
+                "-":{
+                    "conditions":{"s":"-","ds":"-"},
+                    "result":"--",
+                },
+            }
+        }
+        s_thre_dict={
+            "-":{"min":-np.inf,"max":0.1},
+            "o":{"min":0.1,"max":0.2},
+            "+":{"min":0.2,"max":np.inf},
+        }
+        ds_threshold=0.1*(1/20) # thre[/s]*dt[s]
+        ds_thre_dict={
+            "-":{"min":-np.inf,"max":-ds_threshold},
+            "o":{"min":-ds_threshold,"max":ds_threshold},
+            "+":{"min":ds_threshold,"max":np.inf},
+        }
+        dfps_dict={
+            "--":-2,
+            "-":-1,
+            "o":0,
+            "+":1,
+            "++":2,
+        }
+        fps_clip_dict={
+            "min":0.25,
+            "max":20,
+        }
         
+        fps_history={}
+        focus_keys=list(data_dicts[list(data_dicts.keys())[0]].keys())
+        focus_keys.remove("timestamp")
+        focus_keys= [k for k in focus_keys if int(k)>=50000000]
+        
+        def get_control_input(s_value,ds_value):
+            if np.isnan(s_value):
+                s_value=0
+            if np.isnan(ds_value):
+                ds_value=0
+            for key in s_thre_dict.keys():
+                if (s_thre_dict[key]["min"]<=s_value) and (s_value<=s_thre_dict[key]["max"]):
+                    s=key
+            for key in ds_thre_dict.keys():
+                if (ds_thre_dict[key]["min"]<=ds_value) and (ds_value<=ds_thre_dict[key]["max"]):
+                    ds=key
+            dfps=control_rule_dict[s][ds]["result"]
+            dfps_value=dfps_dict[dfps]
+            return dfps_value
+
+        for patient in data_dicts.keys():
+            # 非floatのデータを置換
+            fps_dict={k:{"fps":initial_fps,"previous_fps":initial_fps,"d":np.nan,"previous_d":np.nan} for k in focus_keys}
+            fps_history[patient]=pd.DataFrame(data_dicts[patient]["timestamp"].values,columns=["timestamp"])
+            for k in focus_keys:
+                fps_history[patient][k]=np.nan
+            data_dicts[patient][50000000].replace(convert_dict[50000000],inplace=True)
+            data_dicts[patient][50000010].replace(convert_dict[50000010],inplace=True)
+            for i,row in data_dicts[patient].iterrows():
+                if i<entropy_window:
+                    continue
+                # 各特徴量について，entropyを求める
+                score_df=data_dicts[patient].loc[np.max([0,i-entropy_window]):i,focus_keys]
+                score_df=score_df/score_df.sum()
+                entropy=(-1/np.log(len(score_df.index))*(score_df*np.log(score_df.astype(float)))).sum()
+                degree_of_diversification=1-entropy+1e-5
+                print(degree_of_diversification)
+                # entropyの値に基づいて，FPSを決める
+                for k,d in degree_of_diversification.items():
+                    new_fps=fps_dict[k]["fps"]+get_control_input(s_value=degree_of_diversification[k],ds_value=degree_of_diversification[k]-fps_dict[k]["d"])
+                    new_fps=np.clip(new_fps,fps_clip_dict["min"],fps_clip_dict["max"])
+                    fps_dict[k]["previous_fps"]=fps_dict[k]["fps"]
+                    fps_dict[k]["previous_d"]=fps_dict[k]["d"]
+                    fps_dict[k]["fps"]=new_fps
+                    fps_dict[k]["d"]=degree_of_diversification[k]
+                    fps_history[patient].loc[i,k]=new_fps
+                    
+                # FPSに基づいて，スキップする行を消す
+                pass
+            if patient=="B":
+                print(fps_history[patient])
+                raise NotImplementedError
+
     def define_scenario(self):
         print("# シナリオ生成 #")
         start_timestamp=0
@@ -262,7 +360,6 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
         for patient in self.data_dicts.keys():
             self.data_dicts[patient][40000000]=list(map(patient_or_not,self.data_dicts[patient][50000000]))
             self.data_dicts[patient][40000001]=list(map(age,self.data_dicts[patient][50000010]))
-        
         pass
 
     def pose_similarity(self):
@@ -334,16 +431,6 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
             self.data_dicts[patient][40000111].fillna(method="bfill",inplace=True)
             self.data_dicts[patient][40000111]=self.activation_func(self.data_dicts[patient][40000111])
             pass
-
-    def save_session(self):
-        print("# graph保存 #")
-        self.write_picklelog(self.graph_dicts,self.data_dir_dict["trial_dir_path"]+"/graph_dicts.pickle")
-        for patient in self.patients:
-            del self.graph_dicts[patient]["G"]
-        self.write_json(self.graph_dicts,self.data_dir_dict["trial_dir_path"]+"/graph_dicts.json")
-        print("# DataFrame 保存 #")
-        for patient in self.patients:
-            self.data_dicts[patient].to_csv(self.data_dir_dict["trial_dir_path"]+"/data_"+patient+".csv",index=False)
 
     def fuzzy_multiply(self):
         def judge_left_or_right(tri1,tri2):
@@ -420,8 +507,23 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
                     raise Exception("なんかおかしい")
 
             pass
-
+    
+    def save_session(self):
+        print("# graph保存 #")
+        self.write_picklelog(self.graph_dicts,self.data_dir_dict["trial_dir_path"]+"/graph_dicts.pickle")
+        for patient in self.patients:
+            del self.graph_dicts[patient]["G"]
+        self.write_json(self.graph_dicts,self.data_dir_dict["trial_dir_path"]+"/graph_dicts.json")
+        print("# DataFrame 保存 #")
+        for patient in self.patients:
+            self.data_dicts[patient].to_csv(self.data_dir_dict["trial_dir_path"]+"/data_"+patient+".csv",index=False)
+    
     def main(self):
+        if self.throttling:
+            print("# スロットリングのためのデータ間引きを実施 #")
+            self.data_dicts=self.pseudo_throttling(self.data_dicts)
+            raise NotImplementedError
+
         print("# 5 -> 4層推論 #")
         # 内的・静的
         self.fuzzy_logic()
@@ -457,7 +559,7 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
         pass
 
 if __name__=="__main__":
-    trial_name="20241229BuildSimulator"
+    trial_name="20241231Throttling"
     strage="NASK"
     cls=Master(trial_name,strage)
     cls.main()
