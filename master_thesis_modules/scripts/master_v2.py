@@ -38,6 +38,7 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
 
         # parameters
         self.spatial_normalization_param=np.sqrt(2)*6
+        self.fps=20
         self.throttling=True
 
         # 危険動作の事前定義
@@ -76,7 +77,7 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
         self.AHP_dict=getConsistencyMtx().get_all_comparison_mtx_and_weight(trial_name=self.trial_name,strage=self.strage)
 
         # シナリオの定義・DataFrameの生成
-        self.data_dicts=self.define_scenario()
+        self.data_dicts=self.define_scenario(fps=self.fps)
 
     def pseudo_throttling(self,data_dicts):
         initial_fps=20
@@ -85,6 +86,10 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
             50000000:{"yes":1,"no":0},
             50000010:{"old":2,"middle":1,"young":0},
             }
+        convert_dict_swap={
+            50000000:{v: k for k, v in convert_dict[50000000].items()},
+            50000010:{v: k for k, v in convert_dict[50000010].items()},
+        }
         control_rule_dict={# control_rule_dict[s][ds]["result"] -> ans
             "+":{
                 "+":{
@@ -130,11 +135,11 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
             }
         }
         s_thre_dict={
-            "-":{"min":-np.inf,"max":0.1},
-            "o":{"min":0.1,"max":0.2},
-            "+":{"min":0.2,"max":np.inf},
+            "-":{"min":-np.inf,"max":1e-5},
+            "o":{"min":1e-5,"max":1e-3},
+            "+":{"min":1e-3,"max":np.inf},
         }
-        ds_threshold=0.1*(1/20) # thre[/s]*dt[s]
+        ds_threshold=1e-7#0.1*(1/20) # thre[/s]*dt[s]
         ds_thre_dict={
             "-":{"min":-np.inf,"max":-ds_threshold},
             "o":{"min":-ds_threshold,"max":ds_threshold},
@@ -144,15 +149,16 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
             "--":-2,
             "-":-1,
             "o":0,
-            "+":1,
-            "++":2,
+            "+":2,
+            "++":4,
         }
         fps_clip_dict={
-            "min":0.25,
+            "min":1,
             "max":20,
         }
         
         fps_history={}
+        dod_history={}
         focus_keys=list(data_dicts[list(data_dicts.keys())[0]].keys())
         focus_keys.remove("timestamp")
         focus_keys= [k for k in focus_keys if int(k)>=50000000]
@@ -173,45 +179,89 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
             return dfps_value
 
         for patient in data_dicts.keys():
-            # 非floatのデータを置換
-            fps_dict={k:{"fps":initial_fps,"previous_fps":initial_fps,"d":np.nan,"previous_d":np.nan} for k in focus_keys}
+            fps_dict={k:{"entropy":np.nan,"fps":initial_fps,"previous_fps":initial_fps,"d":np.nan,"previous_d":np.nan} for k in focus_keys}
             fps_history[patient]=pd.DataFrame(data_dicts[patient]["timestamp"].values,columns=["timestamp"])
+            dod_history[patient]=pd.DataFrame(data_dicts[patient]["timestamp"].values,columns=["timestamp"])
             for k in focus_keys:
                 fps_history[patient][k]=np.nan
+                dod_history[patient][k]=np.nan
+            # 非floatのデータを置換
             data_dicts[patient][50000000].replace(convert_dict[50000000],inplace=True)
             data_dicts[patient][50000010].replace(convert_dict[50000010],inplace=True)
+
+            # 時系列に沿って計算
             for i,row in data_dicts[patient].iterrows():
                 if i<entropy_window:
                     continue
                 # 各特徴量について，entropyを求める
-                score_df=data_dicts[patient].loc[np.max([0,i-entropy_window]):i,focus_keys]
-                score_df=score_df/score_df.sum()
-                entropy=(-1/np.log(len(score_df.index))*(score_df*np.log(score_df.astype(float)))).sum()
-                degree_of_diversification=1-entropy+1e-5
-                print(degree_of_diversification)
-                # entropyの値に基づいて，FPSを決める
-                for k,d in degree_of_diversification.items():
-                    new_fps=fps_dict[k]["fps"]+get_control_input(s_value=degree_of_diversification[k],ds_value=degree_of_diversification[k]-fps_dict[k]["d"])
+                for k in focus_keys:
+                    if np.isnan(data_dicts[patient].loc[i,k]):
+                        continue
+                    temp_data=data_dicts[patient].loc[:i,k]
+                    temp_data=temp_data.dropna()
+                    temp_data=temp_data.tail(entropy_window)
+                    temp_data=temp_data/temp_data.sum()
+                    # temp_data=temp_data.tail(entropy_window)
+                    if temp_data.sum()==0:
+                        e=1
+                    else:
+                        e=(-1/np.log(entropy_window)*temp_data*np.log(temp_data.astype(float))).sum()
+                    # if e>1 or e<0:
+                    #     print(temp_data.sum())
+                    #     print(patient,i,k)
+                    #     print("temp_data")
+                    #     print(temp_data)
+                    #     print("entropyのもと")
+                    #     print(-1/np.log(entropy_window)*temp_data*np.log(temp_data.astype(float)))
+                    #     print("e")
+                    #     print(e)
+                    #     raise Exception("Entropyが負の値")
+                    fps_dict[k]["e"]=e
+                    # entropyの値に基づいて，FPSを決める
+                    d=1-fps_dict[k]["e"]+1e-10
+                    new_fps=fps_dict[k]["fps"]+get_control_input(s_value=d,ds_value=d-fps_dict[k]["d"])
                     new_fps=np.clip(new_fps,fps_clip_dict["min"],fps_clip_dict["max"])
                     fps_dict[k]["previous_fps"]=fps_dict[k]["fps"]
                     fps_dict[k]["previous_d"]=fps_dict[k]["d"]
                     fps_dict[k]["fps"]=new_fps
-                    fps_dict[k]["d"]=degree_of_diversification[k]
+                    fps_dict[k]["d"]=d
                     fps_history[patient].loc[i,k]=new_fps
+                    dod_history[patient].loc[i,k]=d
                     
-                # FPSに基づいて，スキップする行を消す
+                    # FPSに基づいて，スキップする行を消す
+                    n_skip=int(self.fps/fps_dict[k]["fps"])-1
+                    data_dicts[patient].loc[i+1:i+n_skip,k]=np.nan
+                    # print(data_dicts[patient].loc[i+1:i+n_skip,1])
+                    # if i>10:
+                    #     print(data_dicts[patient].head(10))
+                    #     raise NotImplementedError
+                    # if d>0.1 and d<0.8:
+                    #     raise NotImplementedError
                 pass
-            if patient=="B":
-                print(fps_history[patient])
-                raise NotImplementedError
 
-    def define_scenario(self):
+        for patient in data_dicts.keys():
+            # binary化したデータを直す
+            data_dicts[patient][50000000].replace(convert_dict_swap[50000000],inplace=True)
+            data_dicts[patient][50000010].replace(convert_dict_swap[50000010],inplace=True)
+
+            # 間引き結果を保存
+            data_dicts[patient].to_csv(self.data_dir_dict["trial_dir_path"]+"/data_"+patient+"_throttling_beforeInterp.csv",index=False)
+            fps_history[patient].to_csv(self.data_dir_dict["trial_dir_path"]+"/fps_"+patient+".csv",index=False)
+            dod_history[patient].to_csv(self.data_dir_dict["trial_dir_path"]+"/degreeOfDiversification_"+patient+".csv",index=False)
+        
+            # ffillでデータを補間して保存
+            data_dicts[patient].interpolate(method="ffill",inplace=True)
+            data_dicts[patient].to_csv(self.data_dir_dict["trial_dir_path"]+"/data_"+patient+"_throttling.csv",index=False)
+
+        return data_dicts
+
+    def define_scenario(self,fps=20):
         print("# シナリオ生成 #")
         start_timestamp=0
         end_timestamp=10
         xrange=[0,6]
         yrange=[0,6]
-        fps=20
+        # fps=20
         patients=list(self.graph_dicts.keys())
         general_dict={
             "start_timestamp":start_timestamp,
@@ -516,13 +566,12 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
         self.write_json(self.graph_dicts,self.data_dir_dict["trial_dir_path"]+"/graph_dicts.json")
         print("# DataFrame 保存 #")
         for patient in self.patients:
-            self.data_dicts[patient].to_csv(self.data_dir_dict["trial_dir_path"]+"/data_"+patient+".csv",index=False)
+            self.data_dicts[patient].to_csv(self.data_dir_dict["trial_dir_path"]+"/data_"+patient+"_raw.csv",index=False)
     
     def main(self):
         if self.throttling:
             print("# スロットリングのためのデータ間引きを実施 #")
             self.data_dicts=self.pseudo_throttling(self.data_dicts)
-            raise NotImplementedError
 
         print("# 5 -> 4層推論 #")
         # 内的・静的

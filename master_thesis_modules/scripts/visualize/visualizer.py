@@ -565,7 +565,7 @@ class Visualizer(Manager):
 
     def plot_matplotlib(self):
         import matplotlib.pyplot as plt
-        csv_paths=sorted(glob(self.data_dir_dict["trial_dir_path"]+"/*csv"))
+        csv_paths=sorted(glob(self.data_dir_dict["trial_dir_path"]+"/data_*csv"))
         for csv_path in csv_paths:
             data=pd.read_csv(csv_path,header=0)
             print(data)
@@ -602,7 +602,7 @@ class Visualizer(Manager):
         pass
 
 if __name__=="__main__":
-    trial_name="20241229BuildSimulator"
+    trial_name="20241231Throttling"
     strage="NASK"
     cls=Visualizer(trial_name=trial_name,strage=strage)
     # cls.visualize_graph(trial_name="20241229BuildSimulator",strage="NASK",name="A",show=True)

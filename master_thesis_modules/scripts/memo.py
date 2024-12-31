@@ -1,17 +1,30 @@
+import pandas as pd
 import numpy as np
+np.random.seed(1)
 
-def membership_view(theta):
-    if theta>90:
-        return 1
-    else:
-        return theta/90
-    
+data=pd.DataFrame(np.random.random((5,6)),columns=[0,1,2,3,4,5])
+# data.loc[1:2,1]=np.nan
+data[3]=0
+print(data)
+print(data.loc[:1,:])
+# print(len(data.index))
 
+# entropy_window=3
 
-object_pos=(1,0)
-subject_vel=(1,0)
-object_pos=np.array(object_pos)
-subject_vel=np.array(subject_vel)
-theta=np.rad2deg(np.arccos(np.dot(object_pos,subject_vel)/(np.linalg.norm(object_pos)*np.linalg.norm(subject_vel))))
-print(theta)
-print(membership_view(theta))
+# for k in data.keys():
+#     temp_data=data[k]
+#     temp_data=temp_data.dropna()
+#     temp_data=temp_data.tail(entropy_window)
+#     if temp_data.sum()==0:
+#         e=1
+#     else:
+#         e=(-1/np.log(entropy_window)*temp_data*np.log(temp_data.astype(float))).sum()
+#     d=1-e
+#     print(k)
+#     print(d)
+#     # print(temp_data.tail(3))
+
+# n_skip=3
+# i=0
+# data.loc[i+1:i+n_skip,1]=np.nan
+# print(data)
