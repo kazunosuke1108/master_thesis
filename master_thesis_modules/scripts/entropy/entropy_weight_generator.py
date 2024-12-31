@@ -25,13 +25,21 @@ class EntropyWeightGenerator():
         # 正規化
         score_df=score_df/score_df.sum()
         # 列ごとにエントロピーを計算していく
-        ic(score_df.index)
-        ic(-1/np.log(len(score_df.index))*(score_df*np.log(score_df)))
+        # ic(score_df.index)
+        # ic(-1/np.log(len(score_df.index))*(score_df*np.log(score_df)))
         entropy=-1/np.log(len(score_df.index))*(score_df*np.log(score_df)).sum()
-        degree_of_diversification=1-entropy
+        degree_of_diversification=1-entropy+1e-5
         weight=degree_of_diversification/degree_of_diversification.sum()
-        ic(score_df)
-        # ic(weight.to_dict())
+        # ic(score_df)
+        # ic(entropy)
+        # ic(degree_of_diversification)
+        # ic(weight)
+        # NaNが含まれた場合の対応
+        for node in score_df.keys():
+            if np.isnan(weight[node]) or abs(weight[node])==np.inf:
+                for node in score_df.keys():
+                    weight[node]=1/len(list(score_df.keys()))
+                return weight.to_dict()
         return weight.to_dict()
 
 

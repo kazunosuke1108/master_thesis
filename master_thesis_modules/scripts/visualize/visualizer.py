@@ -569,10 +569,12 @@ class Visualizer(Manager):
         for csv_path in csv_paths:
             data=pd.read_csv(csv_path,header=0)
             print(data)
+            # plt.plot(data["timestamp"],data["20000000"],"-x",label="naiteki")
+            # plt.plot(data["timestamp"],data["20000001"],"-^",label="gaiteki")
             plt.plot(data["timestamp"],data["30000000"],"-x",label="zokusei")
             plt.plot(data["timestamp"],data["30000001"],"-^",label="motion")
-            plt.plot(data["timestamp"],data["30000010"],"-^",label="objects")
-            plt.plot(data["timestamp"],data["30000011"],"-^",label="staff")
+            # plt.plot(data["timestamp"],data["30000010"],"-^",label="objects")
+            # plt.plot(data["timestamp"],data["30000011"],"-^",label="staff")
             # plt.plot(data["timestamp"],data["40000102"],"-o",label="handrail")
 
             # plt.plot(data["timestamp"],data["40000010"],"-x",label="standup")
@@ -590,7 +592,10 @@ class Visualizer(Manager):
 
         for csv_path in csv_paths:
             data=pd.read_csv(csv_path,header=0)
+            # if "B" in os.path.basename(csv_path):
             plt.plot(data["timestamp"],data["10000000"],label=os.path.basename(csv_path))
+        plt.xlabel("Time [s]")
+        plt.ylabel("Risk value")
         plt.legend()
         plt.show()
     def main(self):

@@ -16,9 +16,10 @@ from scripts.management.manager import Manager
 from scripts.network.graph_manager import GraphManager
 from scripts.AHP.get_comparison_mtx import getConsistencyMtx
 from scripts.fuzzy.fuzzy_reasoning import FuzzyReasoning
+from scripts.entropy.entropy_weight_generator import EntropyWeightGenerator
 from scripts.pseudo_data.pseudo_data_generator import PseudoDataGenerator
 
-class Master(Manager,GraphManager,FuzzyReasoning):
+class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
     def __init__(self,trial_name,strage):
         super().__init__()
         print("# Master開始 #")
@@ -228,6 +229,9 @@ class Master(Manager,GraphManager,FuzzyReasoning):
         )
         return data_dicts
 
+    def activation_func(self,val):
+        return val
+
     def fuzzy_logic(self):
         def mu_yes():
             return (0.4,0.7,1.0)
@@ -266,10 +270,12 @@ class Master(Manager,GraphManager,FuzzyReasoning):
             row=row[1]
             similarity=1-np.nanmean(abs(self.risky_motion_dict[risk]["features"]-row[[50000100,50000101,50000102,50000103]]))
             similarity=similarity**4
+            # similarity=self.activation_func(similarity)
             return similarity
         for patient in self.data_dicts.keys():
             for risk in self.risky_motion_dict.keys():
                 self.data_dicts[patient][risk]=list(map(get_similarity,[risk for i in range(len(self.data_dicts[patient]))],self.data_dicts[patient].iterrows()))
+                self.data_dicts[patient][risk]=self.activation_func(self.data_dicts[patient][risk])
             print(patient,risk)
             
     def object_risk(self):
@@ -279,18 +285,21 @@ class Master(Manager,GraphManager,FuzzyReasoning):
                 (self.data_dicts[patient][50001000]-self.data_dicts[patient][60010000])**2+\
                 (self.data_dicts[patient][50001001]-self.data_dicts[patient][60010001])**2
             )/self.spatial_normalization_param,0,1)
+            self.data_dicts[patient][40000100]=self.activation_func(self.data_dicts[patient][40000100])
 
             # 車椅子
             self.data_dicts[patient][40000101]=1-np.clip(np.sqrt(
                 (self.data_dicts[patient][50001010]-self.data_dicts[patient][60010000])**2+\
                 (self.data_dicts[patient][50001011]-self.data_dicts[patient][60010001])**2
             )/self.spatial_normalization_param,0,1)
+            self.data_dicts[patient][40000101]=self.activation_func(self.data_dicts[patient][40000101])
 
             # 手すり (逆数ではない)
             self.data_dicts[patient][40000102]=np.clip(np.sqrt(
                 (self.data_dicts[patient][50001020]-self.data_dicts[patient][60010000])**2+\
                 (self.data_dicts[patient][50001021]-self.data_dicts[patient][60010001])**2
             )/self.spatial_normalization_param,0,1)
+            self.data_dicts[patient][40000102]=self.activation_func(self.data_dicts[patient][40000102])
 
     def staff_risk(self):
         def direction_risk(patient_x,patient_y,staff_x,staff_y,staff_vx,staff_vy):
@@ -311,6 +320,7 @@ class Master(Manager,GraphManager,FuzzyReasoning):
                 (self.data_dicts[patient][50001100]-self.data_dicts[patient][60010000])**2+\
                 (self.data_dicts[patient][50001101]-self.data_dicts[patient][60010001])**2
             )/self.spatial_normalization_param,0,1)
+            self.data_dicts[patient][40000110]=self.activation_func(self.data_dicts[patient][40000110])
             # 向きリスク
             self.data_dicts[patient][40000111]=list(map(direction_risk,
                                                         self.data_dicts[patient][60010000],
@@ -322,6 +332,7 @@ class Master(Manager,GraphManager,FuzzyReasoning):
                                                         ))
             self.data_dicts[patient][40000111].fillna(method="ffill",inplace=True)
             self.data_dicts[patient][40000111].fillna(method="bfill",inplace=True)
+            self.data_dicts[patient][40000111]=self.activation_func(self.data_dicts[patient][40000111])
             pass
 
     def save_session(self):
@@ -375,6 +386,21 @@ class Master(Manager,GraphManager,FuzzyReasoning):
         for patient in self.data_dicts.keys():
             self.data_dicts[patient][output_node_code]=list(map(ask_risk_to_calculator,self.data_dicts[patient][input_node_codes].iterrows()))
 
+    def ewm_master(self,input_node_codes,output_node_code):
+        horizon=100
+        for patient in self.data_dicts.keys():
+            for i,row in self.data_dicts[patient].iterrows():
+                score_df=self.data_dicts[patient].loc[np.max(i-horizon,0):i,input_node_codes]
+                weight=self.get_entropy_weight_t(score_df=score_df)
+                self.data_dicts[patient].loc[i,output_node_code]=np.array(list(weight.values()))@self.data_dicts[patient].loc[i,input_node_codes].values
+                if self.data_dicts[patient].loc[i,output_node_code]>1:
+                    raise Exception("なんかおかしい")
+                # print(weight)
+                # if i>105 and patient=="B":
+                #     raise NotImplementedError
+                pass
+        pass
+
     def main(self):
         print("# 5 -> 4層推論 #")
         # 内的・静的
@@ -398,11 +424,14 @@ class Master(Manager,GraphManager,FuzzyReasoning):
 
         print("# 3 -> 2層推論 #")
         # 内的
+        # self.ewm_master(input_node_codes=[30000000,30000001],output_node_code=20000000)
         self.fuzzy_reasoning_master(input_node_codes=[30000000,30000001],output_node_code=20000000)
         # 外的
+        # self.ewm_master(input_node_codes=[30000010,30000011],output_node_code=20000001)
         self.fuzzy_reasoning_master(input_node_codes=[30000010,30000011],output_node_code=20000001)
         
         print("# 2 -> 1層推論 #")
+        # self.ewm_master(input_node_codes=[20000000,20000001],output_node_code=10000000)
         self.fuzzy_reasoning_master(input_node_codes=[20000000,20000001],output_node_code=10000000)
         pass
 
