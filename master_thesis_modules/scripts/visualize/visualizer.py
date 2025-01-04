@@ -565,14 +565,14 @@ class Visualizer(Manager):
 
     def plot_matplotlib(self):
         import matplotlib.pyplot as plt
-        csv_paths=sorted(glob(self.data_dir_dict["trial_dir_path"]+"/data_*csv"))
-        for csv_path in csv_paths:
-            data=pd.read_csv(csv_path,header=0)
-            print(data)
+        csv_paths=sorted(glob(self.data_dir_dict["trial_dir_path"]+"/data_*raw.csv"))
+        # for csv_path in csv_paths:
+        #     data=pd.read_csv(csv_path,header=0)
+        #     print(data)
             # plt.plot(data["timestamp"],data["20000000"],"-x",label="naiteki")
             # plt.plot(data["timestamp"],data["20000001"],"-^",label="gaiteki")
-            plt.plot(data["timestamp"],data["30000000"],"-x",label="zokusei")
-            plt.plot(data["timestamp"],data["30000001"],"-^",label="motion")
+            # plt.plot(data["timestamp"],data["30000000"],"-x",label="zokusei")
+            # plt.plot(data["timestamp"],data["30000001"],"-^",label="motion")
             # plt.plot(data["timestamp"],data["30000010"],"-^",label="objects")
             # plt.plot(data["timestamp"],data["30000011"],"-^",label="staff")
             # plt.plot(data["timestamp"],data["40000102"],"-o",label="handrail")
@@ -587,8 +587,8 @@ class Visualizer(Manager):
             
             # plt.plot(data["timestamp"],data["50001110"],label="pose2")
             # plt.plot(data["timestamp"],data["50001111"],label="pose3")
-            plt.legend()
-            plt.show()
+            # plt.legend()
+            # plt.show()
 
         for csv_path in csv_paths:
             data=pd.read_csv(csv_path,header=0)
@@ -602,7 +602,7 @@ class Visualizer(Manager):
         pass
 
 if __name__=="__main__":
-    trial_name="20241231Throttling"
+    trial_name="20250104ThrottlingTrue"
     strage="NASK"
     cls=Visualizer(trial_name=trial_name,strage=strage)
     # cls.visualize_graph(trial_name="20241229BuildSimulator",strage="NASK",name="A",show=True)

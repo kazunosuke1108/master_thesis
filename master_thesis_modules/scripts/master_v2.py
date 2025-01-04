@@ -608,7 +608,7 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
         pass
 
 if __name__=="__main__":
-    trial_name="20241231Throttling"
+    trial_name="20250104ThrottlingTrue"
     strage="NASK"
     cls=Master(trial_name,strage)
     cls.main()
