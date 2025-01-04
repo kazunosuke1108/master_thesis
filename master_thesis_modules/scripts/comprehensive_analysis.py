@@ -2,6 +2,8 @@ import os
 import sys
 from pprint import pprint
 
+from multiprocessing import cpu_count,Process
+
 import copy
 import numpy as np
 import pandas as pd
@@ -177,15 +179,53 @@ class ComprehensiveAnalysis():
                                                 trial_no+=1
         return condition_dicts
     
-    def main(self):
+    def sample_process(self,text):
+        print(text)
+        return text
+    def check_multiprocessor(self):
+        nprocess=cpu_count()
+        texts=np.arange(1000)
+        p_list=[]
+        for i,text in enumerate(texts):
+            p=Process(target=self.sample_process,args=(text,))
+            p_list.append(p)
+            if len(p_list)==nprocess or i+1==len(texts):
+                for p in p_list:
+                    p.start()
+                for p in p_list:
+                    p.join()
+                p_list=[]
+        pass
+
+    def main(self,trial_name,strage,condition_dict):       
+        cls_master=Master(trial_name=trial_name,strage=strage,scenario_dict=condition_dict)
+        cls_master.main()
+        cls_master.save_session()
+
+    def comprehensive_analysis_main(self):
         strage="NASK"
         condition_dicts=self.generate_condition_dicts()
-        for trial_name,condition_dict in condition_dicts.items():
-            cls_master=Master(trial_name=trial_name,strage=strage,scenario_dict=condition_dict)
-            cls_master.main()
-            cls_master.save_session()
-            del cls_master
+        nprocess=cpu_count()
+        p_list=[]
+        
+        for i,(trial_name,condition_dict) in enumerate(condition_dicts.items()):
+            p=Process(target=self.main,args=(trial_name,strage,condition_dict))
+            if len(p_list)==nprocess or i+1==len(condition_dicts):
+                for p in p_list:
+                    p.start()
+                for p in p_list:
+                    p.join()
+                p_list=[]
+            
+            # cls_master=Master(trial_name=trial_name,strage=strage,scenario_dict=condition_dict)
+            # cls_master.main()
+            # cls_master.save_session()
+
+
+
+            # del cls_master
 
 if __name__=="__main__":
     cls=ComprehensiveAnalysis()
-    cls.main()
+    # cls.check_multiprocessor()
+    cls.comprehensive_analysis_main()
