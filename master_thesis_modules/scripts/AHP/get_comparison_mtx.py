@@ -70,7 +70,7 @@ class getConsistencyMtx(Manager):
         eigvals,eigvecs,max_eigval,weights,CI=self.evaluate_mtx(A)
         return A,eigvals,eigvecs,max_eigval,weights,CI
     
-    def get_all_comparison_mtx_and_weight(self,trial_name,strage):
+    def get_all_comparison_mtx_and_weight(self,trial_name,strage,save_mtx=False):
         # 内的・動的（動作）30000001
         AHP_dict={}
         self.data_dir_dict=self.get_database_dir(trial_name=trial_name,strage=strage)
@@ -90,7 +90,8 @@ class getConsistencyMtx(Manager):
         AHP_dict[30000001]["CI"]=CI
         AHP_dict[30000001]["weights"]=weights
         data=pd.DataFrame(data)
-        data.to_csv(csv_path,index=False,header=False)
+        if save_mtx:
+            data.to_csv(csv_path,index=False,header=False)
         print(weights)
         
         # 外的・静的（物体）30000010
@@ -109,7 +110,8 @@ class getConsistencyMtx(Manager):
         AHP_dict[30000010]["CI"]=CI
         AHP_dict[30000010]["weights"]=weights
         data=pd.DataFrame(data)
-        data.to_csv(csv_path,index=False,header=False)
+        if save_mtx:
+            data.to_csv(csv_path,index=False,header=False)
         
         return AHP_dict
 
