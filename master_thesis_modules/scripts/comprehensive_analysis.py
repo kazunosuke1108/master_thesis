@@ -210,6 +210,7 @@ class ComprehensiveAnalysis():
         
         for i,(trial_name,condition_dict) in enumerate(condition_dicts.items()):
             p=Process(target=self.main,args=(trial_name,strage,condition_dict))
+            p_list.append(p)
             if len(p_list)==nprocess or i+1==len(condition_dicts):
                 for p in p_list:
                     p.start()
