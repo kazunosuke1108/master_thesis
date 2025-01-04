@@ -40,6 +40,8 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
         self.spatial_normalization_param=np.sqrt(2)*6
         self.fps=20
         self.throttling=True
+        self.bg_differencing=True
+        self.bg_differencing_thre=0.5
 
         # 危険動作の事前定義
         self.risky_motion_dict={
@@ -156,14 +158,21 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
             "min":1,
             "max":20,
         }
-        
+        dfps_powerup_by_bg_differencing_dict={
+            "++":"++",
+            "+":"++",
+            "o":"+",
+            "-":"+",
+            "--":"o",
+        }
+
         fps_history={}
         dod_history={}
         focus_keys=list(data_dicts[list(data_dicts.keys())[0]].keys())
         focus_keys.remove("timestamp")
         focus_keys= [k for k in focus_keys if int(k)>=50000000]
         
-        def get_control_input(s_value,ds_value):
+        def get_control_input(s_value,ds_value,bg_value=0):
             if np.isnan(s_value):
                 s_value=0
             if np.isnan(ds_value):
@@ -175,6 +184,9 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
                 if (ds_thre_dict[key]["min"]<=ds_value) and (ds_value<=ds_thre_dict[key]["max"]):
                     ds=key
             dfps=control_rule_dict[s][ds]["result"]
+            if self.bg_differencing:
+                if bg_value>self.bg_differencing_thre:
+                    dfps=dfps_powerup_by_bg_differencing_dict[dfps]
             dfps_value=dfps_dict[dfps]
             return dfps_value
 
@@ -219,7 +231,7 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
                     fps_dict[k]["e"]=e
                     # entropyの値に基づいて，FPSを決める
                     d=1-fps_dict[k]["e"]+1e-10
-                    new_fps=fps_dict[k]["fps"]+get_control_input(s_value=d,ds_value=d-fps_dict[k]["d"])
+                    new_fps=fps_dict[k]["fps"]+get_control_input(s_value=d,ds_value=d-fps_dict[k]["d"],bg_value=data_dicts[patient].loc[i,70000000])
                     new_fps=np.clip(new_fps,fps_clip_dict["min"],fps_clip_dict["max"])
                     fps_dict[k]["previous_fps"]=fps_dict[k]["fps"]
                     fps_dict[k]["previous_d"]=fps_dict[k]["d"]
@@ -608,7 +620,7 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
         pass
 
 if __name__=="__main__":
-    trial_name="20250104ThrottlingTrue"
+    trial_name="20250104_143800_BgDon"
     strage="NASK"
     cls=Master(trial_name,strage)
     cls.main()

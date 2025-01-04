@@ -137,7 +137,6 @@ class PseudoDataGenerator(Manager):
             end=a_dict["end_timestamp"]
             label=a_dict["label"]
             extract_index=(data_dicts[patient]["timestamp"]>=start) & (data_dicts[patient]["timestamp"]<=end)
-
             if "_" in label:
                 l,p=label.split("_")
                 print(l,p)
@@ -165,10 +164,24 @@ class PseudoDataGenerator(Manager):
             # data_dicts[patient][50001110].fillna(method="bfill",inplace=True)
             # data_dicts[patient][50001111].fillna(method="ffill",inplace=True)
             # data_dicts[patient][50001111].fillna(method="bfill",inplace=True)
+        
+        # 背景差分の擬似データを生成
+        bg_differencing_pseudo_data_rules={
+            "sit":0.1,
+            "stand":0.4,
+            "standup":0.7,
+            "sitdown":0.7,
+        }
+        for patient in patients:
+            for _,a_dict in action_dict[patient].items():
+                data_dicts[patient][70000000][(data_dicts[patient]["timestamp"]>=a_dict["start_timestamp"]) & ((data_dicts[patient]["timestamp"]<=a_dict["end_timestamp"]))]=\
+                    bg_differencing_pseudo_data_rules[a_dict["label"]]
+
         return data_dicts
     
 
 if __name__=="__main__":
-    trial_name="BuildSimulator20241229"
+    trial_name=""
     strage="NASK"
     cls=PseudoDataGenerator(trial_name=trial_name,strage=strage)
+    

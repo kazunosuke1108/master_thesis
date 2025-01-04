@@ -348,6 +348,13 @@ class GraphManager():
                     "layer":6,
                     "node_code_to":[]
                     },
+            70000000:{
+                    "score":np.nan,
+                    "status":"active",
+                    "description_en":"Background differencing value",
+                    "layer":6,
+                    "node_code_to":[]
+                    },
         }
 
         # 重み定義
