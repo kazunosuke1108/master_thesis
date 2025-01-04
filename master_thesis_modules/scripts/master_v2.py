@@ -20,11 +20,12 @@ from scripts.entropy.entropy_weight_generator import EntropyWeightGenerator
 from scripts.pseudo_data.pseudo_data_generator import PseudoDataGenerator
 
 class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
-    def __init__(self,trial_name,strage):
+    def __init__(self,trial_name,strage,scenario_dict={}):
         super().__init__()
         print("# Master開始 #")
         self.trial_name=trial_name
         self.strage=strage
+        self.scenario_dict=scenario_dict
         self.data_dir_dict=self.get_database_dir(self.trial_name,self.strage)
         self.patients=["A","B","C"]
         print("# default graph 定義 #")
@@ -79,7 +80,7 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
         self.AHP_dict=getConsistencyMtx().get_all_comparison_mtx_and_weight(trial_name=self.trial_name,strage=self.strage)
 
         # シナリオの定義・DataFrameの生成
-        self.data_dicts=self.define_scenario(fps=self.fps)
+        self.data_dicts=self.define_scenario(fps=self.fps,scenario_dict=scenario_dict)
 
     def pseudo_throttling(self,data_dicts):
         initial_fps=20
@@ -267,7 +268,7 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
 
         return data_dicts
 
-    def define_scenario(self,fps=20):
+    def define_scenario(self,fps,scenario_dict):
         print("# シナリオ生成 #")
         start_timestamp=0
         end_timestamp=10
@@ -275,108 +276,116 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
         yrange=[0,6]
         # fps=20
         patients=list(self.graph_dicts.keys())
-        general_dict={
-            "start_timestamp":start_timestamp,
-            "end_timestamp":end_timestamp,
-            "fps":fps,
-            "patients":patients,
-            "xrange":xrange,
-            "yrange":yrange,
-        }
-        zokusei_dict={
-            "A":{
-                "patient":"yes",
-                "age":"old",
-            },
-            "B":{
-                "patient":"yes",
-                "age":"old",
-            },
-            "C":{
-                "patient":"yes",
-                "age":"old",
-            },
-            "NS":{
-                "patient":"no",
-                "age":"middle"
+        if len(scenario_dict)==0:
+            general_dict={
+                "start_timestamp":start_timestamp,
+                "end_timestamp":end_timestamp,
+                "fps":fps,
+                "patients":patients,
+                "xrange":xrange,
+                "yrange":yrange,
             }
-        }
-        position_dict={
-            "A":(2,5),
-            "B":(2,2),
-            "C":(5,2),
-            "NS":(5,5),
-        }
-        action_dict={
-            "A":{
-                0:{
-                    "label":"sit",
-                    "start_timestamp":0,
-                    "end_timestamp":end_timestamp,
-                    },
-            },
-            "B":{
-                0:{
-                    "label":"sit",
-                    "start_timestamp":0,
-                    "end_timestamp":2,
-                    },
-                2:{
-                    "label":"standup",
-                    "start_timestamp":2,
-                    "end_timestamp":4,
-                    },
-                4:{
-                    "label":"stand",
-                    "start_timestamp":4,
-                    "end_timestamp":6,
-                    },
-                6:{
-                    "label":"sitdown",
-                    "start_timestamp":6,
-                    "end_timestamp":8,
-                    },
-                8:{
-                    "label":"sit",
-                    "start_timestamp":8,
-                    "end_timestamp":end_timestamp,
-                    },
-            },
-            "C":{
-                0:{
-                    "label":"sit",
-                    "start_timestamp":0,
-                    "end_timestamp":end_timestamp,
-                    },
-            },
-            "NS":{
-                0:{
-                    "label":"work",
-                    "start_timestamp":0,
-                    "end_timestamp":5,
+            zokusei_dict={
+                "A":{
+                    "patient":"yes",
+                    "age":"old",
                 },
-                5:{
-                    "label":"approach_B",
-                    "start_timestamp":5,
-                    "end_timestamp":7,
-                    },
-                7:{
-                    "label":"work_B",
-                    "start_timestamp":7,
-                    "end_timestamp":9,
+                "B":{
+                    "patient":"yes",
+                    "age":"old",
                 },
-                9:{
-                    "label":"leave_B",
-                    "start_timestamp":9,
-                    "end_timestamp":end_timestamp,
-                    }
+                "C":{
+                    "patient":"yes",
+                    "age":"old",
+                },
+                "NS":{
+                    "patient":"no",
+                    "age":"middle"
+                }
             }
-        }
-        surrounding_objects={
-            "A":[],
-            "B":["wheelchair",],
-            "C":["ivPole",],
-        }
+            position_dict={
+                "A":(2,5),
+                "B":(2,2),
+                "C":(5,2),
+                "NS":(5,5),
+            }
+            action_dict={
+                "A":{
+                    0:{
+                        "label":"sit",
+                        "start_timestamp":0,
+                        "end_timestamp":end_timestamp,
+                        },
+                },
+                "B":{
+                    0:{
+                        "label":"sit",
+                        "start_timestamp":0,
+                        "end_timestamp":2,
+                        },
+                    2:{
+                        "label":"standup",
+                        "start_timestamp":2,
+                        "end_timestamp":4,
+                        },
+                    4:{
+                        "label":"stand",
+                        "start_timestamp":4,
+                        "end_timestamp":6,
+                        },
+                    6:{
+                        "label":"sitdown",
+                        "start_timestamp":6,
+                        "end_timestamp":8,
+                        },
+                    8:{
+                        "label":"sit",
+                        "start_timestamp":8,
+                        "end_timestamp":end_timestamp,
+                        },
+                },
+                "C":{
+                    0:{
+                        "label":"sit",
+                        "start_timestamp":0,
+                        "end_timestamp":end_timestamp,
+                        },
+                },
+                "NS":{
+                    0:{
+                        "label":"work",
+                        "start_timestamp":0,
+                        "end_timestamp":5,
+                    },
+                    5:{
+                        "label":"approach_B",
+                        "start_timestamp":5,
+                        "end_timestamp":7,
+                        },
+                    7:{
+                        "label":"work_B",
+                        "start_timestamp":7,
+                        "end_timestamp":9,
+                    },
+                    9:{
+                        "label":"leave_B",
+                        "start_timestamp":9,
+                        "end_timestamp":end_timestamp,
+                        }
+                }
+            }
+            surrounding_objects={
+                "A":[],
+                "B":["wheelchair",],
+                "C":["ivPole",],
+            }
+        else:
+            general_dict=scenario_dict["general_dict"]
+            zokusei_dict=scenario_dict["zokusei_dict"]
+            position_dict=scenario_dict["position_dict"]
+            action_dict=scenario_dict["action_dict"]
+            surrounding_objects=scenario_dict["surrounding_objects"]
+
 
         cls_PDG=PseudoDataGenerator(trial_name=self.trial_name,strage=self.strage)
         data_dicts=cls_PDG.get_pseudo_data(

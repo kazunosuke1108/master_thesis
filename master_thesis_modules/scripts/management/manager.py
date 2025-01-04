@@ -59,6 +59,8 @@ class Manager():
         elif strage=="local":
             database_dir_path=module_dir_path+"/database"
 
+        if "/" in trial_name:
+            os.makedirs(database_dir_path+"/"+trial_name.split("/")[0],exist_ok=True)
         trial_dir_path=database_dir_path+"/"+trial_name
         common_dir_path=database_dir_path+"/common"
 
