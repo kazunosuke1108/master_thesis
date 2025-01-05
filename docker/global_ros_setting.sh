@@ -1,14 +1,14 @@
 #!/bin/bash
 
 ## source 
-source /home/${USER}/catkin_ws/devel/setup.bash
+source /catkin_ws/devel/setup.bash
 ## get ipv4 address
 ipv4addr=$(/sbin/ifconfig -a                                 |
             grep inet[^6]                                     |
             sed 's/.*inet[^6][^0-9]*\([0-9.]*\)[^0-9]*.*/\1/' |
             grep '^192\.168\.'                                )
 
-CATKIN_HOME=/home/${USER}/catkin_ws
+CATKIN_HOME=/catkin_ws
 export TTY_WHILL=/dev/serial/by-id/usb-FTDI_FT232R_USB_UART_AB0P5EEG-if00-port0
 
 ## export

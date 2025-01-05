@@ -152,7 +152,7 @@ RUN apt-get install -y ros-noetic-tmc-desktop-full
 #######################################################################
 ##                install transformers (huggingface)                 ##
 #######################################################################
-RUN pip install git+https://github.com/huggingface/transformers.git
+RUN pip install transformers
 RUN pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
 
 #######################################################################

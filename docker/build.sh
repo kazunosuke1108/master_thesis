@@ -1,4 +1,4 @@
- #!/bin/bash -x
+#!/bin/bash -x
 
 cd `dirname $0`
 
@@ -23,6 +23,6 @@ else
     echo "=========================" 
     echo "=nvidia docker installed="
     echo "========================="
-    docker build  --tag ${USER}/master_thesis --build-arg USER=${USER} --build-arg USER_ID=`id -u` --build-arg workspace="/home/${USER}/catkin_ws" .
+    docker build  --tag ${USER}/master_thesis --build-arg USER=${USER} --build-arg USER_ID=`id -u` --build-arg workspace="/catkin_ws" .
     
 fi
