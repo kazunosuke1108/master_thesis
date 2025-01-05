@@ -1,6 +1,8 @@
 import os
 import sys
 from glob import glob
+from pprint import pprint
+
 sys.path.append(".")
 sys.path.append("..")
 sys.path.append(os.path.expanduser("~")+"/kazu_ws/master_thesis/master_thesis_modules")
@@ -71,9 +73,21 @@ class Visualizer(Manager):
                     p.join()
                 p_list=[]
         self.write_json(self.score_dict,json_path=self.simulation_common_dir_path+"/standing.json")
+    
+    def check_json(self):
+        data=self.load_json(self.simulation_common_dir_path+"/standing.json")
+        count_dict={
+            "risk25_max":{"A":0,"B":0,"C":0,},
+            "risk79_max":{"A":0,"B":0,"C":0,},
+        }
+        for trial_no,d in data.items():
+            count_dict["risk25_max"][data[trial_no]["risk25_max"]]+=1
+            count_dict["risk79_max"][data[trial_no]["risk79_max"]]+=1
+        pprint(count_dict)
 
 if __name__=="__main__":
     simulation_name="20250104SimulationPosition"
     strage="NASK"
     cls=Visualizer(simulation_name=simulation_name,strage=strage)
-    cls.main()
+    # cls.main()
+    cls.check_json()
