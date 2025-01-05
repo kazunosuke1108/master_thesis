@@ -61,15 +61,15 @@ class Visualizer(Manager):
         trial_dir_paths=[path for path in sorted(glob(self.simulation_dir_path+"/*")) if f"common" not in os.path.basename(path)]
         print(trial_dir_paths)
         for i,trial_dir_path in enumerate(trial_dir_paths):
-            self.check_standing_detection(trial_dir_path)
-            # p=Process(target=self.check_standing_detection,args=(trial_dir_path,))
-            # p_list.append(p)
-            # if len(p_list)==nprocess or i+1==len(trial_dir_paths):
-            #     for p in p_list:
-            #         p.start()
-            #     for p in p_list:
-            #         p.join()
-            #     p_list=[]
+            # self.check_standing_detection(trial_dir_path)
+            p=Process(target=self.check_standing_detection,args=(trial_dir_path,))
+            p_list.append(p)
+            if len(p_list)==nprocess or i+1==len(trial_dir_paths):
+                for p in p_list:
+                    p.start()
+                for p in p_list:
+                    p.join()
+                p_list=[]
         self.write_json(self.score_dict,json_path=self.simulation_common_dir_path+"/standing.json")
 
 if __name__=="__main__":
