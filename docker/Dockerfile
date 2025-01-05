@@ -193,7 +193,7 @@ RUN adduser ${USER} root
 
 # USER root
 USER ${USER}
-RUN echo "export PS1='\[\e[1;31;40m\]CLIP\[\e[0m\] \u:\w\$ '">> ~/.bashrc
+RUN echo "export PS1='\[\e[1;31;40m\]MASTER THESIS\[\e[0m\] \u:\w\$ '">> ~/.bashrc
 RUN echo "source /ros_setting.sh">> ~/.bashrc
 
 WORKDIR ${workspace}
