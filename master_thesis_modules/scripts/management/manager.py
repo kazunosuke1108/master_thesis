@@ -37,7 +37,10 @@ class Manager():
         else:#dockerのとき
             module_dir_path=home+"/"+"catkin_ws/src"+"/"+module_name
             if not os.path.isdir(module_dir_path):
+                module_dir_path="/"+"catkin_ws/src"+"/"+module_name
+            if not os.path.isdir(module_dir_path):
                 raise FileNotFoundError("module directory not found: "+module_dir_path)
+            
         
         return module_dir_path
 
@@ -59,12 +62,15 @@ class Manager():
         elif strage=="local":
             database_dir_path=module_dir_path+"/database"
 
+        mobilesensing_dir_path=database_dir_path.replace("MasterThesis","MobileSensing")
+
         if "/" in trial_name:
             os.makedirs(database_dir_path+"/"+trial_name.split("/")[0],exist_ok=True)
         trial_dir_path=database_dir_path+"/"+trial_name
         common_dir_path=database_dir_path+"/common"
 
         database_dir_dict={
+            "mobilesensing_dir_path":mobilesensing_dir_path,
             "module_dir_path":module_dir_path,
             "database_dir_path":database_dir_path,
             "trial_dir_path":trial_dir_path,

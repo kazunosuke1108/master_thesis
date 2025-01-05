@@ -41,7 +41,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
    usbutils \
    sudo \
    python3-pip \
-   libusb-1.0-0-dev
+   libusb-1.0-0-dev \
+   icecream
 
 #######################################################################
 ##                           install font                            ##
@@ -159,6 +160,11 @@ RUN pip install torch torchvision torchaudio --index-url https://download.pytorc
 ##                    install ultralytics (YOLO)                     ##
 #######################################################################
 RUN pip install ultralytics
+
+#######################################################################
+##                    install icecream (print tools)                 ##
+#######################################################################
+RUN pip install icecream
 
 #######################################################################
 ##                            delete cash                            ##
