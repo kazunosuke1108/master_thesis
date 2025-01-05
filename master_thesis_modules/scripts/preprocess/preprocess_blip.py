@@ -82,6 +82,7 @@ class PreprocessMaster(Manager,blipTools):
         print(id_names)
         self.feature_dict={id_name:copy.deepcopy(self.feature_data) for id_name in id_names}
         for i,row in self.annotation_data.iterrows():
+            print("now processing...",i,"/",len(self.annotation_data))
             # 高画質jpgのpath取得
             rgb_image_path=self.data_dir_dict["mobilesensing_dir_path"]+"/"+self.annotation_data.loc[i,"fullrgb_imagePath"]
             rgb_img=cv2.imread(rgb_image_path)
@@ -118,7 +119,7 @@ class PreprocessMaster(Manager,blipTools):
                         # BLIP 年齢？
                         answer,confidence=self.get_vqa(blip_processor=self.blip_processor,blip_model=self.blip_model,device=self.device,image=bbox_rgb_img,question=q_info["query"],confidence=True)
                         self.feature_dict[id_name].loc[i,self.questions[q_title]["node_code"]]=answer
-                        self.feature_dict[id_name].loc[i,50000010]=confidence
+                        self.feature_dict[id_name].loc[i,50000011]=confidence
                     elif q_title=="ivPole":
                         # BLIP 点滴？
                         answer,confidence=self.get_vqa(blip_processor=self.blip_processor,blip_model=self.blip_model,device=self.device,image=extended_bbox_rgb_img,question=q_info["query"],confidence=True)
