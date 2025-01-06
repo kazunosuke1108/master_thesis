@@ -52,8 +52,8 @@ class PreprocessMaster(Manager,blipTools):
         # 一括で記録できるものを片付ける
         for id_name in id_names:
             # 患者の位置
-            self.feature_dict[id_name]["60000000"]=self.annotation_data[id_name+"_x"]
-            self.feature_dict[id_name]["60000001"]=self.annotation_data[id_name+"_y"]
+            self.feature_dict[id_name]["60010000"]=self.annotation_data[id_name+"_x"]
+            self.feature_dict[id_name]["60010001"]=self.annotation_data[id_name+"_y"]
             self.feature_dict[id_name]["50001100"]=self.annotation_data[self.nurse_id+"_x"].values
             # print(self.feature_dict[id_name]["50001100"])
             # raise NotImplementedError
@@ -98,7 +98,7 @@ class PreprocessMaster(Manager,blipTools):
         pass
 
 if __name__=="__main__":
-    trial_name="20250106ExperimentDevelopment"
+    trial_name="20250106ExperimentFix6000"
     strage="NASK"
     cls=PreprocessMaster(trial_name=trial_name,strage=strage)
     cls.main()

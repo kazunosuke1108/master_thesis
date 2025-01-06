@@ -2,6 +2,7 @@ import os
 import sys
 import copy
 import dill
+from glob import glob
 
 from icecream import ic
 from pprint import pprint
@@ -20,30 +21,60 @@ from scripts.entropy.entropy_weight_generator import EntropyWeightGenerator
 from scripts.pseudo_data.pseudo_data_generator import PseudoDataGenerator
 
 class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
-    def __init__(self,trial_name,strage,scenario_dict={}):
+    def __init__(self,trial_name,strage,scenario_dict={},runtype="simulation"):
         super().__init__()
         print("# Master開始 #")
         self.trial_name=trial_name
         self.strage=strage
         self.scenario_dict=scenario_dict
+        self.runtype=runtype
         self.data_dir_dict=self.get_database_dir(self.trial_name,self.strage)
-        self.patients=["A","B","C"]
+        
         print("# default graph 定義 #")
         default_graph=self.get_default_graph()
-        
-        # 人数分のgraphを定義
-        print("# 人数分のgraph 定義 #")
-        self.graph_dicts={}
-        for patient in self.patients:
-            self.graph_dicts[patient]=copy.deepcopy(default_graph)
 
         # parameters
         self.spatial_normalization_param=np.sqrt(2)*6
         self.fps=20
-        self.throttling=True
-        self.bg_differencing=True
+        self.throttling=False
+        self.bg_differencing=False
         self.bg_differencing_thre=0.5
 
+        if self.runtype=="simulation":
+            self.patients=["A","B","C"]
+            # 人数分のgraphを定義
+            # シナリオの定義・DataFrameの生成
+            print("# simulation用のデータを生成中 #")
+            self.data_dicts=self.define_scenario(fps=self.fps,scenario_dict=scenario_dict)
+        elif self.runtype=="experiment":
+            self.raw_csv_paths=sorted(glob(self.data_dir_dict["trial_dir_path"]+"/data_*_raw.csv"))
+            self.patients=[os.path.basename(p)[len("data_"):-len("_raw.csv")] for p in self.raw_csv_paths]
+            print("# 実験データをロード中 #")
+            self.data_dicts={}
+            for patient,raw_csv_path in zip(self.patients,self.raw_csv_paths):
+                self.data_dicts[patient]=pd.read_csv(raw_csv_path,header=0)
+                renew_dict={}
+                for col in self.data_dicts[patient].keys():
+                    try:
+                        new_col=int(col)
+                        renew_dict[col]=new_col
+                    except Exception:
+                        continue
+                    self.data_dicts[patient].rename(columns=renew_dict,inplace=True)
+
+
+        print("# 人数分のgraph 定義 #")
+        self.graph_dicts={}
+        for patient in self.patients:
+            self.graph_dicts[patient]=copy.deepcopy(default_graph)
+            # dataに列が存在するかどうか確認
+            for col in self.graph_dicts[patient]["node_dict"].keys():
+                try:
+                    self.data_dicts[patient][col]
+                except KeyError:
+                    self.data_dicts[patient][col]=np.nan
+
+        
         # 危険動作の事前定義
         self.risky_motion_dict={
             40000010:{
@@ -79,8 +110,6 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
         # AHP 一対比較行列の作成
         self.AHP_dict=getConsistencyMtx().get_all_comparison_mtx_and_weight(trial_name=self.trial_name,strage=self.strage)
 
-        # シナリオの定義・DataFrameの生成
-        self.data_dicts=self.define_scenario(fps=self.fps,scenario_dict=scenario_dict)
 
     def pseudo_throttling(self,data_dicts):
         initial_fps=20

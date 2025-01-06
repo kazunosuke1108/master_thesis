@@ -680,30 +680,24 @@ class Visualizer(Manager):
 
     def plot_matplotlib(self):
         import matplotlib.pyplot as plt
-        csv_paths=sorted(glob(self.data_dir_dict["trial_dir_path"]+"/data_*yolo.csv"))
+        csv_paths=sorted(glob(self.data_dir_dict["trial_dir_path"]+"/data_*_raw.csv"))
+        data_dict={}
+        id_names=[]
         for csv_path in csv_paths:
             data=pd.read_csv(csv_path,header=0)
+            id_name=os.path.basename(csv_path).split("_")[1]
+            id_names.append(id_name)
+            data_dict[id_name]=data
         #     print(data)
-            plt.plot(data["timestamp"],data["50000103"],"-x",label=os.path.basename(csv_path)[:-len("_yolo.csv")])
-            # plt.plot(data["timestamp"],data["20000001"],"-^",label="gaiteki")
-            # plt.plot(data["timestamp"],data["30000000"],"-x",label="zokusei")
-            # plt.plot(data["timestamp"],data["30000001"],"-^",label="motion")
-            # plt.plot(data["timestamp"],data["30000010"],"-^",label="objects")
-            # plt.plot(data["timestamp"],data["30000011"],"-^",label="staff")
-            # plt.plot(data["timestamp"],data["40000102"],"-o",label="handrail")
-
-            # plt.plot(data["timestamp"],data["40000010"],"-x",label="standup")
-            # plt.plot(data["timestamp"],data["40000011"],"-^",label="releaseBrake")
-            # plt.plot(data["timestamp"],data["40000012"],"-s",label="moveWheelchair")
-            # plt.plot(data["timestamp"],data["40000013"],"-o",label="loseBalance")
-            # plt.plot(data["timestamp"],data["40000014"],label="MoveHand")
-            # plt.plot(data["timestamp"],data["40000015"],label="cough")
-            # plt.plot(data["timestamp"],data["40000016"],label="touchFace")
-            
-            # plt.plot(data["timestamp"],data["50001110"],label="pose2")
-            # plt.plot(data["timestamp"],data["50001111"],label="pose3")
-        plt.legend()
-        plt.show()
+        export_labels=[str(k) for k in data_dict[id_name].keys() if str(k)!="timestamp"]
+        for export_label in export_labels:
+            for id_name in id_names:
+                plt.plot(data_dict[id_name]["timestamp"],data_dict[id_name][export_label],"-o",label=id_name)
+            plt.legend()
+            plt.grid()
+            plt.title(export_label)
+            plt.savefig(self.data_dir_dict["trial_dir_path"]+f"/result_{export_label}.jpg")
+            plt.close()
 
         # for csv_path in csv_paths:
         #     data=pd.read_csv(csv_path,header=0)
@@ -717,7 +711,7 @@ class Visualizer(Manager):
         pass
 
 if __name__=="__main__":
-    trial_name="20250105BuildPreprocessor"
+    trial_name="20250106ExperimentDevelopment"
     strage="NASK"
     cls=Visualizer(trial_name=trial_name,strage=strage)
     # cls.visualize_graph(trial_name="20241229BuildSimulator",strage="NASK",name="A",show=True)

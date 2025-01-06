@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 class Manager():
     def __init__(self):
         super().__init__()
-        plt.rcParams["figure.figsize"] = (7.5,5)
+        plt.rcParams["figure.figsize"] = (15,10)
         plt.rcParams["figure.autolayout"] = True
         plt.rcParams["font.size"] = 24
         plt.rcParams['font.family'] = 'Times New Roman'

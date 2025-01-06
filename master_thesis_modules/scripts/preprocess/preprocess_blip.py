@@ -62,8 +62,8 @@ class PreprocessMaster(Manager,blipTools):
             50001101,
             50001110,
             50001111,
-            60000000,
-            60000001,
+            60010000,
+            60010001,
         ]
         for col in columns:
             self.feature_data[col]=np.nan
@@ -153,7 +153,7 @@ class PreprocessMaster(Manager,blipTools):
         pass
 
 if __name__=="__main__":
-    trial_name="20250105BuildPreprocessor"
+    trial_name="20250106ExperimentFix6000"
     strage="NASK"
     cls=PreprocessMaster(trial_name=trial_name,strage=strage)
     cls.main()
