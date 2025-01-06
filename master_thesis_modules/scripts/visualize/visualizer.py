@@ -515,11 +515,11 @@ class Visualizer(Manager):
 
     def draw_features(self):
         # csv_paths=[path for path in self.data_paths if (("feature" in os.path.basename(path)) and (".csv" in os.path.basename(path)))]
-        csv_paths=sorted(glob(self.data_dir_dict["trial_dir_path"]+"/*.csv"))
+        csv_paths=sorted(glob(self.data_dir_dict["trial_dir_path"]+"/data_*yolo.csv"))
         plot_data=[]
 
         for csv_path in csv_paths:
-            name=os.path.basename(csv_path)[:-4].split("_")[-1]
+            name=os.path.basename(csv_path)[:-4].split("_")[-2]
             data=pd.read_csv(csv_path,header=0)
             nodes=[k for k in list(data.keys()) if (("timestamp" not in k) and ("active" not in k) and ("fps" not in k))]
             categories=sorted(list(set([str(k)[:1] for k in nodes])))
@@ -680,11 +680,11 @@ class Visualizer(Manager):
 
     def plot_matplotlib(self):
         import matplotlib.pyplot as plt
-        csv_paths=sorted(glob(self.data_dir_dict["trial_dir_path"]+"/data_*raw.csv"))
-        # for csv_path in csv_paths:
-        #     data=pd.read_csv(csv_path,header=0)
+        csv_paths=sorted(glob(self.data_dir_dict["trial_dir_path"]+"/data_*yolo.csv"))
+        for csv_path in csv_paths:
+            data=pd.read_csv(csv_path,header=0)
         #     print(data)
-            # plt.plot(data["timestamp"],data["20000000"],"-x",label="naiteki")
+            plt.plot(data["timestamp"],data["50000103"],"-x",label=os.path.basename(csv_path)[:-len("_yolo.csv")])
             # plt.plot(data["timestamp"],data["20000001"],"-^",label="gaiteki")
             # plt.plot(data["timestamp"],data["30000000"],"-x",label="zokusei")
             # plt.plot(data["timestamp"],data["30000001"],"-^",label="motion")
@@ -702,17 +702,17 @@ class Visualizer(Manager):
             
             # plt.plot(data["timestamp"],data["50001110"],label="pose2")
             # plt.plot(data["timestamp"],data["50001111"],label="pose3")
-            # plt.legend()
-            # plt.show()
-
-        for csv_path in csv_paths:
-            data=pd.read_csv(csv_path,header=0)
-            # if "B" in os.path.basename(csv_path):
-            plt.plot(data["timestamp"],data["10000000"],label=os.path.basename(csv_path))
-        plt.xlabel("Time [s]")
-        plt.ylabel("Risk value")
         plt.legend()
         plt.show()
+
+        # for csv_path in csv_paths:
+        #     data=pd.read_csv(csv_path,header=0)
+        #     # if "B" in os.path.basename(csv_path):
+        #     plt.plot(data["timestamp"],data["10000000"],label=os.path.basename(csv_path))
+        # plt.xlabel("Time [s]")
+        # plt.ylabel("Risk value")
+        # plt.legend()
+        # plt.show()
     def main(self):
         pass
 
@@ -721,8 +721,8 @@ if __name__=="__main__":
     strage="NASK"
     cls=Visualizer(trial_name=trial_name,strage=strage)
     # cls.visualize_graph(trial_name="20241229BuildSimulator",strage="NASK",name="A",show=True)
-    # cls.plot_matplotlib()
-    cls.draw_positions()
+    cls.plot_matplotlib()
+    # cls.draw_positions()
     # cls.draw_features()
     # cls.draw_weight()
     # cls.draw_fps()

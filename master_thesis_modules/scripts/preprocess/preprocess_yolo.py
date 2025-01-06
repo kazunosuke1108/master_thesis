@@ -28,6 +28,12 @@ class PreprocessMaster(Manager,blipTools):
         self.strage=strage
         self.data_dir_dict=self.get_database_dir(trial_name=trial_name,strage=strage)
 
+        # 姿勢推定結果のプロット有無
+        self.debug=False
+        if self.debug:
+            self.data_dir_dict["pose_dir_path"]=self.data_dir_dict["trial_dir_path"]+"/pose"
+            os.makedirs(self.data_dir_dict["pose_dir_path"],exist_ok=True)
+
         # YOLO
         self.model=YOLO("yolo11x-pose.pt")
 
@@ -108,12 +114,24 @@ class PreprocessMaster(Manager,blipTools):
 
         stand_ratio=np.nanmax([0,np.nanmin([1,hip_length/ankle_length])])
         return stand_ratio
+    
+    def feature_stand_v2(self,kp_dict,t,b,l,r):
+        # bboxの縦横比で考える。
+        # 縦が横の2倍以下のとき座る。3倍以上で立つ。
+        ratio=(b-t)/(r-l)
+        sit_ratio=2
+        stand_ratio=3.5
+        ratio=(np.clip(ratio,sit_ratio,stand_ratio)-sit_ratio)/(stand_ratio-sit_ratio)
+        ratio=np.clip(ratio,0,1)# 念の為
+        return ratio
 
     def feature_lean(self,kp_dict):
         shoulder=np.array([np.nanmean([kp_dict["l_shoulder"]["x"],kp_dict["r_shoulder"]["x"]]),np.nanmean([kp_dict["l_shoulder"]["y"],kp_dict["r_shoulder"]["y"]])])
         hip=np.array([np.nanmean([kp_dict["l_hip"]["x"],kp_dict["r_hip"]["x"]]),np.nanmean([kp_dict["l_hip"]["y"],kp_dict["r_hip"]["y"]])])
-        theta=abs(np.arctan2(abs(shoulder[1]-hip[1]),abs(shoulder[0]-hip[0])))
-        stand_ratio=np.nanmax([0,np.nanmin([1,theta/(np.pi/2)])])
+        theta=abs(np.arctan2(abs(shoulder[0]-hip[0]),abs(shoulder[1]-hip[1])))
+        # stand_ratio=np.nanmax([0,np.nanmin([1,theta/(np.pi/2)])])
+        stand_ratio=theta/(np.pi/4)
+        stand_ratio=np.clip(stand_ratio,0,1)
         return stand_ratio
     
     def feature_wrist(self,kp_dict):
@@ -131,7 +149,9 @@ class PreprocessMaster(Manager,blipTools):
         shoulder=np.array([np.nanmean([kp_dict["l_shoulder"]["x"],kp_dict["r_shoulder"]["x"]]),np.nanmean([kp_dict["l_shoulder"]["y"],kp_dict["r_shoulder"]["y"]])])
         hip=np.array([np.nanmean([kp_dict["l_hip"]["x"],kp_dict["r_hip"]["x"]]),np.nanmean([kp_dict["l_hip"]["y"],kp_dict["r_hip"]["y"]])])
         sebone=np.sqrt((shoulder-hip)[0]**2+(shoulder-hip)[1]**2)
-        wrist_ratio=np.nanmax([0,np.nanmin([1,wrist_distance/sebone])])
+        # wrist_ratio=np.nanmax([0,np.nanmin([1,wrist_distance/sebone])])
+        wrist_ratio=wrist_distance/(sebone*2)
+        wrist_ratio=np.clip(wrist_ratio,0,1)
 
         return wrist_ratio
     
@@ -154,15 +174,20 @@ class PreprocessMaster(Manager,blipTools):
         # print("r_ankle_distance",r_ankle_distance)
         # print("ankle_distance",ankle_distance)
         # print("sebone",sebone)
-        ankle_ratio=np.nanmax([0,np.nanmin([1,ankle_distance/sebone])])
-
+        # ankle_ratio=np.nanmax([0,np.nanmin([1,ankle_distance/sebone])])
+        ankle_ratio=ankle_distance/sebone
+        ankle_ratio=np.clip(ankle_ratio,0,1)
         return ankle_ratio
 
     def main(self):
-        # 毎行読み込む
         id_names=[k[:-len("_activeBinary")] for k in self.annotation_data.keys() if "activeBinary" in k]
         print(id_names)
+        # 毎行読み込む
         for i,row in self.annotation_data.iterrows():
+            # if i>100:
+            #     break
+            # bboxの内包関係チェッカー
+            self.occlusion_dict={id_name:{"bbox_t":np.nan,"bbox_b":np.nan,"bbox_l":np.nan,"bbox_r":np.nan} for id_name in id_names}
             print("now processing...",i,"/",len(self.annotation_data))
             # 高画質jpgのpath取得
             rgb_image_path=self.data_dir_dict["mobilesensing_dir_path"]+"/"+self.annotation_data.loc[i,"fullrgb_imagePath"]
@@ -175,15 +200,19 @@ class PreprocessMaster(Manager,blipTools):
                 t,b,l,r=int(t),int(b),int(l),int(r)
                 bbox_rgb_img=rgb_img[t:b,l:r]
                 # 拡張bounding boxの切り出し
-                extend_ratio=0.05
+                extend_ratio=0.025
                 t_e,b_e,l_e,r_e,=np.max([t-extend_ratio*rgb_img.shape[0],0]),np.min([b+extend_ratio*rgb_img.shape[0],rgb_img.shape[0]]),np.max([l-extend_ratio*rgb_img.shape[1],0]),np.min([r+extend_ratio*rgb_img.shape[1],rgb_img.shape[0]])
                 t_e,b_e,l_e,r_e=int(t_e),int(b_e),int(l_e),int(r_e)
+                self.occlusion_dict[id_name]["bbox_t"],self.occlusion_dict[id_name]["bbox_b"],self.occlusion_dict[id_name]["bbox_l"],self.occlusion_dict[id_name]["bbox_r"]=t_e,b_e,l_e,r_e
                 extended_bbox_rgb_img=rgb_img[t_e:b_e,l_e:r_e]
-                if id_name=="ID_00004":
-                    cv2.imshow("test",extended_bbox_rgb_img)
-                    cv2.waitKey(1)
+                # if (id_name=="ID_00004") & self.debug:
+                #     cv2.imshow("test",extended_bbox_rgb_img)
+                #     cv2.waitKey(1)
                 try:
                     results=self.model(extended_bbox_rgb_img)
+                    if self.debug:
+                        plotted_image=results[0].plot()
+                        cv2.imwrite(self.data_dir_dict["pose_dir_path"]+f"/{trial_name}_{id_name}_{str(i).zfill(5)}.jpg",plotted_image)
                 except ZeroDivisionError:
                     continue
                 # print(results)
@@ -194,35 +223,42 @@ class PreprocessMaster(Manager,blipTools):
                 except TypeError:
                     continue
                 kp_dict={}
-                for i,k in enumerate(self.KEYPOINTS_NAMES):
+                for j,k in enumerate(self.KEYPOINTS_NAMES):
                     kp_dict[k]={
-                        "x":int(kp_xy[i,0]) if int(kp_xy[i,0])!=0 else np.nan,
-                        "y":int(kp_xy[i,1]) if int(kp_xy[i,1])!=0 else np.nan,
-                        "conf":kp_conf[i],
+                        "x":int(kp_xy[j,0]) if int(kp_xy[j,0])!=0 else np.nan,
+                        "y":int(kp_xy[j,1]) if int(kp_xy[j,1])!=0 else np.nan,
+                        "conf":kp_conf[j],
                     }
                 features=np.array([
-                    self.feature_stand(kp_dict),
+                    self.feature_stand_v2(kp_dict,t,b,l,r),
+                    # self.feature_stand(kp_dict),
                     self.feature_lean(kp_dict),
                     self.feature_wrist(kp_dict),
                     self.feature_ankle(kp_dict),
                     ]
                 )
-                self.feature_dict[id_name]["50000100"]=features[0]
-                self.feature_dict[id_name]["50000101"]=features[1]
-                self.feature_dict[id_name]["50000102"]=features[2]
-                self.feature_dict[id_name]["50000103"]=features[3]
+                self.feature_dict[id_name].loc[i,"50000100"]=features[0]
+                self.feature_dict[id_name].loc[i,"50000101"]=features[1]
+                self.feature_dict[id_name].loc[i,"50000102"]=features[2]
+                self.feature_dict[id_name].loc[i,"50000103"]=features[3]
+                # ic(kp_dict)
+                # ic(features)
+                # raise NotImplementedError
+                # bounding boxの重複チェック・削除
+                for opponent_id_name in id_names:
+                    if opponent_id_name==id_name:
+                        continue
+                    if ((l_e<self.occlusion_dict[opponent_id_name]["bbox_l"]) & (self.occlusion_dict[opponent_id_name]["bbox_l"]<r_e)) and \
+                        ((l_e<self.occlusion_dict[opponent_id_name]["bbox_r"]) & (self.occlusion_dict[opponent_id_name]["bbox_r"]<r_e)):
+                        if (opponent_id_name!="ID_00004") and (opponent_id_name!="ID_00007") and (opponent_id_name!="ID_00008") and (opponent_id_name!="ID_00009"):# 一番手前になるのがほぼ明らかなのでID_00004は除外する。それ以外に関しては、IDが若い番号の方を消す                    
+                            # print(f"{opponent_id_name} is occluded by {id_name}. Remove {opponent_id_name}")
+                            # print(l_e,self.occlusion_dict[opponent_id_name]["bbox_l"],self.occlusion_dict[opponent_id_name]["bbox_r"],r_e)
+                            self.feature_dict[opponent_id_name].loc[i,["50000100","50000101","50000102","50000103"]]=np.nan
 
-                
+            # raise NotImplementedError
+
         for id_name in id_names:
             self.feature_dict[id_name].to_csv(self.data_dir_dict["trial_dir_path"]+f"/data_{id_name[len('ID_'):]}_yolo.csv",index=False)
-        # 身体特徴量の抽出
-        
-        # 位置情報
-        # 点滴の紐付け
-        # 車椅子の紐付け
-        # 最寄り壁の算出
-
-        # 看護師
 
         pass
 

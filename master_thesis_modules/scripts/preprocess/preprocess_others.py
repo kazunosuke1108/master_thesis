@@ -7,8 +7,6 @@ import copy
 import pandas as pd
 import numpy as np
 
-import cv2
-from ultralytics import YOLO
 
 
 sys.path.append(".")
@@ -31,8 +29,8 @@ class PreprocessMaster(Manager,blipTools):
         # 看護師IDの登録
         self.nurse_id="ID_00007"
         # 壁
-        self.xrange=[-10,-4]
-        self.yrange=[8,14]
+        self.xrange=[-4,6]
+        self.yrange=[5,10]
 
         # Annotation csvの読み込み
         self.annotation_dir_path=self.data_dir_dict["mobilesensing_dir_path"]+"/Nagasaki20241205193158"
