@@ -2,7 +2,10 @@ import os
 import sys
 sys.path.append(".")
 sys.path.append("..")
-sys.path.append(os.path.expanduser("~")+"/kazu_ws/master_thesis/master_thesis_modules")
+if "catkin_ws" in os.getcwd():
+    sys.path.append("/catkin_ws/src/master_thesis_modules")
+else:
+    sys.path.append(os.path.expanduser("~")+"/kazu_ws/master_thesis/master_thesis_modules")
 
 from icecream import ic
 from pprint import pprint
@@ -26,7 +29,7 @@ class Visualizer(Manager):
         self.data_dir_dict=self.get_database_dir(trial_name=trial_name,strage=strage)
         
         # self.visualize_dir_path=sorted(glob(self.get_database_dir(strage="NASK")["database_dir_path"]+"/*"))[-1]
-        # self.data_paths=sorted(glob(self.visualize_dir_path+"/*"))
+        self.data_paths=sorted(glob(self.data_dir_dict["trial_dir_path"]+"/*"))
         pass
 
     def visualize_graph(self,trial_name="20241229BuildSimulator",strage="NASK",name="A",show=False):
@@ -227,7 +230,6 @@ class Visualizer(Manager):
             self.jpg2mp4(sorted(glob(trial_temp_dir_path+"/*")),mp4_path=trial_dir_path+f"/{name}.mp4",fps=4)
         return frames
 
-
     def draw_timeseries(self,data,name,label_name="",symbol=""):
         if label_name=="":
             try:
@@ -260,14 +262,15 @@ class Visualizer(Manager):
         return trace
 
     def draw_3d(self,plot_data,data,name):
-        try:
-            label_name=self.node_dict[int(name)]["description"]
-        except ValueError:
-            label_name=name
+        # try:
+        #     label_name=self.node_dict[int(name)]["description"]
+        # except ValueError:
+        label_name=name
+        print(name)
         trace=go.Scatter3d(
-            x=data["x"],
-            y=data["y"],
-            z=data["timestamp"],
+            x=data["60000000"],
+            y=data["60000001"],
+            z=data["timestamp"]-data["timestamp"].values[0],
             mode="lines+markers",
             name=str(name)+":"+label_name,
         )
@@ -379,22 +382,134 @@ class Visualizer(Manager):
             )
         return fig
 
+    def plot_map(self,fig,dimension="2D"):
+        from PIL import Image,ImageOps
+        def cell_to_xy(x, y, map_config, map_height):
+            """
+            2D mapの画像座標系を地図座標系に変換する
+            """
+            cell_x = map_config["origin"][0] + x * map_config["resolution"]
+            cell_y = (map_height - y) * map_config["resolution"] + map_config["origin"][1]
+            return cell_x, cell_y
+
+        map_img=Image.open(self.data_dir_dict["mobilesensing_dir_path"]+"/common"+"/map/map2d.pgm")
+        map_config=self.load_yaml(self.data_dir_dict["mobilesensing_dir_path"]+"/common"+"/map/map2d.yaml")
+        map_initial_x, map_initial_y = cell_to_xy(0, map_img.height, map_config, map_img.height)
+        map_end_x, map_end_y = cell_to_xy(map_img.width, 0, map_config, map_img.height)
+
+        # fig=go.Figure()
+        if dimension=="2D":
+            fig.add_layout_image(
+                dict(
+                    source=map_img,
+                    xref="x",  # x座標系を指定
+                    yref="y",  # y座標系を指定
+                    x=map_initial_x,   # 画像の左下のx座標
+                    y=map_end_y,   # 画像の左上のy座標 (y軸が逆転しているので注意)
+                    sizex=map_end_x - map_initial_x,  # 画像の幅
+                    sizey=map_end_y - map_initial_y,  # 画像の高さ
+                    sizing="stretch",     # 画像を伸縮してフィットさせる
+                    layer="below"         # 軌跡の下に表示
+                )
+            )
+        else:
+            map_img=Image.open(self.data_dir_dict["mobilesensing_dir_path"]+"/common"+"/map/map2d.png").convert("RGB")
+            map_img=ImageOps.flip(map_img)
+            map_img_np=np.array(map_img)
+
+            # 画像の幅と高さを取得
+            img_height, img_width, _ = map_img_np.shape
+
+            # 画像のRGBデータを(行, 列)に対応する色データとして抽出
+            img_x = np.linspace(0, 1, img_width)  # x座標をスケール
+            img_y = np.linspace(0, 1, img_height)  # y座標をスケール
+            img_x = (map_end_x-map_initial_x)*img_x+map_initial_x
+            img_y = (map_end_y-map_initial_y)*img_y+map_initial_y
+
+            # 画像のRGBデータを1次元配列に変換してScatter3dで表示
+            x_flat = np.tile(img_x, img_height)
+            y_flat = np.repeat(img_y, img_width)
+            z_flat = np.ones_like(x_flat)  # z=0平面に表示
+
+            # 色情報を1次元配列に変換
+            colors_flat = ['rgb({}, {}, {})'.format(r, g, b) for r, g, b in map_img_np.reshape(-1, 3)]
+
+            # compress
+            x_flat=x_flat[::5]
+            y_flat=y_flat[::5]
+            z_flat=z_flat[::5]
+            colors_flat=colors_flat[::5]
+
+            fig.add_trace(go.Scatter3d(
+                x=x_flat,
+                y=y_flat,
+                z=z_flat,
+                mode='markers',
+                marker=dict(
+                    size=5,  # 各ピクセルを点として表示
+                    color=colors_flat
+                ),
+                showlegend=False  # 凡例を非表示
+            ))
+            # import skimage.io
+            # import skimage.transform
+            # map_img=skimage.io.imread(self.data_dir_dict["mobilesensing_dir_path"]+"/common"+"/map/map2d.png")
+            # # map_img=skimage.transform.rotate(map_img,90)
+            # map_img = np.flipud(map_img)
+            # map_img= map_img.swapaxes(0, 1)[:, ::-1]
+            # map_img_8 = Image.fromarray(map_img).convert('P', palette='WEB', dither=None)
+            # idx_to_color = np.array(map_img_8.getpalette()).reshape((-1, 3))
+            # colorscale=[[i/255.0, "rgb({}, {}, {})".format(*rgb)] for i, rgb in enumerate(idx_to_color)]
+            # print(map_img_8.size)
+            # # raise NotImplementedError
+            # xrange=np.arange(map_initial_x,map_end_x)#,map_img_rgb.size[0])
+            # yrange=np.arange(map_initial_y,map_end_y)#,map_img_rgb.size[1])
+            # print(xrange)
+            # # raise NotImplementedError
+            # fig.add_trace(go.Surface(
+            #     # z=[[z,z],[z,z]],
+            #     z=np.ones_like(map_img),
+            #     # x=xrange,
+            #     # y=yrange,
+            #     surfacecolor=np.array(map_img_8),  # 画像を色として設定
+            #     cmin=0,
+            #     cmax=255,
+            #     colorscale=colorscale,
+            #     contours_z=dict(show=True, project_z=True, highlightcolor="limegreen"),
+            #     opacity=1.0,
+            #     showscale=False  # カラーバーは非表示
+            # ))
+            # グラフの設定
+            fig.update_layout(
+                scene=dict(
+                    xaxis=dict(title='X'),
+                    yaxis=dict(title='Y'),
+                    zaxis=dict(title='Z'),
+                    aspectmode="manual",  # 画像のアスペクト比を手動で調整
+                    aspectratio=dict(x=(map_end_x-map_initial_x)/(map_end_y-map_initial_y), y=1, z=1)  # 適切なアスペクト比を設定
+                )
+            )
+        return fig
+    
+
+
     def draw_positions(self):
-        csv_paths=[path for path in self.data_paths if (("position" in os.path.basename(path)) and (".csv" in os.path.basename(path)))]
+        csv_paths=[path for path in self.data_paths if (("data" in os.path.basename(path)) and ("_all.csv" in os.path.basename(path)))]
         plot_data=[]
 
         for csv_path in csv_paths:
-            name=os.path.basename(csv_path)[:-4].split("_")[-1]
+            name="ID_"+os.path.basename(csv_path)[:-4].split("_")[-2]
             data=pd.read_csv(csv_path,header=0)
             plot_data=self.draw_3d(plot_data,data,name)
         fig=go.Figure(data=plot_data)
-        fig=self.customize_camera(fig)
+        # fig=self.customize_camera(fig)
         fig.update_layout(
                 scene_aspectmode='manual',
                 scene_aspectratio=dict(x=5, y=5, z=3),
             )
-        fig=self.customize_layout(fig)
-        fig.to_html(self.visualize_dir_path+"/positions.html")
+        # fig=self.customize_layout(fig)
+        fig=self.plot_map(fig,dimension="3D")
+        fig.write_html(self.data_dir_dict["trial_dir_path"]+"/positions.html")
         fig.show()
         pass
 
@@ -602,12 +717,12 @@ class Visualizer(Manager):
         pass
 
 if __name__=="__main__":
-    trial_name="20250104ThrottlingTrue"
+    trial_name="20250105BuildPreprocessor"
     strage="NASK"
     cls=Visualizer(trial_name=trial_name,strage=strage)
     # cls.visualize_graph(trial_name="20241229BuildSimulator",strage="NASK",name="A",show=True)
-    cls.plot_matplotlib()
-    # cls.draw_positions()
+    # cls.plot_matplotlib()
+    cls.draw_positions()
     # cls.draw_features()
     # cls.draw_weight()
     # cls.draw_fps()

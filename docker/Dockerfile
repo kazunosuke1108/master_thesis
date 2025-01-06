@@ -162,9 +162,10 @@ RUN pip install torch torchvision torchaudio --index-url https://download.pytorc
 RUN pip install ultralytics
 
 #######################################################################
-##                    install icecream (print tools)                 ##
+##                        install benri tools                        ##
 #######################################################################
 RUN pip install icecream
+RUN pip install plotly
 
 #######################################################################
 ##                            delete cash                            ##

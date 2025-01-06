@@ -57,8 +57,8 @@ class PreprocessMaster(Manager,blipTools):
             self.feature_dict[id_name]["60000000"]=self.annotation_data[id_name+"_x"]
             self.feature_dict[id_name]["60000001"]=self.annotation_data[id_name+"_y"]
             self.feature_dict[id_name]["50001100"]=self.annotation_data[self.nurse_id+"_x"].values
-            print(self.feature_dict[id_name]["50001100"])
-            raise NotImplementedError
+            # print(self.feature_dict[id_name]["50001100"])
+            # raise NotImplementedError
             self.feature_dict[id_name]["50001101"]=self.annotation_data[self.nurse_id+"_y"].values
             self.feature_dict[id_name]["50001110"]=self.feature_dict[id_name]["50001100"].diff()
             self.feature_dict[id_name]["50001111"]=self.feature_dict[id_name]["50001101"].diff()
