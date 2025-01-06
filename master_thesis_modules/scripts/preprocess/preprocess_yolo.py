@@ -258,12 +258,12 @@ class PreprocessMaster(Manager,blipTools):
             # raise NotImplementedError
 
         for id_name in id_names:
-            self.feature_dict[id_name].to_csv(self.data_dir_dict["trial_dir_path"]+f"/data_{id_name[len('ID_'):]}_yolo.csv",index=False)
+            self.feature_dict[id_name].to_csv(self.data_dir_dict["trial_dir_path"]+f"/data_{id_name[len('ID_'):]}_raw.csv",index=False)
 
         pass
 
 if __name__=="__main__":
-    trial_name="20250105BuildPreprocessor"
+    trial_name="20250106ExperimentDevelopment"
     strage="NASK"
     cls=PreprocessMaster(trial_name=trial_name,strage=strage)
     cls.main()

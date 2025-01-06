@@ -629,8 +629,9 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
         pass
 
 if __name__=="__main__":
-    trial_name="20250104_143800_BgDon"
+    trial_name="20250106ExperimentDevelopment"
     strage="NASK"
-    cls=Master(trial_name,strage)
+    runtype="experiment"
+    cls=Master(trial_name,strage,runtype=runtype)
     cls.main()
     cls.save_session()

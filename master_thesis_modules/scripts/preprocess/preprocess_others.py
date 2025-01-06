@@ -39,8 +39,8 @@ class PreprocessMaster(Manager,blipTools):
         ic(self.annotation_data)
 
         # BLIP記入済みのデータをload
-        feature_csv_paths=sorted(glob(self.data_dir_dict["trial_dir_path"]+"/data_*_yolo.csv"))
-        self.id_names=["ID_"+os.path.basename(p)[len("data_"):-len("_yolo.csv")] for p in feature_csv_paths]
+        feature_csv_paths=sorted(glob(self.data_dir_dict["trial_dir_path"]+"/data_*_raw.csv"))
+        self.id_names=["ID_"+os.path.basename(p)[len("data_"):-len("_raw.csv")] for p in feature_csv_paths]
         self.feature_dict={}
         for id_name,feature_csv_path in zip(self.id_names,feature_csv_paths):
             self.feature_dict[id_name]=pd.read_csv(feature_csv_path,header=0)
@@ -85,7 +85,7 @@ class PreprocessMaster(Manager,blipTools):
                 self.feature_dict[id_name]["50001020"]
                 
         for id_name in id_names:
-            self.feature_dict[id_name].to_csv(self.data_dir_dict["trial_dir_path"]+f"/data_{id_name[len('ID_'):]}_all.csv",index=False)
+            self.feature_dict[id_name].to_csv(self.data_dir_dict["trial_dir_path"]+f"/data_{id_name[len('ID_'):]}_raw.csv",index=False)
         # 身体特徴量の抽出
         
         # 位置情報
@@ -98,7 +98,7 @@ class PreprocessMaster(Manager,blipTools):
         pass
 
 if __name__=="__main__":
-    trial_name="20250105BuildPreprocessor"
+    trial_name="20250106ExperimentDevelopment"
     strage="NASK"
     cls=PreprocessMaster(trial_name=trial_name,strage=strage)
     cls.main()
