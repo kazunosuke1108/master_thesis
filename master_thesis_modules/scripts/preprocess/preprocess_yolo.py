@@ -3,12 +3,15 @@ import sys
 from glob import glob
 from icecream import ic
 import copy
+import time
 
 import pandas as pd
 import numpy as np
 
 import cv2
 from ultralytics import YOLO
+import logging
+logging.getLogger("ultralytics").setLevel(logging.ERROR)
 
 
 sys.path.append(".")
@@ -29,7 +32,7 @@ class PreprocessMaster(Manager,blipTools):
         self.data_dir_dict=self.get_database_dir(trial_name=trial_name,strage=strage)
 
         # 姿勢推定結果のプロット有無
-        self.debug=False
+        self.debug=True
         if self.debug:
             self.data_dir_dict["pose_dir_path"]=self.data_dir_dict["trial_dir_path"]+"/pose"
             os.makedirs(self.data_dir_dict["pose_dir_path"],exist_ok=True)
@@ -209,7 +212,9 @@ class PreprocessMaster(Manager,blipTools):
                 #     cv2.imshow("test",extended_bbox_rgb_img)
                 #     cv2.waitKey(1)
                 try:
+                    start=time.time()
                     results=self.model(extended_bbox_rgb_img)
+                    print("fps: ",np.round(1/(time.time()-start),2))
                     if self.debug:
                         plotted_image=results[0].plot()
                         cv2.imwrite(self.data_dir_dict["pose_dir_path"]+f"/{trial_name}_{id_name}_{str(i).zfill(5)}.jpg",plotted_image)
@@ -257,13 +262,13 @@ class PreprocessMaster(Manager,blipTools):
 
             # raise NotImplementedError
 
-        for id_name in id_names:
-            self.feature_dict[id_name].to_csv(self.data_dir_dict["trial_dir_path"]+f"/data_{id_name[len('ID_'):]}_raw.csv",index=False)
+        # for id_name in id_names:
+        #     self.feature_dict[id_name].to_csv(self.data_dir_dict["trial_dir_path"]+f"/data_{id_name[len('ID_'):]}_raw.csv",index=False)
 
         pass
 
 if __name__=="__main__":
-    trial_name="20250106ExperimentFix6000"
+    trial_name="20250106TodaysFinal"
     strage="NASK"
     cls=PreprocessMaster(trial_name=trial_name,strage=strage)
     cls.main()

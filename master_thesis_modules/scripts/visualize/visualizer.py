@@ -268,8 +268,8 @@ class Visualizer(Manager):
         label_name=name
         print(name)
         trace=go.Scatter3d(
-            x=data["60000000"],
-            y=data["60000001"],
+            x=data["60010000"],
+            y=data["60010001"],
             z=data["timestamp"]-data["timestamp"].values[0],
             mode="lines+markers",
             name=str(name)+":"+label_name,
@@ -494,7 +494,7 @@ class Visualizer(Manager):
 
 
     def draw_positions(self):
-        csv_paths=[path for path in self.data_paths if (("data" in os.path.basename(path)) and ("_all.csv" in os.path.basename(path)))]
+        csv_paths=[path for path in self.data_paths if (("data" in os.path.basename(path)) and ("_eval.csv" in os.path.basename(path)))]
         plot_data=[]
 
         for csv_path in csv_paths:
@@ -680,7 +680,7 @@ class Visualizer(Manager):
 
     def plot_matplotlib(self):
         import matplotlib.pyplot as plt
-        csv_paths=sorted(glob(self.data_dir_dict["trial_dir_path"]+"/data_*_raw.csv"))
+        csv_paths=sorted(glob(self.data_dir_dict["trial_dir_path"]+"/data_*_eval.csv"))
         data_dict={}
         id_names=[]
         for csv_path in csv_paths:
@@ -691,6 +691,7 @@ class Visualizer(Manager):
         #     print(data)
         export_labels=[str(k) for k in data_dict[id_name].keys() if str(k)!="timestamp"]
         for export_label in export_labels:
+            print(export_label)
             for id_name in id_names:
                 plt.plot(data_dict[id_name]["timestamp"],data_dict[id_name][export_label],"-o",label=id_name)
             plt.legend()
@@ -711,7 +712,7 @@ class Visualizer(Manager):
         pass
 
 if __name__=="__main__":
-    trial_name="20250106ExperimentDevelopment"
+    trial_name="20250106TodaysFinal"
     strage="NASK"
     cls=Visualizer(trial_name=trial_name,strage=strage)
     # cls.visualize_graph(trial_name="20241229BuildSimulator",strage="NASK",name="A",show=True)

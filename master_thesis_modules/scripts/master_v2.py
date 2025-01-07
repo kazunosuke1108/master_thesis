@@ -616,7 +616,7 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
         self.write_json(self.graph_dicts,self.data_dir_dict["trial_dir_path"]+"/graph_dicts.json")
         print("# DataFrame 保存 #")
         for patient in self.patients:
-            self.data_dicts[patient].to_csv(self.data_dir_dict["trial_dir_path"]+"/data_"+patient+"_raw.csv",index=False)
+            self.data_dicts[patient].to_csv(self.data_dir_dict["trial_dir_path"]+"/data_"+patient+"_eval.csv",index=False)
     
     def main(self):
         if self.throttling:
@@ -658,7 +658,7 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
         pass
 
 if __name__=="__main__":
-    trial_name="20250106ExperimentDevelopment"
+    trial_name="20250106TodaysFinal"
     strage="NASK"
     runtype="experiment"
     cls=Master(trial_name,strage,runtype=runtype)

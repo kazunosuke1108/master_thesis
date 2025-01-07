@@ -35,6 +35,7 @@ class PreprocessMaster(Manager,blipTools):
         # Annotation csvの読み込み
         self.annotation_dir_path=self.data_dir_dict["mobilesensing_dir_path"]+"/Nagasaki20241205193158"
         annotation_csv_path=self.annotation_dir_path+"/csv/annotation/Nagasaki20241205193158_annotation_ytpc2024j_20241205_193158_fullimagePath.csv"
+        annotation_csv_path=self.annotation_dir_path+"/csv/annotation/Nagasaki20241205193158_annotation_ytpc2024j_20241205_193158_fixposition.csv"
         self.annotation_data=pd.read_csv(annotation_csv_path,header=0)
         ic(self.annotation_data)
 
@@ -98,7 +99,7 @@ class PreprocessMaster(Manager,blipTools):
         pass
 
 if __name__=="__main__":
-    trial_name="20250106ExperimentFix6000"
+    trial_name="20250106TodaysFinal"
     strage="NASK"
     cls=PreprocessMaster(trial_name=trial_name,strage=strage)
     cls.main()
