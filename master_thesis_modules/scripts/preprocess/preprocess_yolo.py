@@ -32,7 +32,7 @@ class PreprocessMaster(Manager,blipTools):
         self.data_dir_dict=self.get_database_dir(trial_name=trial_name,strage=strage)
 
         # 姿勢推定結果のプロット有無
-        self.debug=True
+        self.debug=False
         if self.debug:
             self.data_dir_dict["pose_dir_path"]=self.data_dir_dict["trial_dir_path"]+"/pose"
             os.makedirs(self.data_dir_dict["pose_dir_path"],exist_ok=True)
@@ -187,8 +187,6 @@ class PreprocessMaster(Manager,blipTools):
         print(id_names)
         # 毎行読み込む
         for i,row in self.annotation_data.iterrows():
-            # if i>100:
-            #     break
             # bboxの内包関係チェッカー
             self.occlusion_dict={id_name:{"bbox_t":np.nan,"bbox_b":np.nan,"bbox_l":np.nan,"bbox_r":np.nan} for id_name in id_names}
             print("now processing...",i,"/",len(self.annotation_data))
@@ -208,19 +206,14 @@ class PreprocessMaster(Manager,blipTools):
                 t_e,b_e,l_e,r_e=int(t_e),int(b_e),int(l_e),int(r_e)
                 self.occlusion_dict[id_name]["bbox_t"],self.occlusion_dict[id_name]["bbox_b"],self.occlusion_dict[id_name]["bbox_l"],self.occlusion_dict[id_name]["bbox_r"]=t_e,b_e,l_e,r_e
                 extended_bbox_rgb_img=rgb_img[t_e:b_e,l_e:r_e]
-                # if (id_name=="ID_00004") & self.debug:
-                #     cv2.imshow("test",extended_bbox_rgb_img)
-                #     cv2.waitKey(1)
+                # 姿勢推定
                 try:
-                    start=time.time()
                     results=self.model(extended_bbox_rgb_img)
-                    print("fps: ",np.round(1/(time.time()-start),2))
                     if self.debug:
                         plotted_image=results[0].plot()
                         cv2.imwrite(self.data_dir_dict["pose_dir_path"]+f"/{trial_name}_{id_name}_{str(i).zfill(5)}.jpg",plotted_image)
                 except ZeroDivisionError:
                     continue
-                # print(results)
                 kp=results[0].keypoints
                 try:
                     kp_xy=np.array(kp.xy[0].tolist())
@@ -234,6 +227,7 @@ class PreprocessMaster(Manager,blipTools):
                         "y":int(kp_xy[j,1]) if int(kp_xy[j,1])!=0 else np.nan,
                         "conf":kp_conf[j],
                     }
+                # 特徴量算出
                 features=np.array([
                     self.feature_stand_v2(kp_dict,t,b,l,r),
                     # self.feature_stand(kp_dict),
@@ -256,19 +250,19 @@ class PreprocessMaster(Manager,blipTools):
                     if ((l_e<self.occlusion_dict[opponent_id_name]["bbox_l"]) & (self.occlusion_dict[opponent_id_name]["bbox_l"]<r_e)) and \
                         ((l_e<self.occlusion_dict[opponent_id_name]["bbox_r"]) & (self.occlusion_dict[opponent_id_name]["bbox_r"]<r_e)):
                         if (opponent_id_name!="ID_00004") and (opponent_id_name!="ID_00007") and (opponent_id_name!="ID_00008") and (opponent_id_name!="ID_00009"):# 一番手前になるのがほぼ明らかなのでID_00004は除外する。それ以外に関しては、IDが若い番号の方を消す                    
-                            # print(f"{opponent_id_name} is occluded by {id_name}. Remove {opponent_id_name}")
-                            # print(l_e,self.occlusion_dict[opponent_id_name]["bbox_l"],self.occlusion_dict[opponent_id_name]["bbox_r"],r_e)
+                            print(f"{opponent_id_name} is occluded by {id_name}. Remove {opponent_id_name}")
+                            print(l_e,self.occlusion_dict[opponent_id_name]["bbox_l"],self.occlusion_dict[opponent_id_name]["bbox_r"],r_e)
                             self.feature_dict[opponent_id_name].loc[i,["50000100","50000101","50000102","50000103"]]=np.nan
 
             # raise NotImplementedError
 
-        # for id_name in id_names:
-        #     self.feature_dict[id_name].to_csv(self.data_dir_dict["trial_dir_path"]+f"/data_{id_name[len('ID_'):]}_raw.csv",index=False)
+        for id_name in id_names:
+            self.feature_dict[id_name].to_csv(self.data_dir_dict["trial_dir_path"]+f"/data_{id_name[len('ID_'):]}_raw.csv",index=False)
 
         pass
 
 if __name__=="__main__":
-    trial_name="20250106TodaysFinal"
+    trial_name="20250107WhereIs50000100"
     strage="NASK"
     cls=PreprocessMaster(trial_name=trial_name,strage=strage)
     cls.main()

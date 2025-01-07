@@ -31,6 +31,8 @@ class PreprocessMaster(Manager,blipTools):
         # 壁
         self.xrange=[-4,6]
         self.yrange=[5,10]
+        # staff station
+        self.staff_station=[-4,7.5]
 
         # Annotation csvの読み込み
         self.annotation_dir_path=self.data_dir_dict["mobilesensing_dir_path"]+"/Nagasaki20241205193158"
@@ -55,12 +57,16 @@ class PreprocessMaster(Manager,blipTools):
             # 患者の位置
             self.feature_dict[id_name]["60010000"]=self.annotation_data[id_name+"_x"]
             self.feature_dict[id_name]["60010001"]=self.annotation_data[id_name+"_y"]
+            # 看護師の位置
             self.feature_dict[id_name]["50001100"]=self.annotation_data[self.nurse_id+"_x"].values
-            # print(self.feature_dict[id_name]["50001100"])
-            # raise NotImplementedError
             self.feature_dict[id_name]["50001101"]=self.annotation_data[self.nurse_id+"_y"].values
             self.feature_dict[id_name]["50001110"]=self.feature_dict[id_name]["50001100"].diff()
             self.feature_dict[id_name]["50001111"]=self.feature_dict[id_name]["50001101"].diff()
+            # 看護師不在箇所の補填（Staff stationの位置と方角を記入）
+            self.feature_dict[id_name]["50001100"].fillna(self.staff_station[0],inplace=True)
+            self.feature_dict[id_name]["50001101"].fillna(self.staff_station[1],inplace=True)
+            self.feature_dict[id_name]["50001110"].fillna(0.1,inplace=True)
+            self.feature_dict[id_name]["50001111"].fillna(0,inplace=True)
             
         for i,row in self.annotation_data.iterrows():
             print("now processing...",i,"/",len(self.annotation_data))
@@ -99,7 +105,7 @@ class PreprocessMaster(Manager,blipTools):
         pass
 
 if __name__=="__main__":
-    trial_name="20250106TodaysFinal"
+    trial_name="20250107WhereIs50000100"
     strage="NASK"
     cls=PreprocessMaster(trial_name=trial_name,strage=strage)
     cls.main()

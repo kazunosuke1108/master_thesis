@@ -658,7 +658,7 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
         pass
 
 if __name__=="__main__":
-    trial_name="20250106TodaysFinal"
+    trial_name="20250107WhereIs50000100"
     strage="NASK"
     runtype="experiment"
     cls=Master(trial_name,strage,runtype=runtype)
