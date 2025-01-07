@@ -693,10 +693,16 @@ class Visualizer(Manager):
         for export_label in export_labels:
             print(export_label)
             for id_name in id_names:
-                plt.plot(data_dict[id_name]["timestamp"],data_dict[id_name][export_label],"-o",label=id_name)
+                # if int(export_label) in ["10000000","20000001"]:
+                w=20
+                try:
+                    plt.plot(data_dict[id_name]["timestamp"],data_dict[id_name][export_label].rolling(w).mean(),"-o",label=id_name)
+                    plt.title(export_label+f" window: {w}")
+                except pd.errors.DataError:
+                    plt.plot(data_dict[id_name]["timestamp"],data_dict[id_name][export_label],"-o",label=id_name)
+                    plt.title(export_label)
             plt.legend()
             plt.grid()
-            plt.title(export_label)
             plt.savefig(self.data_dir_dict["trial_dir_path"]+f"/result_{export_label}.jpg")
             plt.close()
 

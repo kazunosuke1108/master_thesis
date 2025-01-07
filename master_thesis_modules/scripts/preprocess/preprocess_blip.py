@@ -31,7 +31,7 @@ class PreprocessMaster(Manager,blipTools):
 
         # Annotation csvの読み込み
         self.annotation_dir_path=self.data_dir_dict["mobilesensing_dir_path"]+"/Nagasaki20241205193158"
-        annotation_csv_path=self.annotation_dir_path+"/csv/annotation/Nagasaki20241205193158_annotation_ytpc2024j_20241205_193158_fullimagePath.csv"
+        annotation_csv_path=self.annotation_dir_path+"/csv/annotation/Nagasaki20241205193158_annotation_ytpc2024j_20241205_193158_fixposition.csv"
         self.annotation_data=pd.read_csv(annotation_csv_path,header=0)
         ic(self.annotation_data)
 
@@ -94,12 +94,13 @@ class PreprocessMaster(Manager,blipTools):
                 t,b,l,r=int(t),int(b),int(l),int(r)
                 bbox_rgb_img=rgb_img[t:b,l:r]
                 # 拡張bounding boxの切り出し
-                extend_ratio=0.2
-                t_e,b_e,l_e,r_e,=np.max([t-extend_ratio*rgb_img.shape[0],0]),np.min([b+extend_ratio*rgb_img.shape[0],rgb_img.shape[0]]),np.max([l-extend_ratio*rgb_img.shape[1],0]),np.min([r+extend_ratio*rgb_img.shape[1],rgb_img.shape[0]])
+                extend_ratio_tb=0.2
+                extend_ratio_lr=0.2
+                t_e,b_e,l_e,r_e,=np.max([t-extend_ratio_tb*rgb_img.shape[0],0]),np.min([b+extend_ratio_tb*rgb_img.shape[0],rgb_img.shape[0]]),np.max([l-extend_ratio_lr*rgb_img.shape[1],0]),np.min([r+extend_ratio_lr*rgb_img.shape[1],rgb_img.shape[0]])
                 t_e,b_e,l_e,r_e=int(t_e),int(b_e),int(l_e),int(r_e)
                 extended_bbox_rgb_img=rgb_img[t_e:b_e,l_e:r_e]
-                if id_name=="ID_00000":
-                    cv2.imshow("test",extended_bbox_rgb_img)
+                if id_name in ["ID_00000","ID_00001"]:
+                    cv2.imshow(id_name,extended_bbox_rgb_img)
                     cv2.waitKey(1)
 
                 # BLIP
@@ -123,12 +124,16 @@ class PreprocessMaster(Manager,blipTools):
                     elif q_title=="ivPole":
                         # BLIP 点滴？
                         answer,confidence=self.get_vqa(blip_processor=self.blip_processor,blip_model=self.blip_model,device=self.device,image=extended_bbox_rgb_img,question=q_info["query"],confidence=True)
+                        print(id_name,answer,confidence,extended_bbox_rgb_img.shape)
                         if (answer=="yes") or (answer=="Yes"):
                             answer=(self.annotation_data.loc[i,id_name+"_x"],self.annotation_data.loc[i,id_name+"_y"])
                         else:
                             answer=(np.nan,np.nan)
                         self.feature_dict[id_name].loc[i,50001000]=answer[0]
                         self.feature_dict[id_name].loc[i,50001001]=answer[1]
+                        self.feature_dict[id_name].loc[i,50001002]=confidence
+                        self.feature_dict[id_name].loc[i,50001003]=confidence
+                        
                     elif q_title=="wheelchair":
                         # BLIP 車椅子？
                         answer,confidence=self.get_vqa(blip_processor=self.blip_processor,blip_model=self.blip_model,device=self.device,image=extended_bbox_rgb_img,question=q_info["query"],confidence=True)
@@ -138,6 +143,8 @@ class PreprocessMaster(Manager,blipTools):
                             answer=(np.nan,np.nan)
                         self.feature_dict[id_name].loc[i,50001010]=answer[0]
                         self.feature_dict[id_name].loc[i,50001011]=answer[1]    
+                        self.feature_dict[id_name].loc[i,50001012]=confidence
+                        self.feature_dict[id_name].loc[i,50001013]=confidence
                 
         for id_name in id_names:
             self.feature_dict[id_name].to_csv(self.data_dir_dict["trial_dir_path"]+f"/data_{id_name[len('ID_'):]}_raw.csv",index=False)
@@ -153,7 +160,7 @@ class PreprocessMaster(Manager,blipTools):
         pass
 
 if __name__=="__main__":
-    trial_name="20250106Blipstrage"
+    trial_name="20250107BlipRenewal"
     strage="NASK"
     cls=PreprocessMaster(trial_name=trial_name,strage=strage)
     cls.main()
