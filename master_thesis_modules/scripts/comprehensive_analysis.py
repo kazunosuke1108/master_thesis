@@ -197,8 +197,8 @@ class ComprehensiveAnalysis():
                 p_list=[]
         pass
 
-    def main(self,trial_name,strage,condition_dict):       
-        cls_master=Master(trial_name=trial_name,strage=strage,scenario_dict=condition_dict)
+    def main(self,trial_name,strage,condition_dict,runtype):       
+        cls_master=Master(trial_name=trial_name,strage=strage,scenario_dict=condition_dict,runtype=runtype)
         cls_master.main()
         cls_master.save_session()
 
