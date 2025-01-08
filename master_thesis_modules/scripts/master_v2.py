@@ -36,19 +36,31 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
         # parameters
         self.spatial_normalization_param=np.sqrt(2)*6
         self.fps=20
-        self.throttling=False
+        self.throttling=True
         self.bg_differencing=False
         self.bg_differencing_thre=0.5
+        self.fps_BLIP=10 #[Hz]
+        self.fps_YOLO=50 #[Hz]
 
         if self.runtype=="simulation":
             self.patients=["A","B","C"]
             # 人数分のgraphを定義
             # シナリオの定義・DataFrameの生成
-            print("# simulation用のデータを生成中 #")
-            self.data_dicts=self.define_scenario(fps=self.fps,scenario_dict=scenario_dict)
         elif self.runtype=="experiment":
             self.raw_csv_paths=sorted(glob(self.data_dir_dict["trial_dir_path"]+"/data_*_raw.csv"))
             self.patients=[os.path.basename(p)[len("data_"):-len("_raw.csv")] for p in self.raw_csv_paths]
+        
+        print("# 人数分のgraph 定義 #")
+        self.graph_dicts={}
+        for patient in self.patients:
+            self.graph_dicts[patient]=copy.deepcopy(default_graph)
+            # dataに列が存在するかどうか確認
+
+        if self.runtype=="simulation":
+            print("# simulation用のデータを生成中 #")
+            self.data_dicts=self.define_scenario(fps=self.fps,scenario_dict=scenario_dict)
+            pass
+        elif self.runtype=="experiment":
             print("# 実験データをロード中 #")
             self.data_dicts={}
             for patient,raw_csv_path in zip(self.patients,self.raw_csv_paths):
@@ -62,17 +74,13 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
                         continue
                     self.data_dicts[patient].rename(columns=renew_dict,inplace=True)
 
+        # data_dictsに不足した列がないか確認
+        for col in self.graph_dicts[patient]["node_dict"].keys():
+            try:
+                self.data_dicts[patient][col]
+            except KeyError:
+                self.data_dicts[patient][col]=np.nan
 
-        print("# 人数分のgraph 定義 #")
-        self.graph_dicts={}
-        for patient in self.patients:
-            self.graph_dicts[patient]=copy.deepcopy(default_graph)
-            # dataに列が存在するかどうか確認
-            for col in self.graph_dicts[patient]["node_dict"].keys():
-                try:
-                    self.data_dicts[patient][col]
-                except KeyError:
-                    self.data_dicts[patient][col]=np.nan
 
         
         # 危険動作の事前定義
@@ -200,7 +208,11 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
         dod_history={}
         focus_keys=list(data_dicts[list(data_dicts.keys())[0]].keys())
         focus_keys.remove("timestamp")
-        focus_keys= [k for k in focus_keys if int(k)>=50000000]
+        focus_keys=[int(k) for k in focus_keys]
+        focus_keys_BLIP_zokusei= [50000000,50000001,50000010,50000011]
+        focus_keys_BLIP_objects= [k for k in focus_keys if ((int(k)>=50001000) and (int(k)<=50001013))]
+        focus_keys_YOLO= [50000100,50000101,50000102,50000103]
+        focus_keys_others= [k for k in focus_keys if k not in (focus_keys_BLIP_zokusei+focus_keys_BLIP_objects+focus_keys_YOLO+[70000000])]
         
         def get_control_input(s_value,ds_value,bg_value=0):
             if np.isnan(s_value):
@@ -220,6 +232,40 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
             dfps_value=dfps_dict[dfps]
             return dfps_value
 
+        # 輝度とその変化率に関するデータをまとめておく
+        """
+        70000000: 輝度値
+        70000001: 輝度値の隣接時刻差分
+        70000002: Fuzzy推論結果
+        70000003: 患者間での正規化後の結果
+        """
+        event_df=pd.concat([data_dicts[list(data_dicts.keys())[0]]["timestamp"]]+[data_dicts[patient][70000000] for patient in data_dicts.keys()],axis=1)
+        event_df.fillna(method="ffill",inplace=True)
+        event_df.columns=["timestamp"]+[k+"_70000000" for k in list(data_dicts.keys())]
+        # 隣接データの差分の計算 (Fuzzy推論のため，定義域を-0.5から0.5に制限)
+        diff_clip_value=0.5
+        for patient in data_dicts.keys():
+            event_df[patient+"_70000001"]=event_df[patient+"_70000000"].diff()
+            # 定義域制限
+            event_df[patient+"_70000001"]=np.clip(event_df[patient+"_70000001"],-diff_clip_value,diff_clip_value)
+            # オフセット
+            event_df[patient+"_70000001"]+=0.5
+        # ノイズ除去
+        w=3
+        event_df=event_df.rolling(w).mean()
+        event_df.fillna(method="bfill",inplace=True)
+        # Fuzzy推論による優先度決定
+        for patient in data_dicts.keys():
+            map_arg_1=[{70000000:arg01,70000001:arg02} for arg01,arg02 in zip(event_df[patient+"_70000000"],event_df[patient+"_70000001"])] # {40000110:0.5,40000111:0.5}の形を行数分格納したリスト
+            map_arg_2=[70000000 for _ in event_df[patient+"_70000000"].values]
+            event_df[patient+"_70000002"]=list(map(self.calculate_fuzzy,map_arg_1,map_arg_2))
+            event_df[patient+"_70000002"]=event_df[patient+"_70000002"]**2
+        # 正規化
+        sum_70000002=event_df[[patient+"_70000002" for patient in data_dicts.keys()]].sum(axis=1)
+        for patient in data_dicts.keys():
+            event_df[patient+"_70000003"]=event_df[patient+"_70000002"]/sum_70000002
+
+        # 間引き処理本体
         for patient in data_dicts.keys():
             fps_dict={k:{"entropy":np.nan,"fps":initial_fps,"previous_fps":initial_fps,"d":np.nan,"previous_d":np.nan} for k in focus_keys}
             fps_history[patient]=pd.DataFrame(data_dicts[patient]["timestamp"].values,columns=["timestamp"])
@@ -237,41 +283,61 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
                     continue
                 # 各特徴量について，entropyを求める
                 for k in focus_keys:
+                    # 当該フレームがスキップ対象の場合，continue
                     if np.isnan(data_dicts[patient].loc[i,k]):
                         continue
-                    temp_data=data_dicts[patient].loc[:i,k]
-                    temp_data=temp_data.dropna()
-                    temp_data=temp_data.tail(entropy_window)
-                    temp_data=temp_data/temp_data.sum()
-                    # temp_data=temp_data.tail(entropy_window)
-                    if temp_data.sum()==0:
-                        e=1
-                    else:
-                        e=(-1/np.log(entropy_window)*temp_data*np.log(temp_data.astype(float))).sum()
-                    # if e>1 or e<0:
-                    #     print(temp_data.sum())
-                    #     print(patient,i,k)
-                    #     print("temp_data")
-                    #     print(temp_data)
-                    #     print("entropyのもと")
-                    #     print(-1/np.log(entropy_window)*temp_data*np.log(temp_data.astype(float)))
-                    #     print("e")
-                    #     print(e)
-                    #     raise Exception("Entropyが負の値")
-                    fps_dict[k]["e"]=e
-                    # entropyの値に基づいて，FPSを決める
-                    d=1-fps_dict[k]["e"]+1e-10
-                    new_fps=fps_dict[k]["fps"]+get_control_input(s_value=d,ds_value=d-fps_dict[k]["d"],bg_value=data_dicts[patient].loc[i,70000000])
-                    new_fps=np.clip(new_fps,fps_clip_dict["min"],fps_clip_dict["max"])
-                    fps_dict[k]["previous_fps"]=fps_dict[k]["fps"]
-                    fps_dict[k]["previous_d"]=fps_dict[k]["d"]
-                    fps_dict[k]["fps"]=new_fps
-                    fps_dict[k]["d"]=d
-                    fps_history[patient].loc[i,k]=new_fps
-                    dod_history[patient].loc[i,k]=d
+                    # BLIP関連のFuzzy推論
+                    if k in focus_keys_BLIP_zokusei:
+                        fps_dict[k]["fps"]=1e-2 # 100sに1回確認（実質ゼロ）
+                        pass
+                    elif k in focus_keys_BLIP_objects:
+                        fps_total=event_df.loc[i,patient+"_70000003"]*self.fps_BLIP
+                        if k in [50001000,50001001,50001002,50001003]:#点滴を優先
+                            fps_candidate=np.floor(fps_total/2).astype(int)+fps_total%2
+                        elif k in [50001010,50001011,50001012,50001013]:
+                            fps_candidate=np.floor(fps_total/2).astype(int)
+                        if fps_candidate>1:
+                            fps_dict[k]["fps"]=fps_candidate
+                        else:
+                            fps_dict[k]["fps"]=fps_total/2
+                        pass
+                    # YOLO関連のFuzzy推論
+                    elif k in focus_keys_YOLO:
+                        fps_dict[k]["fps"]=np.floor(event_df.loc[i,patient+"_70000003"]*self.fps_YOLO).astype(int)
+                        pass
+                    # EntropyによるFuzzy制御
+                    elif k in focus_keys_others:
+                        temp_data=data_dicts[patient].loc[:i,k]
+                        temp_data=temp_data.dropna()
+                        temp_data=temp_data.tail(entropy_window)
+                        temp_data=temp_data/temp_data.sum()
+                        # temp_data=temp_data.tail(entropy_window)
+                        if temp_data.sum()==0:
+                            e=1
+                        else:
+                            e=(-1/np.log(entropy_window)*temp_data*np.log(temp_data.astype(float))).sum()
+                        fps_dict[k]["e"]=e
+                        # entropyの値に基づいて，FPSを決める
+                        d=1-fps_dict[k]["e"]+1e-10
+                        new_fps=fps_dict[k]["fps"]+get_control_input(s_value=d,ds_value=d-fps_dict[k]["d"],bg_value=data_dicts[patient].loc[i,70000000])
+                        new_fps=np.clip(new_fps,fps_clip_dict["min"],fps_clip_dict["max"])
+                        fps_dict[k]["previous_fps"]=fps_dict[k]["fps"]
+                        fps_dict[k]["previous_d"]=fps_dict[k]["d"]
+                        fps_dict[k]["fps"]=new_fps
+                        fps_dict[k]["d"]=d
+                        dod_history[patient].loc[i,k]=d
+                    
+                    # FPSのメモ
+                    fps_history[patient].loc[i,k]=fps_dict[k]["fps"]
                     
                     # FPSに基づいて，スキップする行を消す
-                    n_skip=int(self.fps/fps_dict[k]["fps"])-1
+                    try:
+                        n_skip=int(self.fps/fps_dict[k]["fps"])-1
+                    except Exception:
+                        print(i,k,patient,event_df.loc[i,patient+"_70000000"],event_df.loc[i,patient+"_70000001"],event_df.loc[i,patient+"_70000002"],event_df.loc[i,patient+"_70000003"])
+                        print(fps_total,fps_dict[k]["fps"])
+                        print(data_dicts[patient].loc[i,k])
+                        raise Exception
                     data_dicts[patient].loc[i+1:i+n_skip,k]=np.nan
                     # print(data_dicts[patient].loc[i+1:i+n_skip,1])
                     # if i>10:
@@ -611,6 +677,8 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
     def save_session(self):
         print("# graph保存 #")
         self.write_picklelog(self.graph_dicts,self.data_dir_dict["trial_dir_path"]+"/graph_dicts.pickle")
+        self.write_picklelog(self.data_dicts,self.data_dir_dict["trial_dir_path"]+"/data_dicts.pickle")
+        self.write_picklelog(self.scenario_dict,self.data_dir_dict["trial_dir_path"]+"/scenario_dict.pickle")
         for patient in self.patients:
             del self.graph_dicts[patient]["G"]
         self.write_json(self.graph_dicts,self.data_dir_dict["trial_dir_path"]+"/graph_dicts.json")
@@ -658,9 +726,9 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
         pass
 
 if __name__=="__main__":
-    trial_name="20250107Add7000"
+    trial_name="20250108SimulationThrottlingTrue"
     strage="NASK"
-    runtype="experiment"
+    runtype="simulation"
     cls=Master(trial_name,strage,runtype=runtype)
     cls.main()
     cls.save_session()
