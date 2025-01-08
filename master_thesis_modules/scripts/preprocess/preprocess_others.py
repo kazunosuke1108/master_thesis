@@ -105,7 +105,7 @@ class PreprocessMaster(Manager,blipTools):
         pass
 
 if __name__=="__main__":
-    trial_name="20250107WhereIs50000100"
+    trial_name="20250108SavePointYolo"
     strage="NASK"
     cls=PreprocessMaster(trial_name=trial_name,strage=strage)
     cls.main()

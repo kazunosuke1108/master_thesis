@@ -192,7 +192,13 @@ class PreprocessMaster(Manager,blipTools):
             print("now processing...",i,"/",len(self.annotation_data))
             # 高画質jpgのpath取得
             rgb_image_path=self.data_dir_dict["mobilesensing_dir_path"]+"/"+self.annotation_data.loc[i,"fullrgb_imagePath"]
+            try:
+                diff_image_path=self.data_dir_dict["mobilesensing_dir_path"]+"/"+self.annotation_data.loc[i,"fulldiff_imagePath"]
+            except TypeError:
+                pass # nanだった場合、直前の背景差分画像を使用
             rgb_img=cv2.imread(rgb_image_path)
+            diff_img=cv2.imread(diff_image_path)
+
             for id_name in id_names:
                 # bounding boxの切り出し
                 t,b,l,r=row[id_name+"_bbox_lowerY"],row[id_name+"_bbox_higherY"],row[id_name+"_bbox_lowerX"],row[id_name+"_bbox_higherX"],
@@ -206,6 +212,15 @@ class PreprocessMaster(Manager,blipTools):
                 t_e,b_e,l_e,r_e=int(t_e),int(b_e),int(l_e),int(r_e)
                 self.occlusion_dict[id_name]["bbox_t"],self.occlusion_dict[id_name]["bbox_b"],self.occlusion_dict[id_name]["bbox_l"],self.occlusion_dict[id_name]["bbox_r"]=t_e,b_e,l_e,r_e
                 extended_bbox_rgb_img=rgb_img[t_e:b_e,l_e:r_e]
+                # 背景差分値の取得
+                bbox_diff_img=diff_img[t:b,l:r]
+                self.feature_dict[id_name].loc[i,"70000000"]=bbox_diff_img.mean()/255
+                # if id_name=="ID_00000":
+                #     cv2.imshow("diff",bbox_diff_img)
+                #     cv2.waitKey(1)
+                #     print(bbox_diff_img.max()/255,bbox_diff_img.mean()/255)
+                # raise NotImplementedError
+
                 # 姿勢推定
                 try:
                     results=self.model(extended_bbox_rgb_img)
@@ -252,7 +267,7 @@ class PreprocessMaster(Manager,blipTools):
                         if (opponent_id_name!="ID_00004") and (opponent_id_name!="ID_00007") and (opponent_id_name!="ID_00008") and (opponent_id_name!="ID_00009"):# 一番手前になるのがほぼ明らかなのでID_00004は除外する。それ以外に関しては、IDが若い番号の方を消す                    
                             print(f"{opponent_id_name} is occluded by {id_name}. Remove {opponent_id_name}")
                             print(l_e,self.occlusion_dict[opponent_id_name]["bbox_l"],self.occlusion_dict[opponent_id_name]["bbox_r"],r_e)
-                            self.feature_dict[opponent_id_name].loc[i,["50000100","50000101","50000102","50000103"]]=np.nan
+                            self.feature_dict[opponent_id_name].loc[i,["50000100","50000101","50000102","50000103","70000000"]]=np.nan
 
             # raise NotImplementedError
 
@@ -262,7 +277,7 @@ class PreprocessMaster(Manager,blipTools):
         pass
 
 if __name__=="__main__":
-    trial_name="20250107WhereIs50000100"
+    trial_name="20250108SavePointYolo"
     strage="NASK"
     cls=PreprocessMaster(trial_name=trial_name,strage=strage)
     cls.main()
