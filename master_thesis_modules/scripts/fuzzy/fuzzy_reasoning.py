@@ -103,6 +103,24 @@ class FuzzyReasoning():
                     "result":"low",
                 },
             },
+            70000000:{
+                1:{
+                    "conditions":{70000000:"high",70000001:"high"},
+                    "result":"high",
+                },
+                2:{
+                    "conditions":{70000000:"high",70000001:"low"},
+                    "result":"middle",
+                },
+                3:{
+                    "conditions":{70000000:"low",70000001:"high"},
+                    "result":"middle",
+                },
+                4:{
+                    "conditions":{70000000:"low",70000001:"low"},
+                    "result":"low",
+                },
+            },
         }
 
     def membership_func(self,x,type="high"):
