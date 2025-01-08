@@ -677,6 +677,8 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
     def save_session(self):
         print("# graph保存 #")
         self.write_picklelog(self.graph_dicts,self.data_dir_dict["trial_dir_path"]+"/graph_dicts.pickle")
+        self.write_picklelog(self.data_dicts,self.data_dir_dict["trial_dir_path"]+"/data_dicts.pickle")
+        self.write_picklelog(self.scenario_dict,self.data_dir_dict["trial_dir_path"]+"/scenario_dict.pickle")
         for patient in self.patients:
             del self.graph_dicts[patient]["G"]
         self.write_json(self.graph_dicts,self.data_dir_dict["trial_dir_path"]+"/graph_dicts.json")
@@ -724,9 +726,9 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
         pass
 
 if __name__=="__main__":
-    trial_name="20250108DevMewThrottlingExp"
+    trial_name="20250108SimulationThrottlingTrue"
     strage="NASK"
-    runtype="experiment"
+    runtype="simulation"
     cls=Master(trial_name,strage,runtype=runtype)
     cls.main()
     cls.save_session()

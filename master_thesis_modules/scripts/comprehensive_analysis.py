@@ -129,7 +129,7 @@ class ComprehensiveAnalysis():
                 }
         return action_dict
 
-    def generate_condition_dicts(self):
+    def generate_condition_dicts(self,simulation_name):
         patients=["A","B","C"]
         positions={
             "x":[1,3,5],
@@ -174,7 +174,7 @@ class ComprehensiveAnalysis():
                                                         # 座りっぱなしのシナリオを挿入
                                                         condition_dict["action_dict"][patient]=self.get_sit_scenario()
                                                 condition_dict["action_dict"]["NS"]=self.get_nurse_scenario(standup_patient=standup_list[0])
-                                                trila_name="20250104SimulationPosition/"+f"no_{str(trial_no).zfill(5)}"
+                                                trila_name=f"{simulation_name}/"+f"no_{str(trial_no).zfill(5)}"
                                                 condition_dicts[trila_name]=condition_dict
                                                 trial_no+=1
         return condition_dicts
@@ -203,9 +203,10 @@ class ComprehensiveAnalysis():
         cls_master.save_session()
 
     def comprehensive_analysis_main(self):
+        simulation_name="20240108SimulationPosition"
         strage="NASK"
         runtype="simulation"
-        condition_dicts=self.generate_condition_dicts()
+        condition_dicts=self.generate_condition_dicts(simulation_name)
         nprocess=cpu_count()
         p_list=[]
         
