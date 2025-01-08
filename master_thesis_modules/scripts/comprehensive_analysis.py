@@ -204,12 +204,13 @@ class ComprehensiveAnalysis():
 
     def comprehensive_analysis_main(self):
         strage="NASK"
+        runtype="simulation"
         condition_dicts=self.generate_condition_dicts()
         nprocess=cpu_count()
         p_list=[]
         
         for i,(trial_name,condition_dict) in enumerate(condition_dicts.items()):
-            p=Process(target=self.main,args=(trial_name,strage,condition_dict))
+            p=Process(target=self.main,args=(trial_name,strage,condition_dict,runtype))
             p_list.append(p)
             if len(p_list)==nprocess or i+1==len(condition_dicts):
                 for p in p_list:
