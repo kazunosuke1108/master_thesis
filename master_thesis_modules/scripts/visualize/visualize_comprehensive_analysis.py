@@ -2,6 +2,8 @@ import os
 import sys
 from glob import glob
 from pprint import pprint
+import matplotlib.pyplot as plt
+from matplotlib.gridspec import GridSpec
 
 sys.path.append(".")
 sys.path.append("..")
@@ -26,12 +28,20 @@ class Visualizer(Manager):
 
     def check_standing_detection(self,trial_dir_path):
         trial_name=os.path.basename(trial_dir_path)
+        print(trial_name)
         csv_paths=sorted(glob(trial_dir_path+"/data_*_eval.csv"))
         self.score_dict[trial_name]={}
         for csv_path in csv_paths:
+            # データの読み込み
             all_data=pd.read_csv(csv_path,header=0)
             trial_no=os.path.basename(trial_dir_path)
             patient=os.path.basename(csv_path).split("_")[1]
+            # 各登場人物の位置を記録
+            self.score_dict[trial_name][f"pos_{patient}_x"]=all_data["60010000"].mean()
+            self.score_dict[trial_name][f"pos_{patient}_y"]=all_data["60010001"].mean()
+            self.score_dict[trial_name]["pos_NS_x"]=all_data["50001100"].values[-1]
+            self.score_dict[trial_name]["pos_NS_y"]=all_data["50001101"].values[-1]
+            
             # 立ち上がりの部分
             start_timestamp=2 # 患者が立ち始める
             end_timestamp=5   # 看護師が動き始める
@@ -45,11 +55,13 @@ class Visualizer(Manager):
             score=data["10000000"].mean()
             self.score_dict[trial_name]["risk79_"+patient]=score
         try:
+            # A,B,Cそれぞれの立ち上がり時のスコアを取得
             values_25=[self.score_dict[trial_name][f"risk25_{p}"] for p in ["A","B","C"]]
             values_79=[self.score_dict[trial_name][f"risk79_{p}"] for p in ["A","B","C"]]
         except KeyError:
             print(self.score_dict)
             raise KeyError("患者の名前が見つからない")
+        # A,B,Cの中で最もスコアが高い人物を記録
         self.score_dict[trial_name]["risk25_max"]=["A","B","C"][np.argmax(values_25)]
         self.score_dict[trial_name]["risk79_max"]=["A","B","C"][np.argmax(values_79)]
         # self.write_csvlog([trial_name,])
@@ -61,31 +73,167 @@ class Visualizer(Manager):
         trial_dir_paths=[path for path in sorted(glob(self.simulation_dir_path+"/*")) if f"common" not in os.path.basename(path)]
         print(trial_dir_paths)
         for i,trial_dir_path in enumerate(trial_dir_paths):
-            # self.check_standing_detection(trial_dir_path)
-            p=Process(target=self.check_standing_detection,args=(trial_dir_path,))
-            p_list.append(p)
-            if len(p_list)==nprocess or i+1==len(trial_dir_paths):
-                for p in p_list:
-                    p.start()
-                for p in p_list:
-                    p.join()
-                p_list=[]
+            self.check_standing_detection(trial_dir_path)
+            # p=Process(target=self.check_standing_detection,args=(trial_dir_path,))
+            # p_list.append(p)
+            # if len(p_list)==nprocess or i+1==len(trial_dir_paths):
+            #     for p in p_list:
+            #         p.start()
+            #     for p in p_list:
+            #         p.join()
+            #     p_list=[]
         self.write_json(self.score_dict,json_path=self.simulation_common_dir_path+"/standing.json")
     
     def check_json(self):
         data=self.load_json(self.simulation_common_dir_path+"/standing.json")
-        count_dict={
+        self.count_dict={
             "risk25_max":{"A":0,"B":0,"C":0,},
             "risk79_max":{"A":0,"B":0,"C":0,},
         }
+        self.pos_maps={ # key: 最も危険だと判断した人物
+            "A":np.zeros((13,13,3)),
+            "B":np.zeros((13,13,3)),
+            "C":np.zeros((13,13,3)),
+        } # z方向... 0:B, 1:C, 2:NS
         for trial_no,d in data.items():
-            count_dict["risk25_max"][data[trial_no]["risk25_max"]]+=1
-            count_dict["risk79_max"][data[trial_no]["risk79_max"]]+=1
-        pprint(count_dict)
+            self.count_dict["risk25_max"][data[trial_no]["risk25_max"]]+=1
+            self.count_dict["risk79_max"][data[trial_no]["risk79_max"]]+=1
+            for i,id_name in enumerate(["B","C","NS"]):
+                self.pos_maps[data[trial_no]["risk25_max"]][int(data[trial_no][f"pos_{id_name}_x"])-int(data[trial_no][f"pos_A_x"]),int(data[trial_no][f"pos_{id_name}_y"])-int(data[trial_no][f"pos_A_y"]),i]+=1
+        for k in self.pos_maps.keys():
+            self.pos_maps[k]=self.pos_maps[k]/len(list(data.keys()))*255
+        
+    def draw_relative_pos_map(self):
+        plt.imshow(self.pos_maps["A"])   # 患者Aが一番危険だと判定された際の、患者Aから見たB,C,NSの位置
+        plt.title(f"Position of B(R) C(G) and Nurse(B) when A is the most risky (n={self.count_dict['risk25_max']['A']})")
+        plt.xlabel("Position X (position of A = 6)")
+        plt.ylabel("Position Y (position of A = 6)")
+        plt.savefig(self.simulation_common_dir_path+"/result_fig_relativePosition_A_risky.jpg")
+        plt.imshow(self.pos_maps["B"])
+        plt.title(f"Position of B(R) C(G) and Nurse(B) when B is the most risky (n={self.count_dict['risk25_max']['B']})")
+        plt.xlabel("Position X (position of A = 6)")
+        plt.ylabel("Position Y (position of A = 6)")
+        plt.savefig(self.simulation_common_dir_path+"/result_fig_relativePosition_B_risky.jpg")
+        plt.imshow(self.pos_maps["C"])
+        plt.title(f"Position of B(R) C(G) and Nurse(B) when B is the most risky (n={self.count_dict['risk25_max']['C']})")
+        plt.xlabel("Position X (position of A = 6)")
+        plt.ylabel("Position Y (position of A = 6)")
+        plt.savefig(self.simulation_common_dir_path+"/result_fig_relativePosition_C_risky.jpg")
+        pprint(self.count_dict)
+
+    def draw_timeseries_with_categorization(self):
+        # リスク波形を取得
+        json_data=self.load_json(self.simulation_common_dir_path+"/standing.json")
+        trial_dir_paths=[path for path in sorted(glob(self.simulation_dir_path+"/*")) if f"common" not in os.path.basename(path)]
+        gs=GridSpec(nrows=3,ncols=1)
+
+        draw_column="40000111"
+        
+
+        for i,trial_dir_path in enumerate(trial_dir_paths):
+            trial_name=os.path.basename(trial_dir_path)
+            csv_paths=sorted(glob(trial_dir_path+"/data_*_eval.csv"))
+            print("now processing...",i,"/",len(trial_dir_paths))
+            for j,csv_path in enumerate(csv_paths):
+                csv_data=pd.read_csv(csv_path,header=0)
+                if i==0 :
+                    # df_dict[最も危険と判断された患者（most_dangerous_patient）][ノード番号]-> 列が1試行
+                    # focus_keys=[k for k in list(csv_data.keys()) if ((k!="timestamp") and int(k)<)]
+                    df_dict={
+                        "A":{p:{k:pd.DataFrame(csv_data["timestamp"].values,columns=["timestamp"]) for k in csv_data.keys() if k!="timestamp"} for p in ["A","B","C"]},
+                        "B":{p:{k:pd.DataFrame(csv_data["timestamp"].values,columns=["timestamp"]) for k in csv_data.keys() if k!="timestamp"} for p in ["A","B","C"]},
+                        "C":{p:{k:pd.DataFrame(csv_data["timestamp"].values,columns=["timestamp"]) for k in csv_data.keys() if k!="timestamp"} for p in ["A","B","C"]},
+                    }
+                most_dangerous_patient=json_data[trial_name]["risk25_max"]
+                patient=os.path.basename(csv_path)[len("data_"):-len("_eval.csv")]
+                for k in csv_data.keys():
+                    if k=="timestamp":
+                        continue
+                    df_dict[most_dangerous_patient][patient][k][trial_name]=csv_data[k].values
+            # if i>100:
+            #     break
+
+        # 各データの代表値を求める
+        for d_patient in df_dict.keys():
+            for patient in df_dict[d_patient].keys():
+                for k in csv_data.keys():
+                    if k=="timestamp":
+                        continue
+                    try:
+                        df_dict[d_patient][patient][k]["average"]=df_dict[d_patient][patient][k].drop("timestamp",axis=1).mean(axis=1)
+                        df_dict[d_patient][patient][k]["std"]=df_dict[d_patient][patient][k].drop("timestamp",axis=1).std(axis=1)
+                    except TypeError:
+                        pass
+        for k in [k for k in csv_data.keys() if k!="timestamp"]:
+            if int(k)>=50000000:
+                continue
+            try:
+                gs=GridSpec(nrows=3,ncols=1)
+                plt.subplot(gs[0])
+                plt.plot(df_dict["A"]["A"][k]["timestamp"],df_dict["A"]["A"][k]["average"],label="risky: A")
+                plt.fill_between(df_dict["A"]["A"][k]["timestamp"],df_dict["A"]["A"][k]["average"]-df_dict["A"]["A"][k]["std"],df_dict["A"]["A"][k]["average"]+df_dict["A"]["A"][k]["std"],alpha=0.25)
+                plt.plot(df_dict["B"]["A"][k]["timestamp"],df_dict["B"]["A"][k]["average"],label="risky: B")
+                plt.fill_between(df_dict["B"]["A"][k]["timestamp"],df_dict["B"]["A"][k]["average"]-df_dict["B"]["A"][k]["std"],df_dict["B"]["A"][k]["average"]+df_dict["B"]["A"][k]["std"],alpha=0.25)
+                plt.plot(df_dict["C"]["A"][k]["timestamp"],df_dict["C"]["A"][k]["average"],label="risky: C")
+                plt.fill_between(df_dict["C"]["A"][k]["timestamp"],df_dict["C"]["A"][k]["average"]-df_dict["C"]["A"][k]["std"],df_dict["C"]["A"][k]["average"]+df_dict["C"]["A"][k]["std"],alpha=0.25)
+                plt.xlabel("Time [s]")
+                plt.ylabel("Risk Value")
+                plt.title(k)
+                plt.legend()
+                plt.grid()
+                plt.subplot(gs[1])
+                plt.plot(df_dict["A"]["B"][k]["timestamp"],df_dict["A"]["B"][k]["average"],label="risky: A")
+                plt.fill_between(df_dict["A"]["B"][k]["timestamp"],df_dict["A"]["B"][k]["average"]-df_dict["A"]["B"][k]["std"],df_dict["A"]["B"][k]["average"]+df_dict["A"]["B"][k]["std"],alpha=0.25)
+                plt.plot(df_dict["B"]["B"][k]["timestamp"],df_dict["B"]["B"][k]["average"],label="risky: B")
+                plt.fill_between(df_dict["B"]["B"][k]["timestamp"],df_dict["B"]["B"][k]["average"]-df_dict["B"]["B"][k]["std"],df_dict["B"]["B"][k]["average"]+df_dict["B"]["B"][k]["std"],alpha=0.25)
+                plt.plot(df_dict["C"]["B"][k]["timestamp"],df_dict["C"]["B"][k]["average"],label="risky: C")
+                plt.fill_between(df_dict["C"]["B"][k]["timestamp"],df_dict["C"]["B"][k]["average"]-df_dict["C"]["B"][k]["std"],df_dict["C"]["B"][k]["average"]+df_dict["C"]["B"][k]["std"],alpha=0.25)
+                plt.xlabel("Time [s]")
+                plt.ylabel("Risk Value")
+                plt.legend()
+                plt.grid()
+                plt.legend()
+                plt.subplot(gs[2])
+                plt.plot(df_dict["A"]["C"][k]["timestamp"],df_dict["A"]["C"][k]["average"],label="risky: A")
+                plt.fill_between(df_dict["A"]["C"][k]["timestamp"],df_dict["A"]["C"][k]["average"]-df_dict["A"]["C"][k]["std"],df_dict["A"]["C"][k]["average"]+df_dict["A"]["C"][k]["std"],alpha=0.25)
+                plt.plot(df_dict["B"]["C"][k]["timestamp"],df_dict["B"]["C"][k]["average"],label="risky: B")
+                plt.fill_between(df_dict["B"]["C"][k]["timestamp"],df_dict["B"]["C"][k]["average"]-df_dict["B"]["C"][k]["std"],df_dict["B"]["C"][k]["average"]+df_dict["B"]["C"][k]["std"],alpha=0.25)
+                plt.plot(df_dict["C"]["C"][k]["timestamp"],df_dict["C"]["C"][k]["average"],label="risky: C")
+                plt.fill_between(df_dict["C"]["C"][k]["timestamp"],df_dict["C"]["C"][k]["average"]-df_dict["C"]["C"][k]["std"],df_dict["C"]["C"][k]["average"]+df_dict["C"]["C"][k]["std"],alpha=0.25)
+                plt.xlabel("Time [s]")
+                plt.ylabel("Risk Value")
+                plt.legend()
+                plt.grid()
+                plt.savefig(self.simulation_common_dir_path+f"/result_25_{k}_with_categorization.jpg")
+                plt.close()
+            except KeyError:
+                plt.close()
+                continue
+
+            #     patient=os.path.basename(csv_path)[len("data_"):-len("_eval.csv")]
+            #     print(trial_name,patient)
+            #     if patient=="A":
+            #         plt.subplot(gs[0])
+            #     elif patient=="B":
+            #         plt.subplot(gs[1])
+            #     elif patient=="C":
+            #         plt.subplot(gs[2])
+            #     else:
+            #         raise Exception
+            #     plt.plot(csv_data["timestamp"],csv_data[draw_column],"red" if most_dangerous_patient==patient else "black")
+            # if i%100==0:
+            #     plt.pause(1)
+
+                
+
+        # Aのリスク波形を、A,B,Cの誰が最も危険とされたかに応じて色分けして表示
+
+        pass
 
 if __name__=="__main__":
     simulation_name="20250108SimulationPosition"
     strage="NASK"
     cls=Visualizer(simulation_name=simulation_name,strage=strage)
-    cls.main()
-    cls.check_json()
+    # cls.main()
+    # cls.check_json()
+    cls.draw_timeseries_with_categorization()
