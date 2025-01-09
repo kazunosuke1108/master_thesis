@@ -28,7 +28,7 @@ class Notification(Manager):
         self.data_dir_dict=self.get_database_dir(trial_name=self.trial_name,strage=self.strage)
         pass
 
-    def generate_audio(self,text):
+    def generate_audio(self,text,mp3_path):
         query_endpoint = f"{self.base_url}/audio_query?speaker={self.speaker_id}"
         response = requests.post(query_endpoint, params={"text": text})
         if response.status_code != 200:
@@ -50,7 +50,7 @@ class Notification(Manager):
         if response.status_code != 200:
             print("音声合成に失敗しました:", response.text)
             exit()
-        mp3_path=self.data_dir_dict["trial_dir_path"]+"/notification_text.mp3"
+        # mp3_path=self.data_dir_dict["trial_dir_path"]+"/notification_text.mp3"
         with open(mp3_path, "wb") as f:
             f.write(response.content)        
         return mp3_path
@@ -60,17 +60,21 @@ class Notification(Manager):
     def export_with_chime(self,mp3_path,chime_type=1):
         chime_mp3_path=self.data_dir_dict["common_dir_path"]+f"/alert{chime_type}.mp3"
         combined_audio = AudioSegment.from_file(chime_mp3_path)+AudioSegment.from_file(mp3_path)
-        combined_audio.export(self.data_dir_dict["trial_dir_path"]+f"/notification{chime_type}.mp3", format="mp3")
+        combined_audio.export(mp3_path, format="mp3")
 
         pass
 
     def save_audio(self,audio_data):
         pass
 
-    def main(self):
+    def export_audio(self,text,mp3_path,chime_type=1,):
+        mp3_path=self.generate_audio(text=text,mp3_path=mp3_path)
+        self.export_with_chime(mp3_path=mp3_path,chime_type=chime_type)
+
+    def main_dev(self,text):
         # メッセージの生成
         text="患者さんが立ち上がりました。近くに車椅子があります。"
-        mp3_path=self.generate_audio(text=text)
+        mp3_path=self.generate_audio(text=text,mp3_path=self.data_dir_dict["trial_dir_path"]+"/notification.mp3")
         self.export_with_chime(mp3_path,chime_type=1)
         text="デイルームで見守りのお手伝いをお願いします。"
         mp3_path=self.generate_audio(text=text)
@@ -83,7 +87,7 @@ if __name__=="__main__":
     trial_name="20250107VoiceNotification"
     strage="NASK"
     cls=Notification(trial_name,strage)
-    cls.main()
+    cls.main_dev()
 
 
 """
