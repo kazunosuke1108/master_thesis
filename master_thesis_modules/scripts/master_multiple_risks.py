@@ -166,7 +166,6 @@ class ComprehensiveAnalysis():
                     trila_name=f"{simulation_name}/"+f"no_{str(trial_no).zfill(5)}"
                     condition_dicts[trila_name]=condition_dict
                     trial_no+=1
-                    del condition_dict
                 pass
             elif standup_timing=="different":
                 # ばらばらに立ち上がる場合についての検証
