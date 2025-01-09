@@ -26,8 +26,7 @@ class Visualizer(Manager):
 
     def check_standing_detection(self,trial_dir_path):
         trial_name=os.path.basename(trial_dir_path)
-        print(trial_name)
-        csv_paths=sorted(glob(trial_dir_path+"/data_*_raw.csv"))
+        csv_paths=sorted(glob(trial_dir_path+"/data_*_eval.csv"))
         self.score_dict[trial_name]={}
         for csv_path in csv_paths:
             all_data=pd.read_csv(csv_path,header=0)
@@ -49,8 +48,7 @@ class Visualizer(Manager):
             values_25=[self.score_dict[trial_name][f"risk25_{p}"] for p in ["A","B","C"]]
             values_79=[self.score_dict[trial_name][f"risk79_{p}"] for p in ["A","B","C"]]
         except KeyError:
-            print(self.score_dict[trial_name].keys())
-            print(trial_dir_path)
+            print(self.score_dict)
             raise KeyError("患者の名前が見つからない")
         self.score_dict[trial_name]["risk25_max"]=["A","B","C"][np.argmax(values_25)]
         self.score_dict[trial_name]["risk79_max"]=["A","B","C"][np.argmax(values_79)]
@@ -86,8 +84,8 @@ class Visualizer(Manager):
         pprint(count_dict)
 
 if __name__=="__main__":
-    simulation_name="20250104SimulationPosition"
+    simulation_name="20250108SimulationPosition"
     strage="NASK"
     cls=Visualizer(simulation_name=simulation_name,strage=strage)
-    # cls.main()
+    cls.main()
     cls.check_json()

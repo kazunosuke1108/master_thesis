@@ -203,7 +203,7 @@ class ComprehensiveAnalysis():
         cls_master.save_session()
 
     def comprehensive_analysis_main(self):
-        simulation_name="20240108SimulationPosition"
+        simulation_name="20250108SimulationPosition"
         strage="NASK"
         runtype="simulation"
         condition_dicts=self.generate_condition_dicts(simulation_name)
