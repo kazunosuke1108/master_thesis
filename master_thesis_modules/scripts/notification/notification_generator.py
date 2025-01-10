@@ -53,6 +53,10 @@ class NotificationGenerator(Manager,GraphManager):
     
     def guess_dynamic_factor(self,data):
         # 当該時刻のデータ
+        data["40000000"]=[eval(v)[1] for v in data["40000000"].values]
+        data["40000001"]=[eval(v)[1] for v in data["40000001"].values]
+        data.drop("timestamp",inplace=True)
+        data.drop([k for k in data.keys() if int(k)>=50000000],inplace=True)
         data_corr=data.corr()["10000000"]
         # 相関が高い因子を抜き出す
         high_corr_nodes=[k for k in data_corr.keys() if ((data_corr[k]>0.8) and (k!="timestamp") and (k!="10000000"))]
