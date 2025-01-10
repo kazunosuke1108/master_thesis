@@ -19,7 +19,7 @@ from pydub import AudioSegment
 
 
 class Notification(Manager):
-    def __init__(self,trial_name,strage):
+    def __init__(self,trial_name="20250000Audio",strage="NASK"):
         # 音声合成APIのエンドポイント
         self.base_url = "http://127.0.0.1:50021"
         self.speaker_id = 0
