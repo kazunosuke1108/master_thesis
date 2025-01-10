@@ -55,8 +55,8 @@ class NotificationGenerator(Manager,GraphManager):
         # 当該時刻のデータ
         data["40000000"]=[eval(v)[1] for v in data["40000000"].values]
         data["40000001"]=[eval(v)[1] for v in data["40000001"].values]
-        data.drop("timestamp",inplace=True)
-        data.drop([k for k in data.keys() if int(k)>=50000000],inplace=True)
+        data.drop("timestamp",inplace=True,axis=1)
+        data.drop([k for k in data.keys() if int(k)>=50000000],inplace=True,axis=1)
         data_corr=data.corr()["10000000"]
         # 相関が高い因子を抜き出す
         high_corr_nodes=[k for k in data_corr.keys() if ((data_corr[k]>0.8) and (k!="timestamp") and (k!="10000000"))]
@@ -133,7 +133,7 @@ class NotificationGenerator(Manager,GraphManager):
                 alert_text=self.get_alert_sentence(most_risky_patient=most_risky_patient,dynamic_factor_node=dynamic_factor_node,static_factor_node=static_factor_node)
 
                 notification_mp3_path=self.data_dir_dict["trial_dir_path"]+f"/notification_{str(i).zfill(3)}.mp3"
-                Notification().export_audio(text=alert_text,mp3_path=notification_mp3_path,chime_type=1)
+                # Notification().export_audio(text=alert_text,mp3_path=notification_mp3_path,chime_type=1)
                 
                 print("ranking changed")
                 print(self.df_rank.loc[i,"timestamp"])
