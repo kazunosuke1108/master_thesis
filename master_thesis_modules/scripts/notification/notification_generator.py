@@ -22,6 +22,8 @@ class NotificationGenerator(Manager,GraphManager):
         self.strage=strage
         self.result_trial_name=result_trial_name
         self.data_dir_dict=self.get_database_dir(trial_name=self.trial_name,strage=self.strage)
+
+        self.w_average=20 # 平滑化のwindow
         
         # csvデータの読み込み
         csv_paths=sorted(glob(f"{self.data_dir_dict['database_dir_path']}/{self.result_trial_name}/data_*_eval.csv"))
@@ -30,6 +32,13 @@ class NotificationGenerator(Manager,GraphManager):
         
         for csv_path in csv_paths:
             data=pd.read_csv(csv_path,header=0)
+            for k in data.keys():
+                if k =="timestamp":
+                    continue
+                try:
+                    data[k]=data[k].rolling(self.w_average).mean()
+                except pd.errors.DataError:
+                    pass
             id_name=os.path.basename(csv_path)[len("data_"):-len("_eval.csv")]
             self.id_names.append(id_name)
             self.data_dicts[id_name]=data
@@ -97,14 +106,22 @@ class NotificationGenerator(Manager,GraphManager):
 
         factor_df=average_df[(average_df["risky"]==most_risky_patient)].sort_values("significance")
         static_factor_df=factor_df[factor_df["node_type"]=="static"]
-        static_factor_node=static_factor_df.index[static_factor_df["significance"]==static_factor_df["significance"].max()].tolist()[0]
+        static_factor_nodes=static_factor_df.index[static_factor_df["significance"]==static_factor_df["significance"].max()].tolist()
+        if len(static_factor_nodes)>0:
+            static_factor_node=static_factor_nodes[0]
+        else:
+            static_factor_node=""
         
         return static_factor_node,factor_df
         
     def get_alert_sentence(self,most_risky_patient,static_factor_node,dynamic_factor_node):
-        text_static=self.default_graph["node_dict"][int(static_factor_node)]["description_ja"]
-        text_dynamic=self.default_graph["node_dict"][int(dynamic_factor_node)]["description_ja"]
-        alert_text=f"{most_risky_patient}さんが，元々{text_static}のに，{text_dynamic}ので，危険です．"
+        if static_factor_node=="":
+            text_dynamic=self.default_graph["node_dict"][int(dynamic_factor_node)]["description_ja"]
+            alert_text=f"{most_risky_patient}さんが，{text_dynamic}ので，危険です．"
+        else:
+            text_static=self.default_graph["node_dict"][int(static_factor_node)]["description_ja"]
+            text_dynamic=self.default_graph["node_dict"][int(dynamic_factor_node)]["description_ja"]
+            alert_text=f"{most_risky_patient}さんが，元々{text_static}のに，{text_dynamic}ので，危険です．"
         return alert_text
 
     def main(self):
@@ -112,6 +129,9 @@ class NotificationGenerator(Manager,GraphManager):
         self.df_rank=self.get_df_rank(data_dicts=self.data_dicts)
 
         # ランキングの入れ替わりを検知
+        notification_history=pd.DataFrame(columns=["timestamp","sentence"])
+        timestamp_list=[]
+        sentence_list=[]
         most_risky_patient=""
         for i,row in self.df_rank.iterrows():
             if i==0:
@@ -141,13 +161,20 @@ class NotificationGenerator(Manager,GraphManager):
                 print(dynamic_factor_node)
                 print(static_factor_node)
                 print(alert_text)
+                timestamp_list.append(self.df_rank.loc[i,"timestamp"])
+                sentence_list.append(alert_text)
+        notification_history["timestamp"]=timestamp_list
+        notification_history["sentence"]=sentence_list
+
+        print(notification_history)
+
 
             
         pass
 
 if __name__=="__main__":
-    trial_name="20240109NotificationGenerator"
-    result_trial_name="20250108SimulationThrottlingTrue"
+    trial_name="20240109NotificationGeneratorExp"
+    result_trial_name="20250108DevMewThrottlingExp"
     strage="NASK"
 
     cls=NotificationGenerator(trial_name=trial_name,strage=strage,result_trial_name=result_trial_name)
