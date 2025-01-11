@@ -25,6 +25,7 @@ class NotificationGenerator(Manager,GraphManager):
 
         self.w_average=40 # 平滑化のwindow
         self.increase_ratio_min=0 # 危険順位が1位に躍り出た患者の，危険度の上昇具合
+        self.decrease_ratio_max=0 # 危険順位が2位になった患者の，危険度の下降具合
         
         # csvデータの読み込み
         csv_paths=sorted(glob(f"{self.data_dir_dict['database_dir_path']}/{self.result_trial_name}/data_*_eval.csv"))
@@ -125,6 +126,10 @@ class NotificationGenerator(Manager,GraphManager):
             text_dynamic=self.default_graph["node_dict"][int(dynamic_factor_node)]["description_ja"]
             alert_text=f"{most_risky_patient}さんが，元々{text_static}のに，{text_dynamic}ので，危険です．"
         return alert_text
+    
+    def get_help_sentence(self):
+        help_text="デイルームで複数の患者さんの対応が必要です．デイルームに来てください．"
+        return help_text
 
     def main(self):
         # ランキングの作成
@@ -135,22 +140,34 @@ class NotificationGenerator(Manager,GraphManager):
         timestamp_list=[]
         sentence_list=[]
         increase_ratio_list=[]
+        decrease_ratio_list=[]
         most_risky_patient=""
         for i,row in self.df_rank.iterrows():
             if i==0:
                 most_risky_patient=self.df_rank.loc[i,0]
                 continue
             if self.df_rank.loc[i,0]!=most_risky_patient:
+                previous_risky_patient=most_risky_patient
                 most_risky_patient=self.df_rank.loc[i,0]
+                print(most_risky_patient,previous_risky_patient)
                 # 当該時刻における，危険度が上昇した患者のデータを準備
                 w_roi=20
-                data_of_risky_patient=self.data_dicts[self.df_rank.loc[i,0]].loc[i-w_roi:i+w_roi,:]
+                data_of_risky_patient=self.data_dicts[most_risky_patient].loc[i-w_roi:i+w_roi,:]
+                data_of_previous_risky_patient=self.data_dicts[previous_risky_patient].loc[i-w_roi:i+w_roi,:]
                 data_dict_roi={k:v.loc[i-w_roi:i+w_roi,:] for k,v in self.data_dicts.items()}
 
                 # 追い抜いた側が上昇したことによる入れ替わりか，追い抜かれた側が下降したことによる入れ替わりか，判別
                 increase_ratio=data_of_risky_patient.corr().loc["timestamp","10000000"]
-                print(increase_ratio)
                 if increase_ratio>self.increase_ratio_min:
+                    # 追い抜かれた側（通知済み）の危険度が低下していない場合，応援が必要と判断
+                    decrease_ratio=data_of_previous_risky_patient.corr().loc["timestamp","10000000"]
+                    if len(timestamp_list)>0 & decrease_ratio>self.decrease_ratio_max:
+                        # 既に通知を飛ばしたことがあり，かつ今追い抜かれた患者も危険度が低下傾向にない場合，応援通知を飛ばす
+                        help_text=self.get_help_sentence()
+                        notification_mp3_path=self.data_dir_dict["trial_dir_path"]+f"/notification_{str(i).zfill(3)}_help.mp3"
+                        Notification().export_audio(text=help_text,mp3_path=notification_mp3_path,chime_type=2)
+                        pass
+                    
                     # ランキングの入れ替わりを起こすきっかけになった動的要因を探る（動作か周囲の人員配置．値の上昇が見られるものはどっちか考える）
                     dynamic_factor_node,_=self.guess_dynamic_factor(data_of_risky_patient)
 
@@ -169,11 +186,13 @@ class NotificationGenerator(Manager,GraphManager):
                     print(static_factor_node)
                     print(alert_text)
                     increase_ratio_list.append(increase_ratio)
+                    decrease_ratio_list.append(decrease_ratio)
                     timestamp_list.append(self.df_rank.loc[i,"timestamp"]-self.df_rank.loc[0,"timestamp"])
                     sentence_list.append(alert_text)
         notification_history["timestamp"]=timestamp_list
         notification_history["sentence"]=sentence_list
         notification_history["increase_ratio"]=increase_ratio_list
+        notification_history["decrease_ratio"]=decrease_ratio_list
 
         print(notification_history)
 
