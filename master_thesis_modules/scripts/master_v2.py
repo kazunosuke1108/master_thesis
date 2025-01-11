@@ -470,9 +470,9 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
                 }
             }
             surrounding_objects={
-                "A":[],
+                "A":["wheelchair","ivPole"],
                 "B":["wheelchair",],
-                "C":["ivPole",],
+                "C":[],
             }
         else:
             general_dict=scenario_dict["general_dict"]
@@ -726,7 +726,7 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
         pass
 
 if __name__=="__main__":
-    trial_name="20250108SimulationThrottlingTrue"
+    trial_name="20250110ChangeSurroundingObjects"
     strage="NASK"
     runtype="simulation"
     cls=Master(trial_name,strage,runtype=runtype)

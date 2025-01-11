@@ -718,7 +718,7 @@ class Visualizer(Manager):
         pass
 
 if __name__=="__main__":
-    trial_name="20250108SimulationThrottlingTrue"
+    trial_name="20250110ChangeSurroundingObjects"
     strage="NASK"
     cls=Visualizer(trial_name=trial_name,strage=strage)
     # cls.visualize_graph(trial_name="20241229BuildSimulator",strage="NASK",name="A",show=True)
