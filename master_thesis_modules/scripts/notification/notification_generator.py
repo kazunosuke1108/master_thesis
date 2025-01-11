@@ -24,7 +24,7 @@ class NotificationGenerator(Manager,GraphManager):
         self.data_dir_dict=self.get_database_dir(trial_name=self.trial_name,strage=self.strage)
 
         self.w_average=40 # 平滑化のwindow
-        self.increase_ratio_min=0 # 危険順位が1位に躍り出た患者の，危険度の上昇具合
+        self.increase_ratio_min=0.8 # 危険順位が1位に躍り出た患者の，危険度の上昇具合
         self.decrease_ratio_max=0 # 危険順位が2位になった患者の，危険度の下降具合
         
         # csvデータの読み込み
@@ -161,11 +161,15 @@ class NotificationGenerator(Manager,GraphManager):
                 if increase_ratio>self.increase_ratio_min:
                     # 追い抜かれた側（通知済み）の危険度が低下していない場合，応援が必要と判断
                     decrease_ratio=data_of_previous_risky_patient.corr().loc["timestamp","10000000"]
-                    if len(timestamp_list)>0 & decrease_ratio>self.decrease_ratio_max:
+                    if (len(timestamp_list)>0) & (decrease_ratio>self.decrease_ratio_max):
                         # 既に通知を飛ばしたことがあり，かつ今追い抜かれた患者も危険度が低下傾向にない場合，応援通知を飛ばす
                         help_text=self.get_help_sentence()
                         notification_mp3_path=self.data_dir_dict["trial_dir_path"]+f"/notification_{str(i).zfill(3)}_help.mp3"
-                        Notification().export_audio(text=help_text,mp3_path=notification_mp3_path,chime_type=2)
+                        # Notification().export_audio(text=help_text,mp3_path=notification_mp3_path,chime_type=2)
+                        timestamp_list.append(self.df_rank.loc[i,"timestamp"]-self.df_rank.loc[0,"timestamp"])
+                        sentence_list.append(help_text)
+                        increase_ratio_list.append(increase_ratio)
+                        decrease_ratio_list.append(decrease_ratio)
                         pass
                     
                     # ランキングの入れ替わりを起こすきっかけになった動的要因を探る（動作か周囲の人員配置．値の上昇が見られるものはどっちか考える）
@@ -201,10 +205,10 @@ class NotificationGenerator(Manager,GraphManager):
         pass
 
 if __name__=="__main__":
-    # trial_name="20250111NotificationGenerator"
-    # result_trial_name="20250108SimulationThrottlingTrue"
-    trial_name="20250110NotificationGeneratorExp"
-    result_trial_name="20250108DevMewThrottlingExp"
+    trial_name="20250111NotificationGenerator"
+    result_trial_name="20250108SimulationThrottlingTrue"
+    # trial_name="20250110NotificationGeneratorExp"
+    # result_trial_name="20250108DevMewThrottlingExp"
     strage="NASK"
 
     cls=NotificationGenerator(trial_name=trial_name,strage=strage,result_trial_name=result_trial_name)
