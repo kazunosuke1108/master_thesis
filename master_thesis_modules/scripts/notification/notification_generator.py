@@ -23,7 +23,8 @@ class NotificationGenerator(Manager,GraphManager):
         self.result_trial_name=result_trial_name
         self.data_dir_dict=self.get_database_dir(trial_name=self.trial_name,strage=self.strage)
 
-        self.w_average=20 # 平滑化のwindow
+        self.w_average=40 # 平滑化のwindow
+        self.increase_ratio_min=0 # 危険順位が1位に躍り出た患者の，危険度の上昇具合
         
         # csvデータの読み込み
         csv_paths=sorted(glob(f"{self.data_dir_dict['database_dir_path']}/{self.result_trial_name}/data_*_eval.csv"))
@@ -37,6 +38,7 @@ class NotificationGenerator(Manager,GraphManager):
                     continue
                 try:
                     data[k]=data[k].rolling(self.w_average).mean()
+                    data[k].fillna(method="bfill",inplace=True)
                 except pd.errors.DataError:
                     pass
             id_name=os.path.basename(csv_path)[len("data_"):-len("_eval.csv")]
@@ -132,6 +134,7 @@ class NotificationGenerator(Manager,GraphManager):
         notification_history=pd.DataFrame(columns=["timestamp","sentence"])
         timestamp_list=[]
         sentence_list=[]
+        increase_ratio_list=[]
         most_risky_patient=""
         for i,row in self.df_rank.iterrows():
             if i==0:
@@ -144,27 +147,33 @@ class NotificationGenerator(Manager,GraphManager):
                 data_of_risky_patient=self.data_dicts[self.df_rank.loc[i,0]].loc[i-w_roi:i+w_roi,:]
                 data_dict_roi={k:v.loc[i-w_roi:i+w_roi,:] for k,v in self.data_dicts.items()}
 
-                # ランキングの入れ替わりを起こすきっかけになった動的要因を探る（動作か周囲の人員配置．値の上昇が見られるものはどっちか考える）
-                dynamic_factor_node,_=self.guess_dynamic_factor(data_of_risky_patient)
+                # 追い抜いた側が上昇したことによる入れ替わりか，追い抜かれた側が下降したことによる入れ替わりか，判別
+                increase_ratio=data_of_risky_patient.corr().loc["timestamp","10000000"]
+                print(increase_ratio)
+                if increase_ratio>self.increase_ratio_min:
+                    # ランキングの入れ替わりを起こすきっかけになった動的要因を探る（動作か周囲の人員配置．値の上昇が見られるものはどっちか考える）
+                    dynamic_factor_node,_=self.guess_dynamic_factor(data_of_risky_patient)
 
-                # 元々の危険度を高める要因になっていた静的要因を探る（属性か周囲の物体）
-                static_factor_node,_=self.guess_static_factor(data_dict_roi,most_risky_patient)
+                    # 元々の危険度を高める要因になっていた静的要因を探る（属性か周囲の物体）
+                    static_factor_node,_=self.guess_static_factor(data_dict_roi,most_risky_patient)
 
-                alert_text=self.get_alert_sentence(most_risky_patient=most_risky_patient,dynamic_factor_node=dynamic_factor_node,static_factor_node=static_factor_node)
+                    alert_text=self.get_alert_sentence(most_risky_patient=most_risky_patient,dynamic_factor_node=dynamic_factor_node,static_factor_node=static_factor_node)
 
-                notification_mp3_path=self.data_dir_dict["trial_dir_path"]+f"/notification_{str(i).zfill(3)}.mp3"
-                # Notification().export_audio(text=alert_text,mp3_path=notification_mp3_path,chime_type=1)
-                
-                print("ranking changed")
-                print(self.df_rank.loc[i,"timestamp"])
-                print(self.df_rank.loc[i-1,0],"->",self.df_rank.loc[i,0])
-                print(dynamic_factor_node)
-                print(static_factor_node)
-                print(alert_text)
-                timestamp_list.append(self.df_rank.loc[i,"timestamp"])
-                sentence_list.append(alert_text)
+                    notification_mp3_path=self.data_dir_dict["trial_dir_path"]+f"/notification_{str(i).zfill(3)}.mp3"
+                    # Notification().export_audio(text=alert_text,mp3_path=notification_mp3_path,chime_type=1)
+                    
+                    print("ranking changed")
+                    print(self.df_rank.loc[i,"timestamp"])
+                    print(self.df_rank.loc[i-1,0],"->",self.df_rank.loc[i,0])
+                    print(dynamic_factor_node)
+                    print(static_factor_node)
+                    print(alert_text)
+                    increase_ratio_list.append(increase_ratio)
+                    timestamp_list.append(self.df_rank.loc[i,"timestamp"]-self.df_rank.loc[0,"timestamp"])
+                    sentence_list.append(alert_text)
         notification_history["timestamp"]=timestamp_list
         notification_history["sentence"]=sentence_list
+        notification_history["increase_ratio"]=increase_ratio_list
 
         print(notification_history)
 
@@ -173,7 +182,9 @@ class NotificationGenerator(Manager,GraphManager):
         pass
 
 if __name__=="__main__":
-    trial_name="20240109NotificationGeneratorExp"
+    # trial_name="20250111NotificationGenerator"
+    # result_trial_name="20250108SimulationThrottlingTrue"
+    trial_name="20250110NotificationGeneratorExp"
     result_trial_name="20250108DevMewThrottlingExp"
     strage="NASK"
 
