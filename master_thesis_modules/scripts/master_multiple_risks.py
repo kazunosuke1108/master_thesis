@@ -136,17 +136,6 @@ class ComprehensiveAnalysis():
         # 立ち座り
         for standup_timing in ["same","different"]:
             if standup_timing=="same":
-                # 同時に立ち上がる場合についての検証
-                condition_dict=copy.deepcopy(self.dict_format)
-                # 位置
-                condition_dict["position_dict"]["A"]=(2,5)
-                condition_dict["position_dict"]["B"]=(2,2)
-                condition_dict["position_dict"]["C"]=(5,2)
-                condition_dict["position_dict"]["NS"]=(5,5)
-                # start_standup, standup_duration, stand_durationをそれぞれ定義
-                start_standup=2
-                standup_duration=1
-                stand_duration=4
                 # 立ち上がる組合せを定義
                 standups=[
                     ["A"],
@@ -154,8 +143,19 @@ class ComprehensiveAnalysis():
                     ["A","C"],
                     ["A","B","C"],
                 ]
-                everyone=["A","B","C"]
                 for standup_people in standups:
+                    # 同時に立ち上がる場合についての検証
+                    condition_dict=copy.deepcopy(self.dict_format)
+                    # 位置
+                    condition_dict["position_dict"]["A"]=(2,5)
+                    condition_dict["position_dict"]["B"]=(2,2)
+                    condition_dict["position_dict"]["C"]=(5,2)
+                    condition_dict["position_dict"]["NS"]=(5,5)
+                    # start_standup, standup_duration, stand_durationをそれぞれ定義
+                    start_standup=2
+                    standup_duration=1
+                    stand_duration=4
+                    everyone=["A","B","C"]
                     # 各自にシナリオを入れていく
                     for person in everyone:
                         if person in standup_people:
@@ -220,7 +220,7 @@ class ComprehensiveAnalysis():
         cls_master.save_session()
 
     def comprehensive_analysis_main(self):
-        simulation_name="20250109SimulationMultipleRisks"
+        simulation_name="20250110SimulationMultipleRisks"
         strage="NASK"
         runtype="simulation"
         condition_dicts=self.generate_condition_dicts(simulation_name)

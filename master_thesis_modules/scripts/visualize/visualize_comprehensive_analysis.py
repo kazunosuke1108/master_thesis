@@ -231,9 +231,9 @@ class Visualizer(Manager):
         pass
 
 if __name__=="__main__":
-    simulation_name="20250108SimulationPosition"
+    simulation_name="20250110SimulationPosition"
     strage="NASK"
     cls=Visualizer(simulation_name=simulation_name,strage=strage)
-    # cls.main()
-    # cls.check_json()
+    cls.main()
+    cls.check_json()
     cls.draw_timeseries_with_categorization()
