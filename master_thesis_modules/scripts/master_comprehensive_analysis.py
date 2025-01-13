@@ -137,8 +137,8 @@ class ComprehensiveAnalysis():
         }
         standups=[
             # ["A"],
-            ["B"],
             # ["B"],
+            ["C"],
             # ["A","B"],
             # ["A","B","C"],
             ]
