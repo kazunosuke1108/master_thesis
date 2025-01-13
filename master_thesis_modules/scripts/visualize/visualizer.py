@@ -694,7 +694,7 @@ class Visualizer(Manager):
             print(export_label)
             for id_name in id_names:
                 # if int(export_label) in ["10000000","20000001"]:
-                w=20
+                w=40
                 try:
                     plt.plot(data_dict[id_name]["timestamp"],data_dict[id_name][export_label].rolling(w).mean(),"-o",label=id_name)
                     plt.title(export_label+f" window: {w}")
@@ -728,25 +728,44 @@ class Visualizer(Manager):
             data_dicts[id_name]=data
         
         plot_nodes=["50000100","50001000","60010000"]
-        marker_shapes=["o","^","s","x","v"]
+        marker_shapes=["o","^","s","x","v","*","+"]
         # edge_colors=["r","g","b","m","c","k"]
         for plot_node in plot_nodes:
-            for i,id_name in enumerate(id_names):
-                plt.plot(data_dicts[id_name]["timestamp"],data_dicts[id_name][plot_node],"--"+marker_shapes[i],alpha=0.5,label=id_name)
+            # for i,id_name in enumerate(id_names):
+            #     plt.plot(data_dicts[id_name]["timestamp"],data_dicts[id_name][plot_node],"--"+marker_shapes[i],alpha=0.5,label=id_name)
+            # plt.legend()
+            # plt.grid()
+            # plt.xlabel("Time [s]")
+            # plt.ylabel("Frame rate [Hz]")
+            # plt.savefig(self.data_dir_dict["trial_dir_path"]+f"/result_fps_{plot_node}.jpg")
+            # plt.close()
+            timestamps = data_dicts[id_names[0]]["timestamp"]
+            stacked_data = [data_dicts[id_name][plot_node] for id_name in id_names]
+
+            # 積み上げ折れ線グラフを描画
+            plt.stackplot(
+                timestamps, 
+                *stacked_data,  # 各 id_name に対応するデータを展開
+                labels=id_names, 
+                alpha=1
+            )
+
+            # グラフの装飾
             plt.legend()
             plt.grid()
             plt.xlabel("Time [s]")
             plt.ylabel("Frame rate [Hz]")
             plt.savefig(self.data_dir_dict["trial_dir_path"]+f"/result_fps_{plot_node}.jpg")
+            plt.show()
         print(csv_paths)
         pass
     def main(self):
         pass
 
 if __name__=="__main__":
-    trial_name="20250113NormalSimulation"
+    # trial_name="20250113NormalSimulation"
     # trial_name="20250110SimulationMultipleRisks/no_00005"
-    # trial_name="20250108DevMewThrottlingExp"
+    trial_name="20250108DevMewThrottlingExp"
     strage="NASK"
     cls=Visualizer(trial_name=trial_name,strage=strage)
     # cls.visualize_graph(trial_name="20241229BuildSimulator",strage="NASK",name="A",show=True)
