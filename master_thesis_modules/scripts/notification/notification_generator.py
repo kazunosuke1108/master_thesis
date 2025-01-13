@@ -23,7 +23,7 @@ class NotificationGenerator(Manager,GraphManager):
         self.result_trial_name=result_trial_name
         self.data_dir_dict=self.get_database_dir(trial_name=self.trial_name,strage=self.strage)
 
-        self.w_average=40 # 平滑化のwindow
+        self.w_average=20 # 平滑化のwindow
         self.increase_ratio_min=0.8 # 危険順位が1位に躍り出た患者の，危険度の上昇具合
         self.decrease_ratio_max=0 # 危険順位が2位になった患者の，危険度の下降具合
         
@@ -114,7 +114,8 @@ class NotificationGenerator(Manager,GraphManager):
             static_factor_node=static_factor_nodes[0]
         else:
             static_factor_node=""
-        
+        print(average_df)
+        print(factor_df)
         return static_factor_node,factor_df
         
     def get_alert_sentence(self,most_risky_patient,static_factor_node,dynamic_factor_node):
@@ -149,7 +150,6 @@ class NotificationGenerator(Manager,GraphManager):
             if self.df_rank.loc[i,0]!=most_risky_patient:
                 previous_risky_patient=most_risky_patient
                 most_risky_patient=self.df_rank.loc[i,0]
-                print(most_risky_patient,previous_risky_patient)
                 # 当該時刻における，危険度が上昇した患者のデータを準備
                 w_roi=20
                 data_of_risky_patient=self.data_dicts[most_risky_patient].loc[i-w_roi:i+w_roi,:]
@@ -204,6 +204,7 @@ class NotificationGenerator(Manager,GraphManager):
 if __name__=="__main__":
     trial_name="20250113NotificationGenerator"
     result_trial_name="20250113NormalSimulation"
+    # result_trial_name="20250110SimulationMultipleRisks/no_00005"
     # trial_name="20250110NotificationGeneratorExp"
     # result_trial_name="20250108DevMewThrottlingExp"
     strage="NASK"
