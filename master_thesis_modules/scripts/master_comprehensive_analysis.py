@@ -136,8 +136,9 @@ class ComprehensiveAnalysis():
             "y":[1,3,5],
         }
         standups=[
-            # ["A"],
-            ["B"],
+            ["A"],
+            # ["B"],
+            # ["B"],
             # ["A","B"],
             # ["A","B","C"],
             ]
@@ -204,7 +205,7 @@ class ComprehensiveAnalysis():
         cls_master.save_session()
 
     def comprehensive_analysis_main(self):
-        simulation_name="20250110SimulationPosition"
+        simulation_name="20250113SimulationPositionA"
         strage="NASK"
         runtype="simulation"
         condition_dicts=self.generate_condition_dicts(simulation_name)

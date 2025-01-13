@@ -102,6 +102,7 @@ class Visualizer(Manager):
                 self.pos_maps[data[trial_no]["risk25_max"]][int(data[trial_no][f"pos_{id_name}_x"])-int(data[trial_no][f"pos_A_x"]),int(data[trial_no][f"pos_{id_name}_y"])-int(data[trial_no][f"pos_A_y"]),i]+=1
         for k in self.pos_maps.keys():
             self.pos_maps[k]=self.pos_maps[k]/len(list(data.keys()))*255
+        print(self.count_dict)
         
     def draw_relative_pos_map(self):
         plt.imshow(self.pos_maps["A"])   # 患者Aが一番危険だと判定された際の、患者Aから見たB,C,NSの位置
@@ -231,9 +232,9 @@ class Visualizer(Manager):
         pass
 
 if __name__=="__main__":
-    simulation_name="20250110SimulationPosition"
+    simulation_name="20250108SimulationPosition"
     strage="NASK"
     cls=Visualizer(simulation_name=simulation_name,strage=strage)
-    cls.main()
+    # cls.main()
     cls.check_json()
-    cls.draw_timeseries_with_categorization()
+    # cls.draw_timeseries_with_categorization()

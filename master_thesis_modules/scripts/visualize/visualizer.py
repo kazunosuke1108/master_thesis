@@ -15,6 +15,7 @@ import numpy as np
 import pandas as pd
 import plotly.subplots as sp
 import plotly.graph_objects as go
+import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import matplotlib.colors as mcolors
 
@@ -679,7 +680,6 @@ class Visualizer(Manager):
         fig.show()
 
     def plot_matplotlib(self):
-        import matplotlib.pyplot as plt
         csv_paths=sorted(glob(self.data_dir_dict["trial_dir_path"]+"/data_*_eval.csv"))
         data_dict={}
         id_names=[]
@@ -703,6 +703,8 @@ class Visualizer(Manager):
                     plt.title(export_label)
             plt.legend()
             plt.grid()
+            plt.xlabel("Time [s]")
+            plt.ylabel("Risk value")
             plt.savefig(self.data_dir_dict["trial_dir_path"]+f"/result_{export_label}.jpg")
             plt.close()
 
@@ -714,15 +716,42 @@ class Visualizer(Manager):
         # plt.ylabel("Risk value")
         # plt.legend()
         # plt.show()
+
+    def plot_fps(self):
+        csv_paths=sorted(glob(self.data_dir_dict["trial_dir_path"]+"/fps_*.csv"))
+        id_names=[os.path.basename(p)[len("fps_"):-len(".csv")] for p in csv_paths]
+        data_dicts={}
+        for id_name,csv_path in zip(id_names,csv_paths):
+            data=pd.read_csv(csv_path,header=0)
+            data=data.fillna(method="ffill")
+            data=data.rolling(4).mean()
+            data_dicts[id_name]=data
+        
+        plot_nodes=["50000100","50001000","60010000"]
+        marker_shapes=["o","^","s","x","v"]
+        # edge_colors=["r","g","b","m","c","k"]
+        for plot_node in plot_nodes:
+            for i,id_name in enumerate(id_names):
+                plt.plot(data_dicts[id_name]["timestamp"],data_dicts[id_name][plot_node],"--"+marker_shapes[i],alpha=0.5,label=id_name)
+            plt.legend()
+            plt.grid()
+            plt.xlabel("Time [s]")
+            plt.ylabel("Frame rate [Hz]")
+            plt.savefig(self.data_dir_dict["trial_dir_path"]+f"/result_fps_{plot_node}.jpg")
+        print(csv_paths)
+        pass
     def main(self):
         pass
 
 if __name__=="__main__":
-    trial_name="20250110SimulationMultipleRisks/no_00005"
+    trial_name="20250113NormalSimulation"
+    # trial_name="20250110SimulationMultipleRisks/no_00005"
+    # trial_name="20250108DevMewThrottlingExp"
     strage="NASK"
     cls=Visualizer(trial_name=trial_name,strage=strage)
     # cls.visualize_graph(trial_name="20241229BuildSimulator",strage="NASK",name="A",show=True)
     cls.plot_matplotlib()
+    # cls.plot_fps()
     # cls.draw_positions()
     # cls.draw_features()
     # cls.draw_weight()

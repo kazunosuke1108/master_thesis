@@ -165,7 +165,7 @@ class NotificationGenerator(Manager,GraphManager):
                         # 既に通知を飛ばしたことがあり，かつ今追い抜かれた患者も危険度が低下傾向にない場合，応援通知を飛ばす
                         help_text=self.get_help_sentence()
                         notification_mp3_path=self.data_dir_dict["trial_dir_path"]+f"/notification_{str(i).zfill(3)}_help.mp3"
-                        Notification().export_audio(text=help_text,mp3_path=notification_mp3_path,chime_type=2)
+                        # Notification().export_audio(text=help_text,mp3_path=notification_mp3_path,chime_type=2)
                         timestamp_list.append(self.df_rank.loc[i,"timestamp"]-self.df_rank.loc[0,"timestamp"])
                         sentence_list.append(help_text)
                         increase_ratio_list.append(increase_ratio)
@@ -181,7 +181,7 @@ class NotificationGenerator(Manager,GraphManager):
                     alert_text=self.get_alert_sentence(most_risky_patient=most_risky_patient,dynamic_factor_node=dynamic_factor_node,static_factor_node=static_factor_node)
 
                     notification_mp3_path=self.data_dir_dict["trial_dir_path"]+f"/notification_{str(i).zfill(3)}.mp3"
-                    Notification().export_audio(text=alert_text,mp3_path=notification_mp3_path,chime_type=1)
+                    # Notification().export_audio(text=alert_text,mp3_path=notification_mp3_path,chime_type=1)
                     
                     print("ranking changed")
                     print(self.df_rank.loc[i,"timestamp"])
@@ -199,14 +199,11 @@ class NotificationGenerator(Manager,GraphManager):
         notification_history["decrease_ratio"]=decrease_ratio_list
 
         print(notification_history)
-
-
-            
         pass
 
 if __name__=="__main__":
-    trial_name="20250111NotificationGenerator"
-    result_trial_name="20250108SimulationThrottlingTrue"
+    trial_name="20250113NotificationGenerator"
+    result_trial_name="20250113NormalSimulation"
     # trial_name="20250110NotificationGeneratorExp"
     # result_trial_name="20250108DevMewThrottlingExp"
     strage="NASK"

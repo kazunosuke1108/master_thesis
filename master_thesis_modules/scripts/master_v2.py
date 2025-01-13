@@ -726,7 +726,7 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
         pass
 
 if __name__=="__main__":
-    trial_name="20250110ChangeSurroundingObjects"
+    trial_name="20250113NormalSimulation"
     strage="NASK"
     runtype="simulation"
     cls=Master(trial_name,strage,runtype=runtype)
