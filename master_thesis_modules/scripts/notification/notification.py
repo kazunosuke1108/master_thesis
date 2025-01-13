@@ -22,13 +22,13 @@ class Notification(Manager):
     def __init__(self,trial_name="20250000Audio",strage="NASK"):
         # 音声合成APIのエンドポイント
         self.base_url = "http://127.0.0.1:50021"
-        self.speaker_id = 0
+        self.speaker_id = 23
         self.trial_name=trial_name
         self.strage=strage
         self.data_dir_dict=self.get_database_dir(trial_name=self.trial_name,strage=self.strage)
         pass
 
-    def generate_audio(self,text,mp3_path):
+    def generate_audio(self,text,mp3_path,speed=1.25):
         query_endpoint = f"{self.base_url}/audio_query?speaker={self.speaker_id}"
         response = requests.post(query_endpoint, params={"text": text})
         if response.status_code != 200:
@@ -37,7 +37,7 @@ class Notification(Manager):
 
         # speedScaleの値を変更
         query_json = response.json()
-        query_json["speedScale"] = 1.25
+        query_json["speedScale"] = speed
 
         # 変更後のクエリデータを再保存
         with open("query.json", "w", encoding="utf-8") as f:
@@ -59,7 +59,11 @@ class Notification(Manager):
 
     def export_with_chime(self,mp3_path,chime_type=1):
         chime_mp3_path=self.data_dir_dict["common_dir_path"]+f"/alert{chime_type}.mp3"
-        combined_audio = AudioSegment.from_file(chime_mp3_path)+AudioSegment.from_file(mp3_path)
+        if chime_type==0:
+            combined_audio=AudioSegment.from_file(mp3_path)
+        else:
+            combined_audio = AudioSegment.from_file(chime_mp3_path)+AudioSegment.from_file(mp3_path)
+
         combined_audio.export(mp3_path, format="mp3")
 
         pass
@@ -67,18 +71,14 @@ class Notification(Manager):
     def save_audio(self,audio_data):
         pass
 
-    def export_audio(self,text,mp3_path,chime_type=1,):
-        mp3_path=self.generate_audio(text=text,mp3_path=mp3_path)
+    def export_audio(self,text,mp3_path,chime_type=1,speed=1.25):
+        mp3_path=self.generate_audio(text=text,mp3_path=mp3_path,speed=speed)
         self.export_with_chime(mp3_path=mp3_path,chime_type=chime_type)
 
-    def main_dev(self,text):
+    def main_dev(self):
         # メッセージの生成
-        text="患者さんが立ち上がりました。近くに車椅子があります。"
-        mp3_path=self.generate_audio(text=text,mp3_path=self.data_dir_dict["trial_dir_path"]+"/notification.mp3")
-        self.export_with_chime(mp3_path,chime_type=1)
-        text="デイルームで見守りのお手伝いをお願いします。"
-        mp3_path=self.generate_audio(text=text)
-        self.export_with_chime(mp3_path,chime_type=2)
+        text="今日も、新幹線をご利用くださいまして、ありがとうございます。この電車は、のぞみ号　新大阪行です。途中の停車駅は、品川、新横浜、名古屋、京都です。"
+        self.export_audio(text=text,mp3_path="test.mp3",speed=1)
 
 
         pass

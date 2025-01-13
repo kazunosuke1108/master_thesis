@@ -157,15 +157,15 @@ class NotificationGenerator(Manager,GraphManager):
                 data_dict_roi={k:v.loc[i-w_roi:i+w_roi,:] for k,v in self.data_dicts.items()}
 
                 # 追い抜いた側が上昇したことによる入れ替わりか，追い抜かれた側が下降したことによる入れ替わりか，判別
-                increase_ratio=data_of_risky_patient.corr().loc["timestamp","10000000"]
+                increase_ratio=data_of_risky_patient.loc[:,["timestamp","10000000"]].corr().loc["timestamp","10000000"]
                 if increase_ratio>self.increase_ratio_min:
                     # 追い抜かれた側（通知済み）の危険度が低下していない場合，応援が必要と判断
-                    decrease_ratio=data_of_previous_risky_patient.corr().loc["timestamp","10000000"]
+                    decrease_ratio=data_of_previous_risky_patient.loc[:,["timestamp","10000000"]].corr().loc["timestamp","10000000"]
                     if (len(timestamp_list)>0) & (decrease_ratio>self.decrease_ratio_max):
                         # 既に通知を飛ばしたことがあり，かつ今追い抜かれた患者も危険度が低下傾向にない場合，応援通知を飛ばす
                         help_text=self.get_help_sentence()
                         notification_mp3_path=self.data_dir_dict["trial_dir_path"]+f"/notification_{str(i).zfill(3)}_help.mp3"
-                        # Notification().export_audio(text=help_text,mp3_path=notification_mp3_path,chime_type=2)
+                        Notification().export_audio(text=help_text,mp3_path=notification_mp3_path,chime_type=2)
                         timestamp_list.append(self.df_rank.loc[i,"timestamp"]-self.df_rank.loc[0,"timestamp"])
                         sentence_list.append(help_text)
                         increase_ratio_list.append(increase_ratio)
@@ -181,7 +181,7 @@ class NotificationGenerator(Manager,GraphManager):
                     alert_text=self.get_alert_sentence(most_risky_patient=most_risky_patient,dynamic_factor_node=dynamic_factor_node,static_factor_node=static_factor_node)
 
                     notification_mp3_path=self.data_dir_dict["trial_dir_path"]+f"/notification_{str(i).zfill(3)}.mp3"
-                    # Notification().export_audio(text=alert_text,mp3_path=notification_mp3_path,chime_type=1)
+                    Notification().export_audio(text=alert_text,mp3_path=notification_mp3_path,chime_type=1)
                     
                     print("ranking changed")
                     print(self.df_rank.loc[i,"timestamp"])
