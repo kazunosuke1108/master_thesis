@@ -1,6 +1,8 @@
 **/__pycache__/**
 *.pt
 *.mp4
+*.mp3
+*.wav
 *.avi
 *.gif
 *.png
