@@ -30,6 +30,7 @@ class Visualizer(Manager):
         trial_name=os.path.basename(trial_dir_path)
         print(trial_name)
         csv_paths=sorted(glob(trial_dir_path+"/data_*_eval.csv"))
+        patients=[os.path.basename(p)[len("data_"):-len("_eval.csv")] for p in csv_paths]
         self.score_dict[trial_name]={}
         for csv_path in csv_paths:
             # データの読み込み
@@ -45,27 +46,49 @@ class Visualizer(Manager):
             # 立ち上がりの部分
             start_timestamp=2 # 患者が立ち始める
             end_timestamp=5   # 看護師が動き始める
-            data=all_data[(all_data["timestamp"]>=start_timestamp) & (all_data["timestamp"]<=end_timestamp)]
-            score=data["10000000"].mean()
+            data_25=all_data[(all_data["timestamp"]>=start_timestamp) & (all_data["timestamp"]<=end_timestamp)]
+            score=data_25["10000000"].mean()
             self.score_dict[trial_name]["risk25_"+patient]=score
             # 看護師対応中の部分
             start_timestamp=7 # 看護師が到着
             end_timestamp=9   # 看護師の対応終了
-            data=all_data[(all_data["timestamp"]>=start_timestamp) & (all_data["timestamp"]<=end_timestamp)]
-            score=data["10000000"].mean()
+            data_79=all_data[(all_data["timestamp"]>=start_timestamp) & (all_data["timestamp"]<=end_timestamp)]
+            score=data_79["10000000"].mean()
             self.score_dict[trial_name]["risk79_"+patient]=score
+            # 外的・静的要因の記録
+            self.score_dict[trial_name]["30000010_"+patient]=all_data["30000010"].mean()
+            # 立上り検知時に見えているか
+            self.score_dict[trial_name]["40000111_"+patient]=data_25["40000111"].min()
+            
+
         try:
             # A,B,Cそれぞれの立ち上がり時のスコアを取得
-            values_25=[self.score_dict[trial_name][f"risk25_{p}"] for p in ["A","B","C"]]
-            values_79=[self.score_dict[trial_name][f"risk79_{p}"] for p in ["A","B","C"]]
+            values_25=[self.score_dict[trial_name][f"risk25_{p}"] for p in patients]
+            values_79=[self.score_dict[trial_name][f"risk79_{p}"] for p in patients]
         except KeyError:
             print(self.score_dict)
             raise KeyError("患者の名前が見つからない")
         # A,B,Cの中で最もスコアが高い人物を記録
-        self.score_dict[trial_name]["risk25_max"]=["A","B","C"][np.argmax(values_25)]
-        self.score_dict[trial_name]["risk79_max"]=["A","B","C"][np.argmax(values_79)]
+        self.score_dict[trial_name]["risk25_max"]=patients[np.argmax(values_25)]
+        self.score_dict[trial_name]["risk79_max"]=patients[np.argmax(values_79)]
         # self.write_csvlog([trial_name,])
-        pass
+
+        # risk25で誰がmaxであるべきなのか，追記する
+        # 外的・静的要因からみた，最重症者の発見（点滴＋車椅子）
+        most_serious_patient=patients[np.argmax([self.score_dict[trial_name][f"30000010_{p}"] for p in patients])]
+        print("most_serious_patient:",most_serious_patient)
+        # 最重症者が今回のシナリオを通じて，視野外になるのかどうかを確認
+        visibility_of_most_serious_patient=self.score_dict[trial_name]["40000111_"+most_serious_patient]
+        visible_binary=visibility_of_most_serious_patient<=(1-(np.cos(np.deg2rad(100))/2+0.5))
+        print("visibility_of_most_serious_patient:",visibility_of_most_serious_patient)
+        print("visible_binary:",visible_binary)
+        # 視野外になるなら，その人が最上位であるべきだし，そうでないなら立ち上がった患者を通知するべき
+        if visible_binary:
+            # 見えているなら
+            self.score_dict[trial_name]["risk25_truth"]=self.score_dict[trial_name]["risk25_max"]
+        else:
+            # 見えていないなら
+            self.score_dict[trial_name]["risk25_truth"]=most_serious_patient
 
     def main(self):
         nprocess=cpu_count()
@@ -232,9 +255,9 @@ class Visualizer(Manager):
         pass
 
 if __name__=="__main__":
-    simulation_name="20250113SimulationPositionA"
+    simulation_name="20250113SimulationPositionB"
     strage="NASK"
     cls=Visualizer(simulation_name=simulation_name,strage=strage)
-    # cls.main()
+    cls.main()
     # cls.check_json()
-    cls.draw_timeseries_with_categorization()
+    # cls.draw_timeseries_with_categorization()
