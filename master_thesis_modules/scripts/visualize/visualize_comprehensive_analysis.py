@@ -59,6 +59,8 @@ class Visualizer(Manager):
             self.score_dict[trial_name]["30000010_"+patient]=all_data["30000010"].mean()
             # 立上り検知時に見えているか
             self.score_dict[trial_name]["40000111_"+patient]=data_25["40000111"].min()
+            # 立ち上がりのリスク
+            self.score_dict[trial_name]["40000010_"+patient]=data_25["40000010"].max()
             
 
         try:
@@ -74,9 +76,11 @@ class Visualizer(Manager):
         # self.write_csvlog([trial_name,])
 
         # risk25で誰がmaxであるべきなのか，追記する
+        # 立ち上がっている人物
+        standing_patient=patients[np.argmax([self.score_dict[trial_name][f"40000010_{p}"] for p in patients])]
         # 外的・静的要因からみた，最重症者の発見（点滴＋車椅子）
         most_serious_patient=patients[np.argmax([self.score_dict[trial_name][f"30000010_{p}"] for p in patients])]
-        print("most_serious_patient:",most_serious_patient)
+        # print("most_serious_patient:",most_serious_patient)
         # 最重症者が今回のシナリオを通じて，視野外になるのかどうかを確認
         visibility_of_most_serious_patient=self.score_dict[trial_name]["40000111_"+most_serious_patient]
 
@@ -88,10 +92,10 @@ class Visualizer(Manager):
         self.score_dict[trial_name]["risk25_hidden"]=most_hidden_patient
         # 視野外になるなら，その人が最上位であるべきだし，そうでないなら立ち上がった患者を通知するべき
         if visible_binary:
-            # 見えているなら
-            self.score_dict[trial_name]["risk25_truth"]=self.score_dict[trial_name]["risk25_max"]
+            # 見えているなら立った人
+            self.score_dict[trial_name]["risk25_truth"]=standing_patient
         else:
-            # 見えていないなら
+            # 見えていないなら最重症の人
             self.score_dict[trial_name]["risk25_truth"]=most_serious_patient
 
     def main(self):
@@ -110,6 +114,19 @@ class Visualizer(Manager):
             #         p.join()
             #     p_list=[]
         self.write_json(self.score_dict,json_path=self.simulation_common_dir_path+"/standing.json")
+    
+    def check_json_v2(self):
+        data=self.load_json(self.simulation_common_dir_path+"/standing.json")
+        # self.count_dict={
+        #     "risk25_max":{"A":0,"B":0,"C":0,},
+        #     "risk79_max":{"A":0,"B":0,"C":0,},
+        # }
+        count_df=pd.DataFrame(data=np.zeros((3,3)),index=["truth_A","truth_B","truth_C"],columns=["ans_A","ans_B","ans_C"])
+        for trial_name, d in data.items():
+            print(trial_name)
+            count_df.loc[f"truth_{d['risk25_truth']}",f"ans_{d['risk25_max']}"]+=1
+        print(count_df)
+        pass
     
     def check_json(self):
         data=self.load_json(self.simulation_common_dir_path+"/standing.json")
@@ -259,9 +276,10 @@ class Visualizer(Manager):
         pass
 
 if __name__=="__main__":
-    simulation_name="20250113SimulationPositionB"
+    simulation_name="20250113SimulationPositionA"
     strage="NASK"
     cls=Visualizer(simulation_name=simulation_name,strage=strage)
     cls.main()
     # cls.check_json()
+    cls.check_json_v2()
     # cls.draw_timeseries_with_categorization()
