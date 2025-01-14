@@ -79,9 +79,13 @@ class Visualizer(Manager):
         print("most_serious_patient:",most_serious_patient)
         # 最重症者が今回のシナリオを通じて，視野外になるのかどうかを確認
         visibility_of_most_serious_patient=self.score_dict[trial_name]["40000111_"+most_serious_patient]
+
         visible_binary=visibility_of_most_serious_patient<=(1-(np.cos(np.deg2rad(100))/2+0.5))
         print("visibility_of_most_serious_patient:",visibility_of_most_serious_patient)
         print("visible_binary:",visible_binary)
+        # 一番視認性が悪い人の発見
+        most_hidden_patient=patients[np.argmax([self.score_dict[trial_name][f"40000111_{p}"] for p in patients])]
+        self.score_dict[trial_name]["risk25_hidden"]=most_hidden_patient
         # 視野外になるなら，その人が最上位であるべきだし，そうでないなら立ち上がった患者を通知するべき
         if visible_binary:
             # 見えているなら
