@@ -699,7 +699,10 @@ class Visualizer(Manager):
                     plt.plot(data_dict[id_name]["timestamp"],data_dict[id_name][export_label].rolling(w).mean(),"-o",label=id_name)
                     plt.title(export_label+f" window: {w}")
                 except pd.errors.DataError:
-                    plt.plot(data_dict[id_name]["timestamp"],data_dict[id_name][export_label],"-o",label=id_name)
+                    try:
+                        plt.plot(data_dict[id_name]["timestamp"],data_dict[id_name][export_label],"-o",label=id_name)
+                    except TypeError:
+                        pass
                     plt.title(export_label)
             plt.legend()
             plt.grid()
@@ -765,7 +768,7 @@ class Visualizer(Manager):
 if __name__=="__main__":
     # trial_name="20250113NormalSimulation"
     # trial_name="20250110SimulationMultipleRisks/no_00005"
-    trial_name="20250108DevMewThrottlingExp"
+    trial_name="20250115PullWheelchairObaachan2"
     strage="NASK"
     cls=Visualizer(trial_name=trial_name,strage=strage)
     # cls.visualize_graph(trial_name="20241229BuildSimulator",strage="NASK",name="A",show=True)

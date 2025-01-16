@@ -202,8 +202,8 @@ class NotificationGenerator(Manager,GraphManager):
         pass
 
 if __name__=="__main__":
-    trial_name="20250113NotificationGenerator"
-    result_trial_name="20250113NormalSimulation"
+    trial_name="20250115NotificationGenerator"
+    result_trial_name="20250115PullWheelchairObaachan"
     # result_trial_name="20250110SimulationMultipleRisks/no_00005"
     # trial_name="20250110NotificationGeneratorExp"
     # result_trial_name="20250108DevMewThrottlingExp"

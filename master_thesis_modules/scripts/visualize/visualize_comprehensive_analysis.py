@@ -116,16 +116,20 @@ class Visualizer(Manager):
         self.write_json(self.score_dict,json_path=self.simulation_common_dir_path+"/standing.json")
     
     def check_json_v2(self):
-        data=self.load_json(self.simulation_common_dir_path+"/standing.json")
-        # self.count_dict={
-        #     "risk25_max":{"A":0,"B":0,"C":0,},
-        #     "risk79_max":{"A":0,"B":0,"C":0,},
-        # }
         count_df=pd.DataFrame(data=np.zeros((3,3)),index=["truth_A","truth_B","truth_C"],columns=["ans_A","ans_B","ans_C"])
+        count_df_2=pd.DataFrame(data=np.zeros((3,3)),index=["truth_A","truth_B","truth_C"],columns=["ans_A","ans_B","ans_C"])
+        # count_df_2=pd.DataFrame(data=np.zeros((3,3)),index=["hidden_A","hidden_B","hidden_C"],columns=["ans_A","ans_B","ans_C"])
+        data=self.load_json(self.simulation_common_dir_path+"/standing.json")
         for trial_name, d in data.items():
             print(trial_name)
-            count_df.loc[f"truth_{d['risk25_truth']}",f"ans_{d['risk25_max']}"]+=1
+            pprint(d)
+            # raise NotImplementedError
+            if d["40000111_A"]<0.25:
+                count_df.loc[f"truth_{d['risk25_truth']}",f"ans_{d['risk25_max']}"]+=1
+            elif d["40000111_A"]>0.75:
+                count_df_2.loc[f"truth_{d['risk25_truth']}",f"ans_{d['risk25_max']}"]+=1
         print(count_df)
+        print(count_df_2)
         pass
     
     def check_json(self):
@@ -279,7 +283,7 @@ if __name__=="__main__":
     simulation_name="20250113SimulationPositionA"
     strage="NASK"
     cls=Visualizer(simulation_name=simulation_name,strage=strage)
-    cls.main()
+    # cls.main()
     # cls.check_json()
     cls.check_json_v2()
     # cls.draw_timeseries_with_categorization()
