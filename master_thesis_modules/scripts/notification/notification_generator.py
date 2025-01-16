@@ -94,7 +94,8 @@ class NotificationGenerator(Manager,GraphManager):
         for patient in data_dicts.keys():
             for node_code in focus_keys:
                 if node_code in ["40000000","40000001"]:
-                    average_df.loc[node_code,patient]=np.mean([eval(v)[1] for v in data_dicts[patient][node_code].values])
+                    average_df.loc[node_code,patient]=np.mean([eval(v)[1] if not type(v)==float else np.nan for v in data_dicts[patient][node_code].values])
+
                 else:
                     average_df.loc[node_code,patient]=data_dicts[patient][node_code].mean()
         average_df["risky"]=average_df.idxmax(axis=1)
@@ -147,14 +148,15 @@ class NotificationGenerator(Manager,GraphManager):
             if i==0:
                 most_risky_patient=self.df_rank.loc[i,0]
                 continue
+            # 順位の入れ替えが発生した場合の通知
             if self.df_rank.loc[i,0]!=most_risky_patient:
                 previous_risky_patient=most_risky_patient
                 most_risky_patient=self.df_rank.loc[i,0]
                 # 当該時刻における，危険度が上昇した患者のデータを準備
                 w_roi=20
-                data_of_risky_patient=self.data_dicts[most_risky_patient].loc[i-w_roi:i+w_roi,:]
-                data_of_previous_risky_patient=self.data_dicts[previous_risky_patient].loc[i-w_roi:i+w_roi,:]
-                data_dict_roi={k:v.loc[i-w_roi:i+w_roi,:] for k,v in self.data_dicts.items()}
+                data_of_risky_patient=self.data_dicts[most_risky_patient].loc[i-w_roi:i,:]
+                data_of_previous_risky_patient=self.data_dicts[previous_risky_patient].loc[i-w_roi:i,:]
+                data_dict_roi={k:v.loc[i-w_roi:i,:] for k,v in self.data_dicts.items()}
 
                 # 追い抜いた側が上昇したことによる入れ替わりか，追い抜かれた側が下降したことによる入れ替わりか，判別
                 increase_ratio=data_of_risky_patient.loc[:,["timestamp","10000000"]].corr().loc["timestamp","10000000"]
@@ -193,6 +195,20 @@ class NotificationGenerator(Manager,GraphManager):
                     decrease_ratio_list.append(decrease_ratio)
                     timestamp_list.append(self.df_rank.loc[i,"timestamp"]-self.df_rank.loc[0,"timestamp"])
                     sentence_list.append(alert_text)
+            else:
+                # 最優先患者の状態変化をトリガーとした通知 
+                # 動的リスクの増加傾向を相関係数で見る
+                w=40
+                corr_30000001=self.data_dicts[most_risky_patient].loc[i-w:i,["timestamp","30000001"]].corr().loc["timestamp","30000001"]
+                corr_30000011=self.data_dicts[most_risky_patient].loc[i-w:i,["timestamp","30000011"]].corr().loc["timestamp","30000011"]
+                print(corr_30000001,corr_30000011)
+                if corr_30000001>0.95:
+                    print(most_risky_patient,i)
+                    print(self.data_dicts[most_risky_patient].loc[i,:])
+                    #  順位入れ替え時と同じ仕組みで通知を行うことを検討
+                    # raise NotImplementedError
+                pass
+        
         notification_history["timestamp"]=timestamp_list
         notification_history["sentence"]=sentence_list
         notification_history["increase_ratio"]=increase_ratio_list
@@ -203,10 +219,11 @@ class NotificationGenerator(Manager,GraphManager):
 
 if __name__=="__main__":
     trial_name="20250115NotificationGenerator"
-    result_trial_name="20250115PullWheelchairObaachan"
+    # result_trial_name="20250115PullWheelchairObaachan2"
     # result_trial_name="20250110SimulationMultipleRisks/no_00005"
     # trial_name="20250110NotificationGeneratorExp"
     # result_trial_name="20250108DevMewThrottlingExp"
+    result_trial_name="20250113NormalSimulation"
     strage="NASK"
 
     cls=NotificationGenerator(trial_name=trial_name,strage=strage,result_trial_name=result_trial_name)
