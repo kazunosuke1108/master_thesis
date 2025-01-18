@@ -75,7 +75,7 @@ class PreprocessMaster(Manager,blipTools):
         self.risky_motion_dict={
             40000010:np.array([1,         0,      0,      1]),
             40000011:np.array([0,         0.5,    0.5,      0.5]),
-            40000012:np.array([0,         0.5,      0.5,      0.5]),
+            40000012:np.array([0,         0,      0.5,      0.5]),
             40000013:np.array([0,         1,      np.nan, np.nan]),
             40000014:np.array([np.nan,    0,      1,      np.nan]),
             40000015:np.array([np.nan,    0.5,      0.5,      np.nan]),
