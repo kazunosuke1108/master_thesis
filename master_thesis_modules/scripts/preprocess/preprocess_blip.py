@@ -30,8 +30,8 @@ class PreprocessMaster(Manager,blipTools):
 
 
         # Annotation csvの読み込み
-        self.annotation_dir_path=self.data_dir_dict["mobilesensing_dir_path"]+"/Nagasaki20241205193158"
-        annotation_csv_path=self.annotation_dir_path+"/csv/annotation/Nagasaki20241205193158_annotation_ytpc2024j_20241205_193158_fixposition.csv"
+        self.annotation_dir_path=self.data_dir_dict["mobilesensing_dir_path"]+"/PullWheelchairObaachan"
+        annotation_csv_path=self.annotation_dir_path+"/csv/annotation/PullWheelchairObaachan_annotation_ytnpc2021h_20240827_192540New_fullimagePath.csv"
         self.annotation_data=pd.read_csv(annotation_csv_path,header=0)
         ic(self.annotation_data)
 
@@ -84,8 +84,12 @@ class PreprocessMaster(Manager,blipTools):
         for i,row in self.annotation_data.iterrows():
             print("now processing...",i,"/",len(self.annotation_data))
             # 高画質jpgのpath取得
-            rgb_image_path=self.data_dir_dict["mobilesensing_dir_path"]+"/"+self.annotation_data.loc[i,"fullrgb_imagePath"]
-            rgb_img=cv2.imread(rgb_image_path)
+            # rgb_image_path=self.data_dir_dict["mobilesensing_dir_path"]+"/"+self.annotation_data.loc[i,"fullrgb_imagePath"]
+            rgb_image_path=self.annotation_data.loc[i,"fullrgb_imagePath"]
+            try:
+                rgb_img=cv2.imread(rgb_image_path)
+            except Exception:
+                continue
             for id_name in id_names:
                 # bounding boxの切り出し
                 t,b,l,r=row[id_name+"_bbox_lowerY"],row[id_name+"_bbox_higherY"],row[id_name+"_bbox_lowerX"],row[id_name+"_bbox_higherX"],
@@ -160,7 +164,7 @@ class PreprocessMaster(Manager,blipTools):
         pass
 
 if __name__=="__main__":
-    trial_name="20250107BlipRenewal"
+    trial_name="20250115PullWheelchairObaachan"
     strage="NASK"
     cls=PreprocessMaster(trial_name=trial_name,strage=strage)
     cls.main()

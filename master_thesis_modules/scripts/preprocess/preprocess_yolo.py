@@ -41,8 +41,8 @@ class PreprocessMaster(Manager,blipTools):
         self.model=YOLO("yolo11x-pose.pt")
 
         # Annotation csvの読み込み
-        self.annotation_dir_path=self.data_dir_dict["mobilesensing_dir_path"]+"/Nagasaki20241205193158"
-        annotation_csv_path=self.annotation_dir_path+"/csv/annotation/Nagasaki20241205193158_annotation_ytpc2024j_20241205_193158_fullimagePath.csv"
+        self.annotation_dir_path=self.data_dir_dict["mobilesensing_dir_path"]+"/PullWheelchairObaachan"
+        annotation_csv_path=self.annotation_dir_path+"/csv/annotation/PullWheelchairObaachan_annotation_ytnpc2021h_20240827_192540New_fixposition.csv"
         self.annotation_data=pd.read_csv(annotation_csv_path,header=0)
         ic(self.annotation_data)
 
@@ -191,11 +191,14 @@ class PreprocessMaster(Manager,blipTools):
             self.occlusion_dict={id_name:{"bbox_t":np.nan,"bbox_b":np.nan,"bbox_l":np.nan,"bbox_r":np.nan} for id_name in id_names}
             print("now processing...",i,"/",len(self.annotation_data))
             # 高画質jpgのpath取得
-            rgb_image_path=self.data_dir_dict["mobilesensing_dir_path"]+"/"+self.annotation_data.loc[i,"fullrgb_imagePath"]
-            try:
-                diff_image_path=self.data_dir_dict["mobilesensing_dir_path"]+"/"+self.annotation_data.loc[i,"fulldiff_imagePath"]
-            except TypeError:
-                pass # nanだった場合、直前の背景差分画像を使用
+            rgb_image_path=self.annotation_data.loc[i,"fullrgb_imagePath"] # self.data_dir_dict["mobilesensing_dir_path"]+"/"+
+            # try:
+            diff_image_path=self.annotation_data.loc[i,"fulldiff_imagePath"] # self.data_dir_dict["mobilesensing_dir_path"]+"/"+
+            if type(diff_image_path)!=str:
+                continue
+            # except TypeError:
+            #     continue
+                # pass # nanだった場合、直前の背景差分画像を使用
             rgb_img=cv2.imread(rgb_image_path)
             diff_img=cv2.imread(diff_image_path)
 
@@ -215,11 +218,11 @@ class PreprocessMaster(Manager,blipTools):
                 # 背景差分値の取得
                 bbox_diff_img=diff_img[t:b,l:r]
                 self.feature_dict[id_name].loc[i,"70000000"]=bbox_diff_img.mean()/255
-                # if id_name=="ID_00000":
-                #     cv2.imshow("diff",bbox_diff_img)
-                #     cv2.waitKey(1)
-                #     print(bbox_diff_img.max()/255,bbox_diff_img.mean()/255)
-                # raise NotImplementedError
+                if id_name=="ID_00000":
+                    # cv2.imshow("diff",bbox_diff_img)
+                    cv2.imshow("rgb",extended_bbox_rgb_img)
+                    cv2.waitKey(1)
+                    print(bbox_diff_img.max()/255,bbox_diff_img.mean()/255)
 
                 # 姿勢推定
                 try:
@@ -277,7 +280,7 @@ class PreprocessMaster(Manager,blipTools):
         pass
 
 if __name__=="__main__":
-    trial_name="20250108SavePointYolo"
+    trial_name="20250115PullWheelchairObaachan2"
     strage="NASK"
     cls=PreprocessMaster(trial_name=trial_name,strage=strage)
     cls.main()

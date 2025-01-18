@@ -64,7 +64,7 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
             print("# 実験データをロード中 #")
             self.data_dicts={}
             for patient,raw_csv_path in zip(self.patients,self.raw_csv_paths):
-                self.data_dicts[patient]=pd.read_csv(raw_csv_path,header=0)
+                self.data_dicts[patient]=pd.read_csv(raw_csv_path,header=0)#.fillna(method="bfill")
                 renew_dict={}
                 for col in self.data_dicts[patient].keys():
                     try:
@@ -512,6 +512,8 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
                 return mu_yes()
             elif val=="no":
                 return mu_no()
+            elif np.isnan(val):
+                return np.nan
             else:
                 raise Exception(f"Unexpected value in 内的・静的・患者判別: {val}")
         def age(val):
@@ -521,6 +523,8 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
                 return mu_middle()
             elif val=="old":
                 return mu_old()
+            elif np.isnan(val):
+                return np.nan
             else:
                 raise Exception(f"Unexpected value in 内的・静的・年齢: {val}")
         for patient in self.data_dicts.keys():
@@ -600,6 +604,8 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
 
     def fuzzy_multiply(self):
         def judge_left_or_right(tri1,tri2):
+            if (type(tri1)==float) or (type(tri2)==float):
+                return [np.nan,np.nan,np.nan,],[np.nan,np.nan,np.nan,]
             if tri1[1]<tri2[1]:
                 return tri1,tri2
             else:
@@ -726,9 +732,9 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
         pass
 
 if __name__=="__main__":
-    trial_name="20250113NormalSimulation"
+    trial_name="20250115PullWheelchairObaachan2"
     strage="NASK"
-    runtype="simulation"
+    runtype="experiment"
     cls=Master(trial_name,strage,runtype=runtype)
     cls.main()
     cls.save_session()
