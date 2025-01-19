@@ -119,7 +119,8 @@ class getConsistencyMtx(Manager):
 if __name__=="__main__":
     cls=getConsistencyMtx()
     AHP_dict=cls.get_all_comparison_mtx_and_weight(trial_name="20241229BuildSimulator",strage="NASK")
-    print(AHP_dict[30000001]["CI"])
+    print(AHP_dict[30000010])
+    print(AHP_dict[30000010]["CI"])
 
     # A=cls.get_comparison_mtx(criteria=["a","b","c"])
     # eigvals,eigvecs,max_eigval,weights,CI=cls.evaluate_mtx(A)
