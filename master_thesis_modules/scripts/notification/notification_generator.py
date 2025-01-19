@@ -23,13 +23,33 @@ class NotificationGenerator(Manager,GraphManager):
         self.result_trial_name=result_trial_name
         self.data_dir_dict=self.get_database_dir(trial_name=self.trial_name,strage=self.strage)
 
-        self.w_average=20 # 平滑化のwindow
+        self.w_average=40 # 平滑化のwindow
         self.increase_ratio_min=0.8 # 危険順位が1位に躍り出た患者の，危険度の上昇具合
         self.decrease_ratio_max=0 # 危険順位が2位になった患者の，危険度の下降具合
-        self.notify_interval=2 # 2秒以内に前回の通知が発火していたら送信しない
-        self.increase_corr_threshold=0.95 #
-        self.high_risk_threshold=0.5 #
+        self.notify_interval_dict={"notice":2,"help":10}
+        # self.notify_interval=2 # 2秒以内に前回の通知が発火していたら送信しない
+        self.increase_corr_threshold=0.9 #
+        self.increase_corr_threshold_help=0.9 #
+        self.high_risk_threshold=0.4 #
         self.n_risky_patient_threshold=2
+
+        # node別通知基準
+        self.notify_threshold_by_dinamic_factor={
+            "40000000":0.3,
+            "40000001":0.4,
+            "40000010":0.2,
+            "40000011":0.3,
+            "40000012":0.4,
+            "40000013":0.6,
+            "40000014":0.6,
+            "40000015":0.5,
+            "40000016":0.5,
+            "40000100":0.6,
+            "40000101":0.6,
+            "40000102":0.6,
+            "40000110":0.5,
+            "40000111":0.5,
+        }
         
         # csvデータの読み込み
         csv_paths=sorted(glob(f"{self.data_dir_dict['database_dir_path']}/{self.result_trial_name}/data_*_eval.csv"))
@@ -69,8 +89,13 @@ class NotificationGenerator(Manager,GraphManager):
     
     def guess_dynamic_factor(self,data):
         # 当該時刻のデータ
-        data["40000000"]=[eval(v)[1] for v in data["40000000"].values]
-        data["40000001"]=[eval(v)[1] for v in data["40000001"].values]
+        print(data["40000000"])
+        try:
+            data["40000000"]=[eval(v)[1] for v in data["40000000"].values]
+            data["40000001"]=[eval(v)[1] for v in data["40000001"].values]
+        except SyntaxError:
+            data["40000000"]=data["40000000"]
+            data["40000001"]=data["40000001"]
         data.drop("timestamp",inplace=True,axis=1)
         data.drop([k for k in data.keys() if int(k)>=50000000],inplace=True,axis=1)
         data_corr=data.corr()["10000000"]
@@ -145,14 +170,13 @@ class NotificationGenerator(Manager,GraphManager):
         static_factor_node,_=self.guess_static_factor(data_dict_roi,most_risky_patient)
 
         alert_text=self.get_alert_sentence(most_risky_patient=most_risky_patient,dynamic_factor_node=dynamic_factor_node,static_factor_node=static_factor_node)
-        return alert_text
+        return alert_text,dynamic_factor_node,static_factor_node
     
-    def judge_time_interval(self,notify_history,row):
-        if len(notify_history)==0:
+    def judge_time_interval(self,notify_history,row,alert_type):
+        df=notify_history[notify_history["type"]==alert_type].reset_index()
+        if len(df)==0:
             return True
-        print(notify_history)
-        print(len(notify_history))
-        if row["timestamp"]-notify_history.loc[len(notify_history)-1,"timestamp"]>self.notify_interval:
+        if row["timestamp"]-df.loc[len(df)-1,"timestamp"]>self.notify_interval_dict[alert_type]:
             return True
         else:
             return False
@@ -173,7 +197,7 @@ class NotificationGenerator(Manager,GraphManager):
         for k,v in data_dict_roi.items():
             corr=data_dict_roi[k].loc[:,["timestamp","10000000"]].corr().loc["timestamp","10000000"]
             ave=data_dict_roi[k]["10000000"].mean()
-            if (ave>self.high_risk_threshold) & (corr>self.increase_corr_threshold):
+            if (ave>self.high_risk_threshold) & (corr>self.increase_corr_threshold_help):
                 high_risk_patients.append(k)
                 high_risk_average_list.append(ave)
                 high_risk_increase_ratio_list.append(corr)
@@ -189,7 +213,7 @@ class NotificationGenerator(Manager,GraphManager):
         # 変数の初期化
         most_risky_patient=""
         previous_risky_patient=""
-        notify_history=pd.DataFrame(columns=["timestamp","sentence",])
+        notify_history=pd.DataFrame(columns=["timestamp","sentence","type","10000000"])
         
         for i,row in self.df_rank.iterrows():
             if i==0:
@@ -211,7 +235,8 @@ class NotificationGenerator(Manager,GraphManager):
             need_notify=False
             need_help=False
             ## A 前回通知からの時間経過
-            tf_interval=self.judge_time_interval(notify_history,row)
+            tf_interval_notify=self.judge_time_interval(notify_history,row,"notice")
+            tf_interval_help=self.judge_time_interval(notify_history,row,"help")
 
             ## B 順位入れ替えの発生
             tf_rankChange=True if (most_risky_patient!=previous_risky_patient) else False
@@ -222,21 +247,29 @@ class NotificationGenerator(Manager,GraphManager):
             ## D 複数人総合での危険性上昇
             tf_multiPatient=self.judge_multi_patients(data_dict_roi)
 
-            if tf_interval and (tf_rankChange or tf_topIncrease):
-                need_notify=True
-            if tf_interval and tf_multiPatient:
+            ## E 本人の歴代リスクの中で最悪（値が最大値を更新）
+
+
+            if tf_interval_notify and (tf_rankChange or tf_topIncrease):
+                alert_text,dynamic_factor_node,static_factor_node=self.explain_risk(data_of_risky_patient,data_dict_roi,most_risky_patient)
+                # 発火はdynamic node次第
+                if self.notify_threshold_by_dinamic_factor[dynamic_factor_node]<=data_of_risky_patient["10000000"].values.mean():
+                    need_notify=True
+            if tf_interval_help and tf_multiPatient:
                 need_help=True
             
             if need_notify:
-                alert_text=self.explain_risk(data_of_risky_patient,data_dict_roi,most_risky_patient)
-                print(alert_text)
-                notify_history.loc[len(notify_history),:]=[self.df_rank.loc[i,"timestamp"],alert_text]
-
-            
+                if alert_text not in notify_history["sentence"].values:
+                    notify_history.loc[len(notify_history),:]=[self.df_rank.loc[i,"timestamp"],alert_text,"notice",data_of_risky_patient["10000000"].values.mean()]
             pass
+
+            if need_help:
+                alert_text=self.get_help_sentence()
+                notify_history.loc[len(notify_history),:]=[self.df_rank.loc[i,"timestamp"],alert_text,"help",np.nan]
 
         # 通知文生成
         # 記録
+        print(notify_history)
         pass
 
     def main(self):
@@ -325,11 +358,11 @@ class NotificationGenerator(Manager,GraphManager):
 
 if __name__=="__main__":
     trial_name="20250115NotificationGenerator"
-    # result_trial_name="20250115PullWheelchairObaachan2"
+    # result_trial_name="20250113NormalSimulation"
     # result_trial_name="20250110SimulationMultipleRisks/no_00005"
-    # trial_name="20250110NotificationGeneratorExp"
     # result_trial_name="20250108DevMewThrottlingExp"
-    result_trial_name="20250113NormalSimulation"
+    result_trial_name="20250115PullWheelchairObaachan2"
+    # trial_name="20250110NotificationGeneratorExp"
     strage="NASK"
 
     cls=NotificationGenerator(trial_name=trial_name,strage=strage,result_trial_name=result_trial_name)
