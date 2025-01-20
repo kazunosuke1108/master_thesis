@@ -84,7 +84,7 @@ class Visualizer(Manager):
         # 最重症者が今回のシナリオを通じて，視野外になるのかどうかを確認
         visibility_of_most_serious_patient=self.score_dict[trial_name]["40000111_"+most_serious_patient]
 
-        visible_binary=visibility_of_most_serious_patient<=(1-(np.cos(np.deg2rad(100))/2+0.5))
+        visible_binary=visibility_of_most_serious_patient<=(1-(np.cos(np.deg2rad(35))/2+0.5))
         print("visibility_of_most_serious_patient:",visibility_of_most_serious_patient)
         print("visible_binary:",visible_binary)
         # 一番視認性が悪い人の発見
@@ -116,21 +116,17 @@ class Visualizer(Manager):
         self.write_json(self.score_dict,json_path=self.simulation_common_dir_path+"/standing.json")
     
     def check_json_v2(self):
-        count_df=pd.DataFrame(data=np.zeros((3,3)),index=["truth_A","truth_B","truth_C"],columns=["ans_A","ans_B","ans_C"])
-        count_df_2=pd.DataFrame(data=np.zeros((3,3)),index=["truth_A","truth_B","truth_C"],columns=["ans_A","ans_B","ans_C"])
+        count_df_visible=pd.DataFrame(data=np.zeros((3,3)),index=["truth_A","truth_B","truth_C"],columns=["ans_A","ans_B","ans_C"])
+        count_df_invisible=pd.DataFrame(data=np.zeros((3,3)),index=["truth_A","truth_B","truth_C"],columns=["ans_A","ans_B","ans_C"])
         # count_df_2=pd.DataFrame(data=np.zeros((3,3)),index=["hidden_A","hidden_B","hidden_C"],columns=["ans_A","ans_B","ans_C"])
         data=self.load_json(self.simulation_common_dir_path+"/standing.json")
+        threshold=1-((np.cos(np.deg2rad(35))/2)+0.5)
         for trial_name, d in data.items():
-            print(trial_name)
-            pprint(d)
-            # raise NotImplementedError
-            if d["40000111_A"]<0.25:
-                count_df.loc[f"truth_{d['risk25_truth']}",f"ans_{d['risk25_max']}"]+=1
-            elif d["40000111_A"]>0.75:
-                count_df_2.loc[f"truth_{d['risk25_truth']}",f"ans_{d['risk25_max']}"]+=1
-        print(count_df)
-        print(count_df_2)
-        pass
+            if d["40000111_A"]<threshold:
+                count_df_visible.loc[f"truth_{d['risk25_truth']}",f"ans_{d['risk25_max']}"]+=1
+            elif d["40000111_A"]>threshold:
+                count_df_invisible.loc[f"truth_{d['risk25_truth']}",f"ans_{d['risk25_max']}"]+=1
+        return count_df_visible,count_df_invisible
     
     def check_json(self):
         data=self.load_json(self.simulation_common_dir_path+"/standing.json")
@@ -287,3 +283,27 @@ if __name__=="__main__":
     # cls.check_json()
     cls.check_json_v2()
     # cls.draw_timeseries_with_categorization()
+
+    # 見えている・見えていない別に3x3行列を作成
+    simulation_name="20250113SimulationPositionA"
+    cls=Visualizer(simulation_name=simulation_name,strage=strage)
+    cls.main()
+    count_df_visible,count_df_invisible=cls.check_json_v2()
+
+    
+    simulation_name="20250113SimulationPositionB"
+    cls=Visualizer(simulation_name=simulation_name,strage=strage)
+    cls.main()
+    temp_1,temp_2=cls.check_json_v2()
+    count_df_visible,count_df_invisible=count_df_visible+temp_1,count_df_invisible+temp_2
+    
+    simulation_name="20250113SimulationPositionC2"
+    cls=Visualizer(simulation_name=simulation_name,strage=strage)
+    cls.main()
+    temp_1,temp_2=cls.check_json_v2()
+    count_df_visible,count_df_invisible=count_df_visible+temp_1,count_df_invisible+temp_2
+
+    count_df_visible.to_csv("//192.168.1.5/common/FY2024/01_M2/05_hayashide/MasterThesis_database/common/position_analysis_count_df_visible.csv")
+    count_df_invisible.to_csv("//192.168.1.5/common/FY2024/01_M2/05_hayashide/MasterThesis_database/common/position_analysis_count_df_invisible.csv")
+    pprint(count_df_visible)
+    pprint(count_df_invisible)
