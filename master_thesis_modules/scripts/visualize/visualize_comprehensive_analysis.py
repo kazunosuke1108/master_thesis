@@ -58,7 +58,7 @@ class Visualizer(Manager):
             # 外的・静的要因の記録
             self.score_dict[trial_name]["30000010_"+patient]=all_data["30000010"].mean()
             # 立上り検知時に見えているか
-            self.score_dict[trial_name]["40000111_"+patient]=data_25["40000111"].min()
+            self.score_dict[trial_name]["40000111_"+patient]=data_25["40000111"].max()
             # 立ち上がりのリスク
             self.score_dict[trial_name]["40000010_"+patient]=data_25["40000010"].max()
             
@@ -85,8 +85,9 @@ class Visualizer(Manager):
         visibility_of_most_serious_patient=self.score_dict[trial_name]["40000111_"+most_serious_patient]
 
         visible_binary=visibility_of_most_serious_patient<=(1-(np.cos(np.deg2rad(35))/2+0.5))
-        print("visibility_of_most_serious_patient:",visibility_of_most_serious_patient)
-        print("visible_binary:",visible_binary)
+        # print("patient:",most_serious_patient)
+        # print("visibility_of_most_serious_patient:",visibility_of_most_serious_patient)
+        # print("visible_binary:",visible_binary)
         # 一番視認性が悪い人の発見
         most_hidden_patient=patients[np.argmax([self.score_dict[trial_name][f"40000111_{p}"] for p in patients])]
         self.score_dict[trial_name]["risk25_hidden"]=most_hidden_patient
@@ -303,7 +304,7 @@ if __name__=="__main__":
     temp_1,temp_2=cls.check_json_v2()
     count_df_visible,count_df_invisible=count_df_visible+temp_1,count_df_invisible+temp_2
 
-    count_df_visible.to_csv("//192.168.1.5/common/FY2024/01_M2/05_hayashide/MasterThesis_database/common/position_analysis_count_df_visible.csv")
-    count_df_invisible.to_csv("//192.168.1.5/common/FY2024/01_M2/05_hayashide/MasterThesis_database/common/position_analysis_count_df_invisible.csv")
+    count_df_visible.to_csv("/media/hayashide/MasterThesis/common/position_analysis_count_df_visible.csv")
+    count_df_invisible.to_csv("/media/hayashide/MasterThesis/common/position_analysis_count_df_invisible.csv")
     pprint(count_df_visible)
     pprint(count_df_invisible)
