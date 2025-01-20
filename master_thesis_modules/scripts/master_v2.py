@@ -49,6 +49,8 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
         elif self.runtype=="experiment":
             self.raw_csv_paths=sorted(glob(self.data_dir_dict["trial_dir_path"]+"/data_*_raw.csv"))
             self.patients=[os.path.basename(p)[len("data_"):-len("_raw.csv")] for p in self.raw_csv_paths]
+        elif self.runtype=="basic_check":
+            self.patients=["A"]
         
         print("# 人数分のgraph 定義 #")
         self.graph_dicts={}
@@ -73,6 +75,10 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
                     except Exception:
                         continue
                     self.data_dicts[patient].rename(columns=renew_dict,inplace=True)
+        elif self.runtype=="basic_check":
+            print("# basic checkのデータをロード中 #")
+            self.data_dicts=PseudoDataGenerator(trial_name=self.trial_name,strage=self.strage).get_basic_check_data(graph_dicts=default_graph,patients=self.patients)
+            # raise NotImplementedError
 
         # data_dictsに不足した列がないか確認
         for col in self.graph_dicts[patient]["node_dict"].keys():
@@ -604,8 +610,14 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
 
     def fuzzy_multiply(self):
         def judge_left_or_right(tri1,tri2):
+            # 型エラーの修正
             if (type(tri1)==float) or (type(tri2)==float):
                 return [np.nan,np.nan,np.nan,],[np.nan,np.nan,np.nan,]
+            if (type(tri1)==str):
+                tri1=eval(tri1)
+            if (type(tri2)==str):
+                tri2=eval(tri2)
+            
             if tri1[1]<tri2[1]:
                 return tri1,tri2
             else:
@@ -631,6 +643,8 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
         def weight_sum(row):
             features=np.nan_to_num(row[1].values)
             w_sum=self.AHP_dict[output_node_code]["weights"]@features
+            for i,k in enumerate(input_node_codes):
+                self.graph_dicts[patient]["weight_dict"][output_node_code][k]=self.AHP_dict[output_node_code]["weights"][i]
             return w_sum
         for patient in self.data_dicts.keys():
             self.data_dicts[patient][output_node_code]=list(map(weight_sum,self.data_dicts[patient][input_node_codes].iterrows()))
@@ -640,6 +654,8 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
         def weight_sum(row):
             features=np.nan_to_num(row[1].values)
             w_sum=np.array(weights)@features
+            for i,k in enumerate(input_node_codes):
+                self.graph_dicts[patient]["weight_dict"][output_node_code][k]=weights[i]
             return w_sum
         for patient in self.data_dicts.keys():
             self.data_dicts[patient][output_node_code]=list(map(weight_sum,self.data_dicts[patient][input_node_codes].iterrows()))
@@ -681,6 +697,12 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
             pass
     
     def save_session(self):
+        # 重み情報をnetworkxのGに追記していく
+        for patient in self.patients:
+            for node in self.graph_dicts[patient]["node_dict"].keys():
+                node_code_from=node
+                node_codes_to=self.graph_dicts[patient]["node_dict"][node_code_from]["node_code_to"]
+                self.graph_dicts[patient]["G"].add_edges_from([(node_code_from,node_code_to,{"weight":self.graph_dicts[patient]["weight_dict"][node_code_from][node_code_to]}) for node_code_to in node_codes_to])
         print("# graph保存 #")
         self.write_picklelog(self.graph_dicts,self.data_dir_dict["trial_dir_path"]+"/graph_dicts.pickle")
         self.write_picklelog(self.data_dicts,self.data_dir_dict["trial_dir_path"]+"/data_dicts.pickle")
@@ -732,9 +754,9 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
         pass
 
 if __name__=="__main__":
-    trial_name="20250115PullWheelchairObaachan2"
+    trial_name="20250120FPScontrolTrue"
     strage="NASK"
-    runtype="experiment"
+    runtype="simulation"
     cls=Master(trial_name,strage,runtype=runtype)
     cls.main()
     cls.save_session()

@@ -694,10 +694,10 @@ class Visualizer(Manager):
             print(export_label)
             for id_name in id_names:
                 # if int(export_label) in ["10000000","20000001"]:
-                w=40
+                w=1
                 try:
                     plt.plot(data_dict[id_name]["timestamp"],data_dict[id_name][export_label].rolling(w).mean(),"-o",label=id_name)
-                    plt.title(export_label+f" window: {w}")
+                    # plt.title(export_label+f" window: {w}")
                 except pd.errors.DataError:
                     try:
                         plt.plot(data_dict[id_name]["timestamp"],data_dict[id_name][export_label],"-o",label=id_name)
@@ -768,12 +768,13 @@ class Visualizer(Manager):
 if __name__=="__main__":
     # trial_name="20250113NormalSimulation"
     # trial_name="20250110SimulationMultipleRisks/no_00005"
-    trial_name="20250115PullWheelchairObaachan2"
+    # trial_name="20250115PullWheelchairObaachan2"
+    trial_name="20250120FPScontrolTrue"
     strage="NASK"
     cls=Visualizer(trial_name=trial_name,strage=strage)
     # cls.visualize_graph(trial_name="20241229BuildSimulator",strage="NASK",name="A",show=True)
-    cls.plot_matplotlib()
-    # cls.plot_fps()
+    # cls.plot_matplotlib()
+    cls.plot_fps()
     # cls.draw_positions()
     # cls.draw_features()
     # cls.draw_weight()
