@@ -10,6 +10,7 @@ else:
 from glob import glob
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
 
 from scripts.management.manager import Manager
 from scripts.network.graph_manager import GraphManager
@@ -269,8 +270,26 @@ class NotificationGenerator(Manager,GraphManager):
 
         # 通知文生成
         # 記録
-        print(notify_history)
-        pass
+        print(self.data_dir_dict["trial_dir_path"]+f"/{self.trial_name}_{self.result_trial_name}_notify_history.csv")
+        notify_history.to_csv(self.data_dir_dict["trial_dir_path"]+f"/{self.trial_name}_{self.result_trial_name.replace('/','_')}_notify_history.csv",index=False)
+        self.notify_history=notify_history
+
+    def plot_timeseries_with_notification_point(self):
+        for patient in self.id_names:
+            plt.plot(self.data_dicts[patient]["timestamp"],self.data_dicts[patient]["10000000"],"-o",label=patient)
+
+        for i,row in self.notify_history.iterrows():
+            if row["type"]=="notice":
+                color="red"
+            elif row["type"]=="help":
+                color="blue"
+            plt.plot([row["timestamp"],row["timestamp"]],[0.1,0.7],color=color,linewidth=4,label=row["type"])
+        plt.xlabel("Time [s]")
+        plt.ylabel("Risk value")
+        plt.legend()
+        plt.grid()
+        plt.savefig(self.data_dir_dict["trial_dir_path"]+f"/{self.trial_name}_{self.result_trial_name.replace('/','_')}_notify_history.png")
+        plt.show()
 
     def main(self):
         # ランキングの作成
@@ -357,13 +376,14 @@ class NotificationGenerator(Manager,GraphManager):
         pass
 
 if __name__=="__main__":
-    trial_name="20250115NotificationGenerator"
+    trial_name="20250121NotificationGeneratorExp"
     # result_trial_name="20250113NormalSimulation"
     # result_trial_name="20250110SimulationMultipleRisks/no_00005"
-    # result_trial_name="20250108DevMewThrottlingExp"
-    result_trial_name="20250115PullWheelchairObaachan2"
+    result_trial_name="20250108DevMewThrottlingExp"
+    # result_trial_name="20250115PullWheelchairObaachan2"
     # trial_name="20250110NotificationGeneratorExp"
     strage="NASK"
 
     cls=NotificationGenerator(trial_name=trial_name,strage=strage,result_trial_name=result_trial_name)
     cls.main_new()
+    cls.plot_timeseries_with_notification_point()

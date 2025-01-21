@@ -726,8 +726,9 @@ class Visualizer(Manager):
         data_dicts={}
         for id_name,csv_path in zip(id_names,csv_paths):
             data=pd.read_csv(csv_path,header=0)
+            data=data.fillna(method="bfill")
             data=data.fillna(method="ffill")
-            data=data.rolling(4).mean()
+            # data=data.rolling(4).mean()
             data_dicts[id_name]=data
         
         plot_nodes=["50000100","50001000","60010000"]
@@ -768,8 +769,9 @@ class Visualizer(Manager):
 if __name__=="__main__":
     # trial_name="20250113NormalSimulation"
     # trial_name="20250110SimulationMultipleRisks/no_00005"
+    # trial_name="20250120FPScontrolTrue"
+    trial_name="20250108DevMewThrottlingExp"
     # trial_name="20250115PullWheelchairObaachan2"
-    trial_name="20250120FPScontrolTrue"
     strage="NASK"
     cls=Visualizer(trial_name=trial_name,strage=strage)
     # cls.visualize_graph(trial_name="20241229BuildSimulator",strage="NASK",name="A",show=True)
