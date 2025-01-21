@@ -770,8 +770,9 @@ if __name__=="__main__":
     # trial_name="20250113NormalSimulation"
     # trial_name="20250110SimulationMultipleRisks/no_00005"
     # trial_name="20250120FPScontrolTrue"
-    trial_name="20250108DevMewThrottlingExp"
-    # trial_name="20250115PullWheelchairObaachan2"
+    # trial_name="20250108DevMewThrottlingExp"
+    trial_name="20250115PullWheelchairObaachan2"
+    # trial_name="20250121ChangeCriteriaBefore"
     strage="NASK"
     cls=Visualizer(trial_name=trial_name,strage=strage)
     # cls.visualize_graph(trial_name="20241229BuildSimulator",strage="NASK",name="A",show=True)

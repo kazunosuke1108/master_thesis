@@ -41,6 +41,7 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
         self.bg_differencing_thre=0.5
         self.fps_BLIP=10 #[Hz]
         self.fps_YOLO=50 #[Hz]
+        self.AHP_array_type=2
 
         if self.runtype=="simulation":
             self.patients=["A","B","C"]
@@ -122,7 +123,7 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
         }
 
         # AHP 一対比較行列の作成
-        self.AHP_dict=getConsistencyMtx().get_all_comparison_mtx_and_weight(trial_name=self.trial_name,strage=self.strage)
+        self.AHP_dict=getConsistencyMtx().get_all_comparison_mtx_and_weight(trial_name=self.trial_name,strage=self.strage,array_type=self.AHP_array_type)
 
 
     def pseudo_throttling(self,data_dicts):
@@ -754,9 +755,9 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
         pass
 
 if __name__=="__main__":
-    trial_name="20250120FPScontrolTrue"
+    trial_name="20250121ChangeCriteriaAfter"
     strage="NASK"
-    runtype="simulation"
+    runtype="experiment"
     cls=Master(trial_name,strage,runtype=runtype)
     cls.main()
     cls.save_session()

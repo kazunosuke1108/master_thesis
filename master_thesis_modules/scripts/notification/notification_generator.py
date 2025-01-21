@@ -376,12 +376,13 @@ class NotificationGenerator(Manager,GraphManager):
         pass
 
 if __name__=="__main__":
-    trial_name="20250121NotificationGeneratorExp"
+    trial_name="20250121PullWheelchairObaachan2Notification"
     # result_trial_name="20250113NormalSimulation"
     # result_trial_name="20250110SimulationMultipleRisks/no_00005"
-    result_trial_name="20250108DevMewThrottlingExp"
-    # result_trial_name="20250115PullWheelchairObaachan2"
+    # result_trial_name="20250108DevMewThrottlingExp"
+    result_trial_name="20250115PullWheelchairObaachan2"
     # trial_name="20250110NotificationGeneratorExp"
+    # result_trial_name="20250121ChangeCriteriaBefore"
     strage="NASK"
 
     cls=NotificationGenerator(trial_name=trial_name,strage=strage,result_trial_name=result_trial_name)
