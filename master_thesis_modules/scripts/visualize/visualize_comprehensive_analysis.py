@@ -18,6 +18,7 @@ from multiprocessing import cpu_count,Process
 
 class Visualizer(Manager):
     def __init__(self,simulation_name,strage):
+        super().__init__()
         self.simulation_name=simulation_name
         self.simulation_dir_path=self.get_database_dir(self.simulation_name,strage="NASK")["trial_dir_path"]
         self.simulation_common_dir_path=self.simulation_dir_path+"/common"
@@ -199,7 +200,7 @@ class Visualizer(Manager):
         plt.xlabel("Time [s]")
         plt.ylabel("Risk value")
         plt.legend()
-        plt.gray()
+        plt.grid()
         plt.savefig(self.simulation_common_dir_path+"/risk25_3000_visible.png")
         plt.close()
 
@@ -214,7 +215,7 @@ class Visualizer(Manager):
         plt.xlabel("Time [s]")
         plt.ylabel("Risk value")
         plt.legend()
-        plt.gray()
+        plt.grid()
         plt.savefig(self.simulation_common_dir_path+"/risk25_3000_invisible.png")
         plt.close()
 
@@ -225,7 +226,7 @@ class Visualizer(Manager):
         plt.xlabel("Time [s]")
         plt.ylabel("Risk value")
         plt.legend()
-        plt.gray()
+        plt.grid()
         plt.savefig(self.simulation_common_dir_path+"/risk25_1000.png")
         plt.close()
 
