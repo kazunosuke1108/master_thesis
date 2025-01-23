@@ -77,14 +77,23 @@ class Notification(Manager):
 
     def main_dev(self):
         # メッセージの生成
-        text="今日も、新幹線をご利用くださいまして、ありがとうございます。この電車は、のぞみ号　新大阪行です。途中の停車駅は、品川、新横浜、名古屋、京都です。"
-        self.export_audio(text=text,mp3_path="test.mp3",speed=1)
+        # text="Aさんが，車椅子に乗っていて，ブレーキを解除しているので，危険です"
+        # self.export_audio(text=text,mp3_path="/media/hayashide/MasterThesis/20250121VoiceDemo"+"/unbrake.mp3",chime_type=1,speed=1.25)
+        # text="Cさんが，見守られていないので，危険です"
+        # self.export_audio(text=text,mp3_path="/media/hayashide/MasterThesis/20250121VoiceDemo"+"/outofsight.mp3",chime_type=1,speed=1.25)
+        # text="Aさんが，手すりから離れているのに，立ち上がろうとしているので，危険です"
+        # self.export_audio(text=text,mp3_path="/media/hayashide/MasterThesis/20250121VoiceDemo"+"/standup.mp3",chime_type=1,speed=1.25)
+        # text="複数の患者さんの対応が必要です．デイルームに来てください．"
+        # self.export_audio(text=text,mp3_path="/media/hayashide/MasterThesis/20250121VoiceDemo"+"/helpus.mp3",chime_type=2,speed=1.25)
+        text=""
+        self.export_audio(text=text,mp3_path="/media/hayashide/MasterThesis/20250121VoiceDemo"+"/chime1.mp3",chime_type=1,speed=1.25)
+        self.export_audio(text=text,mp3_path="/media/hayashide/MasterThesis/20250121VoiceDemo"+"/chime2.mp3",chime_type=2,speed=1.25)
 
 
         pass
 
 if __name__=="__main__":
-    trial_name="20250107VoiceNotification"
+    trial_name="20250121VoiceDemo"
     strage="NASK"
     cls=Notification(trial_name,strage)
     cls.main_dev()

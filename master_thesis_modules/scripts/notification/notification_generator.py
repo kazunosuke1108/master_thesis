@@ -188,6 +188,7 @@ class NotificationGenerator(Manager,GraphManager):
         static_factor_node,factor_df=self.guess_static_factor(data_dict_roi,most_risky_patient)
 
         alert_text=self.get_alert_sentence(most_risky_patient=most_risky_patient,dynamic_factor_node=dynamic_factor_node,static_factor_node=static_factor_node)
+        alert_text=self.translate_person_name(alert_text)
         return alert_text,dynamic_factor_node,static_factor_node,data_corr,factor_df
     
     def judge_time_interval(self,notify_history,row,alert_type):
@@ -321,7 +322,7 @@ class NotificationGenerator(Manager,GraphManager):
                 alert_text=self.get_help_sentence()
                 notify_history.loc[len(notify_history),:]=[self.notification_id,self.df_rank.loc[i,"timestamp"],self.df_rank.loc[i,"timestamp"]-self.df_rank.loc[0,"timestamp"],alert_text,"help",np.nan]
                 notification_mp3_path=self.data_dir_dict["trial_dir_path"]+"/"+f"notification_{self.trial_name}_{str(self.notification_id).zfill(5)}.mp3"
-                Notification().export_audio(text=alert_text,mp3_path=notification_mp3_path,chime_type=1)
+                Notification().export_audio(text=alert_text,mp3_path=notification_mp3_path,chime_type=2)
                 self.logger.warning(f"応援を要請しました: 「{alert_text}」")
                 self.save(self.df_rank,data_corr,factor_df,notification_id=self.notification_id)
                 self.notification_id+=1
@@ -331,6 +332,12 @@ class NotificationGenerator(Manager,GraphManager):
         print(self.data_dir_dict["trial_dir_path"]+f"/{self.trial_name}_{self.result_trial_name}_notify_history.csv")
         notify_history.to_csv(self.data_dir_dict["trial_dir_path"]+f"/{self.trial_name}_{self.result_trial_name.replace('/','_')}_notify_history.csv",index=False)
         self.notify_history=notify_history
+
+    def translate_person_name(self,alert_text):
+        name_list=["浅田","井澤","梅木","江川","奥田","柿沼","岸本","久保","毛塚","小林","佐藤","下山"]
+        for i in range(len(name_list)):
+            alert_text=alert_text.replace(str(i).zfill(5),name_list[i])
+        return alert_text
 
     def plot_timeseries_with_notification_point(self):
         for patient in self.id_names:
@@ -357,12 +364,42 @@ class NotificationGenerator(Manager,GraphManager):
         
         pass
 
+    def create_mp4_with_audio(self):
+        from moviepy import VideoFileClip, AudioFileClip, concatenate_videoclips,CompositeAudioClip
+        notification_history_csv_path=sorted(glob(self.data_dir_dict["trial_dir_path"]+f"/*_notify_history.csv"))[0]
+        notification_history=pd.read_csv(notification_history_csv_path)
+        print(notification_history)
+        # mp4_path="/media/hayashide/MasterThesis/20250123NotifyForNagasakiStaff1/動画①_高画質版（音声あり）.mp4"
+        mp4_path="/media/hayashide/MasterThesis/20250123NotifyForNagasakiStaff2/動画②_高画質版（音声あり）.mp4"
+        # output_mp4_path=self.data_dir_dict["trial_dir_path"]+"/動画①_高画質版（音声あり）.mp4"
+        output_mp4_path=self.data_dir_dict["trial_dir_path"]+"/動画②_高画質版（音声あり）.mp4"
+        video = VideoFileClip(mp4_path)
+        # 動画のもともとの音声を削除（音声がなければ無視してOK）
+        video = video.without_audio()
+        audio_clips = []
+        for i,row in notification_history.iterrows():
+            mp3_path=sorted(glob(self.data_dir_dict["trial_dir_path"]+f"/*_{str(i).zfill(5)}.mp3"))[0]
+            audio = AudioFileClip(mp3_path).with_start(row["relativeTimestamp"])
+            audio_clips.append(audio)
+        composite_audio = CompositeAudioClip(audio_clips)
+
+        # 音声の長さを動画に合わせて調整（必要に応じてトリミング）
+        if composite_audio.duration > video.duration:
+            composite_audio = composite_audio.subclip(0, video.duration)
+        
+        video_with_audio = video.with_audio(composite_audio)
+
+        # 出力ファイルとして保存
+        video_with_audio.write_videofile(output_mp4_path, codec="libx264", audio_codec="aac")
+
+        pass
+
 if __name__=="__main__":
-    trial_name="20250123NotifyMewThrottlingExp"
+    trial_name="20250124NotifyForNagasakiStaff2"
     # result_trial_name="20250113NormalSimulation"
     # result_trial_name="20250110SimulationMultipleRisks/no_00005"
-    result_trial_name="20250108DevMewThrottlingExp"
-    # result_trial_name="20250115PullWheelchairObaachan2"
+    # result_trial_name="20250108DevMewThrottlingExp"
+    result_trial_name="20250115PullWheelchairObaachan2"
     # trial_name="20250110NotificationGeneratorExp"
     # result_trial_name="20250121ChangeCriteriaBefore"
     strage="NASK"
@@ -370,3 +407,4 @@ if __name__=="__main__":
     cls=NotificationGenerator(trial_name=trial_name,strage=strage,result_trial_name=result_trial_name)
     cls.main_new()
     cls.plot_timeseries_with_notification_point()
+    cls.create_mp4_with_audio()
