@@ -232,7 +232,7 @@ class NotificationGenerator(Manager,GraphManager):
         # 変数の初期化
         most_risky_patient=""
         previous_risky_patient=""
-        notify_history=pd.DataFrame(columns=["timestamp","sentence","type","10000000"])
+        notify_history=pd.DataFrame(columns=["notificationId","timestamp","relativeTimestamp","sentence","type","10000000"])
         
         for i,row in self.df_rank.iterrows():
             self.logger.info(f"Time i={i}, t={self.df_rank.loc[i,'timestamp']}")
@@ -310,14 +310,16 @@ class NotificationGenerator(Manager,GraphManager):
                 else:
                     notify=True
                 if notify:
-                    notify_history.loc[len(notify_history),:]=[self.df_rank.loc[i,"timestamp"],alert_text,"notice",data_of_risky_patient["10000000"].values.mean()]
+                    notify_history.loc[len(notify_history),:]=[self.notification_id,self.df_rank.loc[i,"timestamp"],self.df_rank.loc[i,"timestamp"]-self.df_rank.loc[0,"timestamp"],alert_text,"notice",data_of_risky_patient["10000000"].values.mean()]
                     self.logger.warning(f"通知しました: 「{alert_text}」")
                     self.save(self.df_rank,data_corr,factor_df,notification_id=self.notification_id)
                     self.notification_id+=1
 
             if need_help:
                 alert_text=self.get_help_sentence()
-                notify_history.loc[len(notify_history),:]=[self.df_rank.loc[i,"timestamp"],alert_text,"help",np.nan]
+                notify_history.loc[len(notify_history),:]=[self.notification_id,self.df_rank.loc[i,"timestamp"],self.df_rank.loc[i,"timestamp"]-self.df_rank.loc[0,"timestamp"],alert_text,"help",np.nan]
+                self.save(self.df_rank,data_corr,factor_df,notification_id=self.notification_id)
+                self.notification_id+=1
 
         # 通知文生成
         # 記録
@@ -345,17 +347,17 @@ class NotificationGenerator(Manager,GraphManager):
     def save(self,df_rank,data_corr,factor_df,notification_id):
         # df_rank
         df_rank.to_csv(self.data_dir_dict["trial_dir_path"]+f"/notify_{str(notification_id).zfill(5)}_df_rank.csv",index=False)
-        data_corr.to_csv(self.data_dir_dict["trial_dir_path"]+f"/notify_{str(notification_id).zfill(5)}_data_corr.csv",index=False)
-        factor_df.to_csv(self.data_dir_dict["trial_dir_path"]+f"/notify_{str(notification_id).zfill(5)}_factor_df.csv",index=False)
+        data_corr.to_csv(self.data_dir_dict["trial_dir_path"]+f"/notify_{str(notification_id).zfill(5)}_data_corr.csv")
+        factor_df.to_csv(self.data_dir_dict["trial_dir_path"]+f"/notify_{str(notification_id).zfill(5)}_factor_df.csv")
         
         pass
 
 if __name__=="__main__":
-    trial_name="20250123DevNotificationLog"
+    trial_name="20250123NotifyMewThrottlingExp"
     # result_trial_name="20250113NormalSimulation"
     # result_trial_name="20250110SimulationMultipleRisks/no_00005"
-    # result_trial_name="20250108DevMewThrottlingExp"
-    result_trial_name="20250115PullWheelchairObaachan2"
+    result_trial_name="20250108DevMewThrottlingExp"
+    # result_trial_name="20250115PullWheelchairObaachan2"
     # trial_name="20250110NotificationGeneratorExp"
     # result_trial_name="20250121ChangeCriteriaBefore"
     strage="NASK"
