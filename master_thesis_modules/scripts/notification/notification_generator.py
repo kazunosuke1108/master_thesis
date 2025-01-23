@@ -311,6 +311,8 @@ class NotificationGenerator(Manager,GraphManager):
                     notify=True
                 if notify:
                     notify_history.loc[len(notify_history),:]=[self.notification_id,self.df_rank.loc[i,"timestamp"],self.df_rank.loc[i,"timestamp"]-self.df_rank.loc[0,"timestamp"],alert_text,"notice",data_of_risky_patient["10000000"].values.mean()]
+                    notification_mp3_path=self.data_dir_dict["trial_dir_path"]+"/"+f"notification_{self.trial_name}_{str(self.notification_id).zfill(5)}.mp3"
+                    Notification().export_audio(text=alert_text,mp3_path=notification_mp3_path,chime_type=1)
                     self.logger.warning(f"通知しました: 「{alert_text}」")
                     self.save(self.df_rank,data_corr,factor_df,notification_id=self.notification_id)
                     self.notification_id+=1
@@ -318,6 +320,9 @@ class NotificationGenerator(Manager,GraphManager):
             if need_help:
                 alert_text=self.get_help_sentence()
                 notify_history.loc[len(notify_history),:]=[self.notification_id,self.df_rank.loc[i,"timestamp"],self.df_rank.loc[i,"timestamp"]-self.df_rank.loc[0,"timestamp"],alert_text,"help",np.nan]
+                notification_mp3_path=self.data_dir_dict["trial_dir_path"]+"/"+f"notification_{self.trial_name}_{str(self.notification_id).zfill(5)}.mp3"
+                Notification().export_audio(text=alert_text,mp3_path=notification_mp3_path,chime_type=1)
+                self.logger.warning(f"応援を要請しました: 「{alert_text}」")
                 self.save(self.df_rank,data_corr,factor_df,notification_id=self.notification_id)
                 self.notification_id+=1
 
