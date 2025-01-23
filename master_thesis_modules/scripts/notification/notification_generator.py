@@ -47,6 +47,8 @@ class NotificationGenerator(Manager,GraphManager):
         # self.logger.debug(f"high_risk_threshold: {self.high_risk_threshold}")
         # self.logger.debug(f"n_risky_patient_threshold: {self.n_risky_patient_threshold}")
 
+        self.notification_id=0
+
 
         # node別通知基準
         self.notify_threshold_by_dinamic_factor={
@@ -122,7 +124,7 @@ class NotificationGenerator(Manager,GraphManager):
         # 一番相関が高い4000番台の因子を抜き出す
         data_corr_4000=data_corr[[k for k in data_corr.keys() if k[0]=="4"]]
         most_corr_node=list(data_corr_4000.keys())[data_corr_4000.argmax()]
-        return most_corr_node,high_corr_nodes
+        return most_corr_node,high_corr_nodes,data_corr
 
     def guess_static_factor(self,data_dicts,most_risky_patient):
         focus_keys=[]
@@ -180,13 +182,13 @@ class NotificationGenerator(Manager,GraphManager):
 
     def explain_risk(self,data_of_risky_patient,data_dict_roi,most_risky_patient):
         # ランキングの入れ替わりを起こすきっかけになった動的要因を探る（動作か周囲の人員配置．値の上昇が見られるものはどっちか考える）
-        dynamic_factor_node,_=self.guess_dynamic_factor(data_of_risky_patient)
+        dynamic_factor_node,_,data_corr=self.guess_dynamic_factor(data_of_risky_patient)
 
         # 元々の危険度を高める要因になっていた静的要因を探る（属性か周囲の物体）
-        static_factor_node,_=self.guess_static_factor(data_dict_roi,most_risky_patient)
+        static_factor_node,factor_df=self.guess_static_factor(data_dict_roi,most_risky_patient)
 
         alert_text=self.get_alert_sentence(most_risky_patient=most_risky_patient,dynamic_factor_node=dynamic_factor_node,static_factor_node=static_factor_node)
-        return alert_text,dynamic_factor_node,static_factor_node
+        return alert_text,dynamic_factor_node,static_factor_node,data_corr,factor_df
     
     def judge_time_interval(self,notify_history,row,alert_type):
         df=notify_history[notify_history["type"]==alert_type].reset_index()
@@ -281,7 +283,7 @@ class NotificationGenerator(Manager,GraphManager):
             if tf_interval_notify:
                 # self.logger.warning("通知時間間隔 条件合致")
                 if tf_rankChange or tf_topIncrease:
-                    alert_text,dynamic_factor_node,static_factor_node=self.explain_risk(data_of_risky_patient,data_dict_roi,most_risky_patient)
+                    alert_text,dynamic_factor_node,static_factor_node,data_corr,factor_df=self.explain_risk(data_of_risky_patient,data_dict_roi,most_risky_patient)
                     self.logger.warning(f"{'ランキング入れ替わり' if tf_rankChange else '首位患者の危険度悪化'}の条件合致")
                     # 発火はdynamic node次第
                     if self.notify_threshold_by_dinamic_factor[dynamic_factor_node]<=data_of_risky_patient["10000000"].values.mean():
@@ -297,14 +299,21 @@ class NotificationGenerator(Manager,GraphManager):
                 need_help=True
             
             if need_notify:
-                if alert_text != notify_history[notify_history["type"]=="notify"]["sentence"].values[-1]:
-                    # 個々のバグ取りから
-                    self.logger.warning("通知内容 直前通知と違うのでOK")
+                notify=False
+                if len(notify_history[notify_history["type"]=="notice"]["sentence"].values)!=0:
+                    if alert_text != notify_history[notify_history["type"]=="notice"]["sentence"].values[-1]:
+                        self.logger.warning("通知内容 直前通知と違うのでOK")
+                        notify=True
+                    else:
+                        self.logger.warning("通知内容 直前通知と同一内容のため，棄却")
+                        notify=False
+                else:
+                    notify=True
+                if notify:
                     notify_history.loc[len(notify_history),:]=[self.df_rank.loc[i,"timestamp"],alert_text,"notice",data_of_risky_patient["10000000"].values.mean()]
                     self.logger.warning(f"通知しました: 「{alert_text}」")
-                else:
-                    self.logger.warning("通知内容 直前通知と同一内容のため，棄却")
-            pass
+                    self.save(self.df_rank,data_corr,factor_df,notification_id=self.notification_id)
+                    self.notification_id+=1
 
             if need_help:
                 alert_text=self.get_help_sentence()
@@ -333,8 +342,11 @@ class NotificationGenerator(Manager,GraphManager):
         plt.savefig(self.data_dir_dict["trial_dir_path"]+f"/{self.trial_name}_{self.result_trial_name.replace('/','_')}_notify_history.png")
         # plt.show()
 
-    def save(self):
+    def save(self,df_rank,data_corr,factor_df,notification_id):
         # df_rank
+        df_rank.to_csv(self.data_dir_dict["trial_dir_path"]+f"/notify_{str(notification_id).zfill(5)}_df_rank.csv",index=False)
+        data_corr.to_csv(self.data_dir_dict["trial_dir_path"]+f"/notify_{str(notification_id).zfill(5)}_data_corr.csv",index=False)
+        factor_df.to_csv(self.data_dir_dict["trial_dir_path"]+f"/notify_{str(notification_id).zfill(5)}_factor_df.csv",index=False)
         
         pass
 
