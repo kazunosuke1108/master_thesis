@@ -23,6 +23,11 @@ class NotificationGenerator(Manager,GraphManager):
         self.strage=strage
         self.result_trial_name=result_trial_name
         self.data_dir_dict=self.get_database_dir(trial_name=self.trial_name,strage=self.strage)
+        # logger
+        self.logger=self.prepare_log(trial_dir_path=self.data_dir_dict["trial_dir_path"])
+        self.logger.info("System start")
+        self.logger.debug(f"trial_name: {self.trial_name}")
+        self.logger.debug(f"result_trial_name: {self.result_trial_name}")
 
         self.w_average=40 # 平滑化のwindow
         self.increase_ratio_min=0.8 # 危険順位が1位に躍り出た患者の，危険度の上昇具合
@@ -33,6 +38,15 @@ class NotificationGenerator(Manager,GraphManager):
         self.increase_corr_threshold_help=0.9 #
         self.high_risk_threshold=0.4 #
         self.n_risky_patient_threshold=2
+        # self.logger.debug(f"w_average: {self.w_average}")
+        # self.logger.debug(f"increase_ratio_min: {self.increase_ratio_min}")
+        # self.logger.debug(f"decrease_ratio_max: {self.decrease_ratio_max}")
+        # self.logger.debug(f"notify_interval_dict: {self.notify_interval_dict}")
+        # self.logger.debug(f"increase_corr_threshold: {self.increase_corr_threshold}")
+        # self.logger.debug(f"increase_corr_threshold_help: {self.increase_corr_threshold_help}")
+        # self.logger.debug(f"high_risk_threshold: {self.high_risk_threshold}")
+        # self.logger.debug(f"n_risky_patient_threshold: {self.n_risky_patient_threshold}")
+
 
         # node別通知基準
         self.notify_threshold_by_dinamic_factor={
@@ -51,6 +65,7 @@ class NotificationGenerator(Manager,GraphManager):
             "40000110":0.5,
             "40000111":0.5,
         }
+        self.logger.info(f"notify_threshold_by_dinamic_factor: {self.notify_threshold_by_dinamic_factor}")
         
         # csvデータの読み込み
         csv_paths=sorted(glob(f"{self.data_dir_dict['database_dir_path']}/{self.result_trial_name}/data_*_eval.csv"))
@@ -208,6 +223,7 @@ class NotificationGenerator(Manager,GraphManager):
             return False
 
     def main_new(self):
+        self.logger.info("Start main loop")
         # ランキングの作成
         self.df_rank=self.get_df_rank(data_dicts=self.data_dicts)
 
@@ -217,9 +233,13 @@ class NotificationGenerator(Manager,GraphManager):
         notify_history=pd.DataFrame(columns=["timestamp","sentence","type","10000000"])
         
         for i,row in self.df_rank.iterrows():
+            self.logger.info(f"Time i={i}, t={self.df_rank.loc[i,'timestamp']}")
             if i==0:
+                self.logger.info("i==0. continue")
                 most_risky_patient=self.df_rank.loc[i,0]
                 previous_risky_patient=most_risky_patient
+                # self.logger.debug(f"most_risky_patient: {most_risky_patient}")
+                # self.logger.debug(f"previous_risky_patient: {previous_risky_patient}")
                 continue
 
             # 情報収集
@@ -250,18 +270,40 @@ class NotificationGenerator(Manager,GraphManager):
 
             ## E 本人の歴代リスクの中で最悪（値が最大値を更新）
 
+            # self.logger.info("Evaluation done.")
+            # self.logger.debug(f"tf_interval_notify: {tf_interval_notify}")
+            # self.logger.debug(f"tf_interval_help: {tf_interval_help}")
+            # self.logger.debug(f"tf_rankChange: {tf_rankChange}")
+            # self.logger.debug(f"tf_topIncrease: {tf_topIncrease}")
+            # self.logger.debug(f"tf_multiPatient: {tf_multiPatient}")
 
-            if tf_interval_notify and (tf_rankChange or tf_topIncrease):
-                alert_text,dynamic_factor_node,static_factor_node=self.explain_risk(data_of_risky_patient,data_dict_roi,most_risky_patient)
-                # 発火はdynamic node次第
-                if self.notify_threshold_by_dinamic_factor[dynamic_factor_node]<=data_of_risky_patient["10000000"].values.mean():
-                    need_notify=True
+            # self.logger.info("Judgement start")
+            if tf_interval_notify:
+                # self.logger.warning("通知時間間隔 条件合致")
+                if tf_rankChange or tf_topIncrease:
+                    alert_text,dynamic_factor_node,static_factor_node=self.explain_risk(data_of_risky_patient,data_dict_roi,most_risky_patient)
+                    self.logger.warning(f"{'ランキング入れ替わり' if tf_rankChange else '首位患者の危険度悪化'}の条件合致")
+                    # 発火はdynamic node次第
+                    if self.notify_threshold_by_dinamic_factor[dynamic_factor_node]<=data_of_risky_patient["10000000"].values.mean():
+                        self.logger.warning(f"dynamic factor {dynamic_factor_node} の発火条件合致 ({self.notify_threshold_by_dinamic_factor[dynamic_factor_node]} <= {data_of_risky_patient['10000000'].values.mean()})")
+                        need_notify=True
+                    else:
+                        self.logger.warning(f"dynamic factor {dynamic_factor_node} の発火条件合致せず ({self.notify_threshold_by_dinamic_factor[dynamic_factor_node]} > {data_of_risky_patient['10000000'].values.mean()})")
+            else:
+                self.logger.warning("通知発報後の時間経過が不十分")
+
             if tf_interval_help and tf_multiPatient:
+                self.logger.warning("応援要請 条件合致")
                 need_help=True
             
             if need_notify:
-                if alert_text not in notify_history["sentence"].values:
+                if alert_text != notify_history[notify_history["type"]=="notify"]["sentence"].values[-1]:
+                    # 個々のバグ取りから
+                    self.logger.warning("通知内容 直前通知と違うのでOK")
                     notify_history.loc[len(notify_history),:]=[self.df_rank.loc[i,"timestamp"],alert_text,"notice",data_of_risky_patient["10000000"].values.mean()]
+                    self.logger.warning(f"通知しました: 「{alert_text}」")
+                else:
+                    self.logger.warning("通知内容 直前通知と同一内容のため，棄却")
             pass
 
             if need_help:
@@ -289,94 +331,15 @@ class NotificationGenerator(Manager,GraphManager):
         plt.legend()
         plt.grid()
         plt.savefig(self.data_dir_dict["trial_dir_path"]+f"/{self.trial_name}_{self.result_trial_name.replace('/','_')}_notify_history.png")
-        plt.show()
+        # plt.show()
 
-    def main(self):
-        # ランキングの作成
-        self.df_rank=self.get_df_rank(data_dicts=self.data_dicts)
-
-        # ランキングの入れ替わりを検知
-        notification_history=pd.DataFrame(columns=["timestamp","sentence"])
-        timestamp_list=[]
-        sentence_list=[]
-        increase_ratio_list=[]
-        decrease_ratio_list=[]
-        most_risky_patient=""
-        previous_risky_patient=""
-        for i,row in self.df_rank.iterrows():
-            if i==0:
-                most_risky_patient=self.df_rank.loc[i,0]
-                previous_risky_patient=self.df_rank.loc[i,0]
-                continue
-            # 順位の入れ替えが発生した場合の通知
-            if self.df_rank.loc[i,0]!=most_risky_patient:
-                previous_risky_patient=most_risky_patient
-                most_risky_patient=self.df_rank.loc[i,0]
-
-                # 当該時刻における，危険度が上昇した患者のデータを準備
-                w_roi=20
-                data_of_risky_patient=self.data_dicts[most_risky_patient].loc[i-w_roi:i,:]
-                data_of_previous_risky_patient=self.data_dicts[previous_risky_patient].loc[i-w_roi:i,:]
-                data_dict_roi={k:v.loc[i-w_roi:i,:] for k,v in self.data_dicts.items()}
-                # 追い抜いた側が上昇したことによる入れ替わりか，追い抜かれた側が下降したことによる入れ替わりか，判別
-                increase_ratio=data_of_risky_patient.loc[:,["timestamp","10000000"]].corr().loc["timestamp","10000000"]
-                if increase_ratio>self.increase_ratio_min:
-                    # 追い抜かれた側（通知済み）の危険度が低下していない場合，応援が必要と判断
-                    decrease_ratio=data_of_previous_risky_patient.loc[:,["timestamp","10000000"]].corr().loc["timestamp","10000000"]
-                    if (len(timestamp_list)>0) & (decrease_ratio>self.decrease_ratio_max):
-                        # 既に通知を飛ばしたことがあり，かつ今追い抜かれた患者も危険度が低下傾向にない場合，応援通知を飛ばす
-                        help_text=self.get_help_sentence()
-                        notification_mp3_path=self.data_dir_dict["trial_dir_path"]+f"/notification_{str(i).zfill(3)}_help.mp3"
-                        # Notification().export_audio(text=help_text,mp3_path=notification_mp3_path,chime_type=2)
-                        timestamp_list.append(self.df_rank.loc[i,"timestamp"]-self.df_rank.loc[0,"timestamp"])
-                        sentence_list.append(help_text)
-                        increase_ratio_list.append(increase_ratio)
-                        decrease_ratio_list.append(decrease_ratio)
-                        pass
-                    
-                    alert_text=self.explain_risk(data_of_risky_patient=data_of_risky_patient,data_dict_roi=data_dict_roi,most_risky_patient=most_risky_patient)
-
-                    notification_mp3_path=self.data_dir_dict["trial_dir_path"]+f"/notification_{str(i).zfill(3)}.mp3"
-                    # Notification().export_audio(text=alert_text,mp3_path=notification_mp3_path,chime_type=1)
-                    
-                    print("ranking changed")
-                    print(self.df_rank.loc[i,"timestamp"])
-                    print(self.df_rank.loc[i-1,0],"->",self.df_rank.loc[i,0])
-                    print(alert_text)
-                    increase_ratio_list.append(increase_ratio)
-                    decrease_ratio_list.append(decrease_ratio)
-                    timestamp_list.append(self.df_rank.loc[i,"timestamp"]-self.df_rank.loc[0,"timestamp"])
-                    sentence_list.append(alert_text)
-            else:
-                # 最優先患者の状態変化をトリガーとした通知 
-                # 動的リスクの増加傾向を相関係数で見る
-                w=40
-                corr_30000001=self.data_dicts[most_risky_patient].loc[i-w:i,["timestamp","30000001"]].corr().loc["timestamp","30000001"]
-                corr_30000011=self.data_dicts[most_risky_patient].loc[i-w:i,["timestamp","30000011"]].corr().loc["timestamp","30000011"]
-                print(corr_30000001,corr_30000011)
-                if corr_30000001>0.95:
-                    # 当該時刻における，危険度が上昇した患者のデータを準備
-                    w_roi=20
-                    data_of_risky_patient=self.data_dicts[most_risky_patient].loc[i-w_roi:i,:]
-                    data_of_previous_risky_patient=self.data_dicts[previous_risky_patient].loc[i-w_roi:i,:]
-                    data_dict_roi={k:v.loc[i-w_roi:i,:] for k,v in self.data_dicts.items()}
-                    print(most_risky_patient,i)
-                    print(self.data_dicts[most_risky_patient].loc[i,:])
-                    alert_text=self.explain_risk(data_of_risky_patient=data_of_risky_patient,data_dict_roi=data_dict_roi,most_risky_patient=most_risky_patient)
-                    print(alert_text)
-                    # raise NotImplementedError
-                pass
+    def save(self):
+        # df_rank
         
-        notification_history["timestamp"]=timestamp_list
-        notification_history["sentence"]=sentence_list
-        notification_history["increase_ratio"]=increase_ratio_list
-        notification_history["decrease_ratio"]=decrease_ratio_list
-
-        print(notification_history)
         pass
 
 if __name__=="__main__":
-    trial_name="20250121PullWheelchairObaachan2Notification"
+    trial_name="20250123DevNotificationLog"
     # result_trial_name="20250113NormalSimulation"
     # result_trial_name="20250110SimulationMultipleRisks/no_00005"
     # result_trial_name="20250108DevMewThrottlingExp"

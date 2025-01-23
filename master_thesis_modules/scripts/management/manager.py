@@ -22,6 +22,31 @@ class Manager():
         plt.rcParams["legend.handlelength"] = 1 # 凡例の線の長さを調節
         pass
 
+    def prepare_log(self,trial_dir_path):
+        import os
+        from datetime import datetime
+        import logging
+
+        logdir=trial_dir_path
+        
+
+        logger = logging.getLogger(os.path.basename(__file__))
+        logger.setLevel(logging.DEBUG)
+        format = "%(asctime)s [%(filename)s:%(funcName)s:%(lineno)d] %(levelname)-9s  %(message)s"
+        st_handler = logging.StreamHandler()
+        st_handler.setLevel(logging.WARNING)
+        # StreamHandlerによる出力フォーマットを先で定義した'format'に設定
+        st_handler.setFormatter(logging.Formatter(format))
+
+        fl_handler = logging.FileHandler(filename=logdir+"/"+datetime.now().strftime('%Y%m%d_%H%M%S')+".log", encoding="utf-8")
+        fl_handler.setLevel(logging.DEBUG)
+        # FileHandlerによる出力フォーマットを先で定義した'format'に設定
+        fl_handler.setFormatter(logging.Formatter(format))
+
+        logger.addHandler(st_handler)
+        logger.addHandler(fl_handler)
+        return logger
+
     def get_module_path(self):
         if os.name == "nt": # Windows
             home = os.path.expanduser("~")
