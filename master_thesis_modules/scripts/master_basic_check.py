@@ -36,12 +36,11 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
         # parameters
         self.spatial_normalization_param=np.sqrt(2)*6
         self.fps=20
-        self.throttling=True
+        self.throttling=False
         self.bg_differencing=False
         self.bg_differencing_thre=0.5
         self.fps_BLIP=10 #[Hz]
         self.fps_YOLO=50 #[Hz]
-        self.AHP_array_type=2
 
         if self.runtype=="simulation":
             self.patients=["A","B","C"]
@@ -123,7 +122,7 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
         }
 
         # AHP 一対比較行列の作成
-        self.AHP_dict=getConsistencyMtx().get_all_comparison_mtx_and_weight(trial_name=self.trial_name,strage=self.strage,array_type=self.AHP_array_type)
+        self.AHP_dict=getConsistencyMtx().get_all_comparison_mtx_and_weight(trial_name=self.trial_name,strage=self.strage)
 
 
     def pseudo_throttling(self,data_dicts):
@@ -629,6 +628,7 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
         for patient in self.data_dicts.keys():
             # 三角形の左右判別
             sort_tri=np.array(list(map(judge_left_or_right,self.data_dicts[patient][40000000],self.data_dicts[patient][40000001])))
+            print(sort_tri)
             left_tri,right_tri=sort_tri[:,0,:],sort_tri[:,1,:]
             
             # 交点の計算
@@ -720,15 +720,18 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
             print("# スロットリングのためのデータ間引きを実施 #")
             self.data_dicts=self.pseudo_throttling(self.data_dicts)
 
-        print("# 5 -> 4層推論 #")
-        # 内的・静的
-        self.fuzzy_logic()
-        # 内的・動的
-        self.pose_similarity()
-        # 外的・静的
-        self.object_risk()
-        # 外的・動的
-        self.staff_risk()
+        if self.runtype!="basic_check":
+            print("# 5 -> 4層推論 #")
+            # 内的・静的
+            self.fuzzy_logic()
+            # 内的・動的
+            self.pose_similarity()
+            # 外的・静的
+            self.object_risk()
+            # 外的・動的
+            self.staff_risk()
+
+        print(self.data_dicts["A"])
 
         print("# 4 -> 3層推論 #")
         # 内定・静的
@@ -755,9 +758,9 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
         pass
 
 if __name__=="__main__":
-    trial_name="20250121ChangeCriteriaAfter"
+    trial_name="20250120DevBasicCheck"
     strage="NASK"
-    runtype="experiment"
+    runtype="basic_check"
     cls=Master(trial_name,strage,runtype=runtype)
     cls.main()
     cls.save_session()

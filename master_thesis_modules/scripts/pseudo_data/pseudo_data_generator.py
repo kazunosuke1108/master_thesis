@@ -179,6 +179,21 @@ class PseudoDataGenerator(Manager):
 
         return data_dicts
     
+    def get_basic_check_data(self,graph_dicts,patients):
+        fill_value=0.1
+        nodes_4000=[k for k in graph_dicts["node_dict"].keys() if ((int(k)>=40000000) and (int(k)<50000000))]
+        array=np.full((len(nodes_4000)+1,len(nodes_4000)),fill_value)
+        for i in range(len(nodes_4000)):
+            array[i+1,i]=1
+        data=pd.DataFrame(data=array,columns=nodes_4000)
+        data.loc[:,40000000]=str((0,0.3,0.6))
+        data.loc[1,40000000]=str((0.4,0.7,1.0))
+        data.loc[:,40000001]=str((0,0.25,0.5))
+        data.loc[2,40000001]=str((0.5,0.75,1.0))
+        data["timestamp"]=np.arange(len(nodes_4000)+1)
+        print(data)
+        data_dicts={patients[0]:data}
+        return data_dicts
 
 if __name__=="__main__":
     trial_name=""
