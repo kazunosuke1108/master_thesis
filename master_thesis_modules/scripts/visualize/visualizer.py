@@ -680,11 +680,13 @@ class Visualizer(Manager):
         fig.show()
 
     def plot_matplotlib(self):
+        plt.rcParams["figure.figsize"] = (10,5)
         csv_paths=sorted(glob(self.data_dir_dict["trial_dir_path"]+"/data_*_eval.csv"))
         data_dict={}
         id_names=[]
         for csv_path in csv_paths:
             data=pd.read_csv(csv_path,header=0)
+            data=data[data["timestamp"]<9]
             id_name=os.path.basename(csv_path).split("_")[1]
             id_names.append(id_name)
             data_dict[id_name]=data
@@ -694,7 +696,7 @@ class Visualizer(Manager):
             print(export_label)
             for id_name in id_names:
                 # if int(export_label) in ["10000000","20000001"]:
-                w=1
+                w=40
                 try:
                     plt.plot(data_dict[id_name]["timestamp"],data_dict[id_name][export_label].rolling(w).mean(),"-o",label=id_name)
                     # plt.title(export_label+f" window: {w}")
@@ -767,17 +769,17 @@ class Visualizer(Manager):
         pass
 
 if __name__=="__main__":
-    # trial_name="20250113NormalSimulation"
+    trial_name="20250113NormalSimulation"
     # trial_name="20250110SimulationMultipleRisks/no_00005"
     # trial_name="20250120FPScontrolTrue"
     # trial_name="20250108DevMewThrottlingExp"
-    trial_name="20250115PullWheelchairObaachan2"
+    # trial_name="20250115PullWheelchairObaachan2"
     # trial_name="20250121ChangeCriteriaBefore"
     strage="NASK"
     cls=Visualizer(trial_name=trial_name,strage=strage)
     # cls.visualize_graph(trial_name="20241229BuildSimulator",strage="NASK",name="A",show=True)
-    # cls.plot_matplotlib()
-    cls.plot_fps()
+    cls.plot_matplotlib()
+    # cls.plot_fps()
     # cls.draw_positions()
     # cls.draw_features()
     # cls.draw_weight()
