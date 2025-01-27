@@ -148,6 +148,82 @@ class Visualizer(Manager):
             elif d["risk25_visibility"]>threshold:
                 count_df_invisible.loc[f"truth_{d['risk25_standingPatient']}",f"ans_{d['risk25_ansOfEvaluation']}"]+=1
         return count_df_visible,count_df_invisible
+    
+    def check_with_rank(self,stand="A",attribution_risk_dict={"A":2,"B":1,"C":0}):
+        df=pd.DataFrame(columns=["trial_name","proposed_rank_0","proposed_rank_1","proposed_rank_2","truth_rank_0","truth_rank_1","truth_rank_2","result_perfect","result_top"])
+        truth_rules=np.array([
+            [1,	2,	1,	0],
+            [1,	1,	1,	1],
+            [1,	2,	0,	2],
+            [1,	1,	0,	3],
+            [1,	0,	1,	4],
+            [1,	0,	0,	5],
+            [0,	2,	1,	6],
+            [0,	2,	0,	7],
+            [0,	1,	1,	8],
+            [0,	1,	0,	9],
+            [0,	0,	1,	10],
+            [0,	0,	0,	11],
+        ])
+        # 立つ1/座る0,大2/中1/小0,見守り無1/あり0,rank
+        truth_rules_df=pd.DataFrame(data=truth_rules,columns=["stand","attribution","monitoring","rank"])
+        trial_dir_paths=[path for path in sorted(glob(self.simulation_dir_path+"/*")) if f"common" not in os.path.basename(path)]
+        print(trial_dir_paths)
+        # 各試行について
+        for i,trial_dir_path in enumerate(trial_dir_paths):
+            try:
+                trial_name=os.path.basename(trial_dir_path)
+                csv_paths=sorted(glob(trial_dir_path+"/data_*_eval.csv"))
+                patients=[os.path.basename(p)[len("data_"):-len("_eval.csv")] for p in csv_paths]
+                self.score_dict[trial_name]={}
+                # 患者1人ずつを抽出
+                total_risk_list=[]
+                visibility_list=[]
+                patient_list=[]
+                for csv_path in csv_paths:
+                    start_timestamp=4 # 患者が立ち上がり終わる頃
+                    end_timestamp=5   # 看護師が動き始める
+                    # データの読み込み
+                    all_data=pd.read_csv(csv_path,header=0)
+                    data_45=all_data[(all_data["timestamp"]>=start_timestamp) & (all_data["timestamp"]<=end_timestamp)]
+                    patient=os.path.basename(csv_path).split("_")[1]
+                    total_risk_list.append(data_45["10000000"].mean())
+                    visibility_list.append(data_45["40000111"].mean())
+                    patient_list.append(patient)
+
+                proposed_rank_list=[l for _,l in sorted(zip(total_risk_list,patient_list),reverse=True)]
+                df.loc[i,"trial_name"]=trial_name
+                df.loc[i,"proposed_rank_0"]=proposed_rank_list[0]
+                df.loc[i,"proposed_rank_1"]=proposed_rank_list[1]
+                df.loc[i,"proposed_rank_2"]=proposed_rank_list[2]
+
+                # 真値算出
+                truth_rank_value_list=[]
+                for j,patient in enumerate(patient_list):
+                    stand_or_not=1 if stand==patient else 0
+                    attribution_risk=attribution_risk_dict[patient]
+                    visible_binary=1 if visibility_list[j]>=(1-(np.cos(np.deg2rad(35))/2+0.5)) else 0
+                    truth_rank=truth_rules_df[(truth_rules_df["stand"]==stand_or_not) & (truth_rules_df["attribution"]==attribution_risk) & (truth_rules_df["monitoring"]==visible_binary)]["rank"].values[0]
+                    truth_rank_value_list.append(truth_rank)
+                truth_rank_list=[l for _,l in sorted(zip(truth_rank_value_list,patient_list),reverse=False)]
+                df.loc[i,"truth_rank_0"]=truth_rank_list[0]
+                df.loc[i,"truth_rank_1"]=truth_rank_list[1]
+                df.loc[i,"truth_rank_2"]=truth_rank_list[2]
+                if (df.loc[i,"proposed_rank_0"]==df.loc[i,"truth_rank_0"]):
+                    df.loc[i,"result_top"]=1 # OK
+                else:
+                    df.loc[i,"result_top"]=0 # NG
+                if (df.loc[i,"proposed_rank_0"]==df.loc[i,"truth_rank_0"]) & (df.loc[i,"proposed_rank_1"]==df.loc[i,"truth_rank_1"]) & (df.loc[i,"proposed_rank_2"]==df.loc[i,"truth_rank_2"]):
+                    df.loc[i,"result_perfect"]=1 # OK
+                else:
+                    df.loc[i,"result_perfect"]=0 # NG
+                print(trial_name,"Perfect:",np.round(df["result_perfect"].sum()/len(df)*100),"%","Top:",np.round(df["result_top"].sum()/len(df)*100),"%")
+            except Exception:
+                continue
+        df.to_csv(self.simulation_common_dir_path+"/compare_with_truth.csv",index=False)
+
+        
+        pass
 
     def draw_timeseries_with_categorization_v2(self):
         # Bが立ったときのjsonを取得
@@ -380,10 +456,20 @@ class Visualizer(Manager):
         pass
 
 if __name__=="__main__":
+    simulation_name="20250113SimulationPositionA"
+    strage="NASK"
+    cls=Visualizer(simulation_name=simulation_name,strage=strage)
+    cls.check_with_rank(stand="A",attribution_risk_dict={"A":2,"B":1,"C":0})
     simulation_name="20250113SimulationPositionB"
     strage="NASK"
     cls=Visualizer(simulation_name=simulation_name,strage=strage)
-    cls.draw_timeseries_with_categorization_v2()
+    cls.check_with_rank(stand="B",attribution_risk_dict={"A":2,"B":1,"C":0})
+    simulation_name="20250113SimulationPositionC2"
+    strage="NASK"
+    cls=Visualizer(simulation_name=simulation_name,strage=strage)
+    cls.check_with_rank(stand="C",attribution_risk_dict={"A":2,"B":1,"C":0})
+
+    # cls.draw_timeseries_with_categorization_v2()
     # cls.main()
     # cls.check_json()
     # cls.check_json_v2()
