@@ -151,16 +151,30 @@ class Visualizer(Manager):
     
     def check_with_rank(self,stand="A",attribution_risk_dict={"A":2,"B":1,"C":0}):
         df=pd.DataFrame(columns=["trial_name","proposed_rank_0","proposed_rank_1","proposed_rank_2","truth_rank_0","truth_rank_1","truth_rank_2","visibility_A","visibility_B","visibility_C","totalRisk_A","totalRisk_B","totalRisk_C","result_perfect","result_top"])
+        # truth_rules=np.array([
+        #     [1,	2,	1,	0],
+        #     [1,	1,	1,	1],
+        #     [1,	2,	0,	2],
+        #     [1,	1,	0,	3],
+        #     [1,	0,	1,	4],
+        #     [1,	0,	0,	5],
+        #     [0,	2,	1,	6],
+        #     [0,	2,	0,	7],
+        #     [0,	1,	1,	8],
+        #     [0,	1,	0,	9],
+        #     [0,	0,	1,	10],
+        #     [0,	0,	0,	11],
+        # ])
         truth_rules=np.array([
             [1,	2,	1,	0],
             [1,	1,	1,	1],
             [1,	2,	0,	2],
             [1,	1,	0,	3],
-            [1,	0,	1,	4],
-            [1,	0,	0,	5],
-            [0,	2,	1,	6],
-            [0,	2,	0,	7],
-            [0,	1,	1,	8],
+            [0,	2,	1,	4],
+            [1,	0,	1,	5],
+            [0,	1,	1,	6],
+            [1,	0,	0,	7],
+            [0,	2,	0,	8],
             [0,	1,	0,	9],
             [0,	0,	1,	10],
             [0,	0,	0,	11],
