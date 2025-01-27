@@ -150,7 +150,7 @@ class Visualizer(Manager):
         return count_df_visible,count_df_invisible
     
     def check_with_rank(self,stand="A",attribution_risk_dict={"A":2,"B":1,"C":0}):
-        df=pd.DataFrame(columns=["trial_name","proposed_rank_0","proposed_rank_1","proposed_rank_2","truth_rank_0","truth_rank_1","truth_rank_2","result_perfect","result_top"])
+        df=pd.DataFrame(columns=["trial_name","proposed_rank_0","proposed_rank_1","proposed_rank_2","truth_rank_0","truth_rank_1","truth_rank_2","visibility_A","visibility_B","visibility_C","totalRisk_A","totalRisk_B","totalRisk_C","result_perfect","result_top"])
         truth_rules=np.array([
             [1,	2,	1,	0],
             [1,	1,	1,	1],
@@ -196,6 +196,9 @@ class Visualizer(Manager):
                 df.loc[i,"proposed_rank_0"]=proposed_rank_list[0]
                 df.loc[i,"proposed_rank_1"]=proposed_rank_list[1]
                 df.loc[i,"proposed_rank_2"]=proposed_rank_list[2]
+                for j,patient in enumerate(patient_list):
+                    df.loc[i,"visibility_"+patient]=visibility_list[j]
+                    df.loc[i,"totalRisk_"+patient]=total_risk_list[j]
 
                 # 真値算出
                 truth_rank_value_list=[]
