@@ -13,9 +13,9 @@ import matplotlib.pyplot as plt
 class Manager():
     def __init__(self):
         super().__init__()
-        plt.rcParams["figure.figsize"] = (15,11)
+        plt.rcParams["figure.figsize"] = (8/2.54,6/2.54)
         plt.rcParams["figure.autolayout"] = True
-        plt.rcParams["font.size"] = 24
+        plt.rcParams["font.size"] = 11
         plt.rcParams['font.family'] = 'Times New Roman'
         plt.rcParams['mathtext.fontset'] = 'stix' # math fontの設定
         plt.rcParams["legend.edgecolor"] = 'black' # edgeの色を変更

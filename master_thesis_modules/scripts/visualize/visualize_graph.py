@@ -184,6 +184,51 @@ class Visualizer(Manager):
         fig.write_image(self.data_dir_dict["trial_dir_path"]+f"/{trial_name}_bar.pdf")
         fig.show()
 
+    def bar_per_branch(self,trial_name="20250120DevBasicCheck",strage="NASK",patient="A",show_features=False,show=False,save=False):
+        
+        plt.rcParams["figure.figsize"] = (8/2.54,12/2.54)
+        self.data_dir_dict=self.get_database_dir(trial_name=trial_name,strage=strage)
+        self.graph_dicts=self.load_picklelog(self.data_dir_dict["trial_dir_path"]+"/graph_dicts.pickle")
+        self.graph_dict=self.graph_dicts[patient]
+        csv_path=self.data_dir_dict["trial_dir_path"]+f"/data_{patient}_eval.csv"
+        self.data=pd.read_csv(csv_path,header=0)
+
+        # グラフの情報を取り出しておく
+        nodes = self.graph_dict["G"].nodes()
+        pos = self.graph_dict["pos_dict"] # key: ノード番号, value: [x,y]
+        weights = nx.get_edge_attributes(self.graph_dict["G"], 'weight') # key:(node_from,node_to), value: weight
+        status = {n:self.graph_dict["node_dict"][n]["status"] for n in nodes}
+        # scores = {n:self.graph_dict["node_dict"][n]["score"] for n in nodes}# key: ノード番号, value: 特徴量
+        descriptions = {n:self.graph_dict["node_dict"][n]["description_en"] for n in nodes}
+
+        pprint(self.graph_dict)
+        # raise NotImplementedError
+        # 1000 ~ 3000まで，nodeをひとつずつ参照．下位に繋がってるノードを列記
+        # 下位ノードと本人ノードの棒グラフを列記
+        for i,row in self.data.iterrows():
+            for node in self.graph_dict["node_dict"].keys():
+                if int(node)>40000000:
+                    continue
+                node_code_to_list=self.graph_dict["node_dict"][node]["node_code_to"]
+                node_code_to_description=[self.graph_dict["node_dict"][n]["description_en"] for n in node_code_to_list]+[self.graph_dict["node_dict"][node]["description_en"]]
+                risk_values=[]
+                for n in node_code_to_list+[node]:
+                    if str(n) in ["40000000","40000001"]:
+                        r=eval(row[str(n)])[1]
+                    else:
+                        r=row[str(n)]
+                    risk_values.append(r)
+                    
+                colors=["blue" for n in node_code_to_list]+["red"]
+                print(node)
+                print(node_code_to_description)
+                print(risk_values)
+                plt.bar(node_code_to_description,risk_values,color=colors)
+                plt.xticks(rotation=90)
+                plt.savefig(self.data_dir_dict["trial_dir_path"]+f"/bar_{node}_{str(i).zfill(2)}.pdf")
+                plt.close()
+                # raise NotImplementedError
+
 
         
 
@@ -195,4 +240,5 @@ class Visualizer(Manager):
 if __name__=="__main__":
     cls=Visualizer()
     # cls.main()
-    cls.bar(show=True)
+    # cls.bar(show=True)
+    cls.bar_per_branch()
