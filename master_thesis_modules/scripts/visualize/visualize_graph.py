@@ -184,7 +184,7 @@ class Visualizer(Manager):
         fig.write_image(self.data_dir_dict["trial_dir_path"]+f"/{trial_name}_bar.pdf")
         fig.show()
 
-    def bar_per_branch(self,trial_name="20250120DevBasicCheck",strage="NASK",patient="A",show_features=False,show=False,save=False):
+    def bar_per_branch(self,trial_name="20250129DevBasicCheck",strage="NASK",patient="A",show_features=False,show=False,save=False):
         
         plt.rcParams["figure.figsize"] = (8/2.54,12/2.54)
         self.data_dir_dict=self.get_database_dir(trial_name=trial_name,strage=strage)
@@ -224,6 +224,7 @@ class Visualizer(Manager):
                 print(node_code_to_description)
                 print(risk_values)
                 plt.bar(node_code_to_description,risk_values,color=colors)
+                plt.ylim([0,1.1])
                 plt.xticks(rotation=90)
                 plt.savefig(self.data_dir_dict["trial_dir_path"]+f"/bar_{node}_{str(i).zfill(2)}.pdf")
                 plt.close()

@@ -196,7 +196,7 @@ class PseudoDataGenerator(Manager):
         return data_dicts
 
 if __name__=="__main__":
-    trial_name=""
+    trial_name="20250129DevBasicCheck"
     strage="NASK"
     cls=PseudoDataGenerator(trial_name=trial_name,strage=strage)
-    
+    cls.get_basic_check_data()
