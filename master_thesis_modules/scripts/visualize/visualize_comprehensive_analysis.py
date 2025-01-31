@@ -242,6 +242,11 @@ class Visualizer(Manager):
         
         pass
 
+    def analyze_comparison_with_truth(self):
+        df=pd.read_csv(self.simulation_common_dir_path+"/compare_with_truth.csv",header=0)
+        print(self.simulation_dir_path,"Perfect:",np.round(df["result_perfect"].sum()/len(df)*100),"%","Top:",np.round(df["result_top"].sum()/len(df)*100),"%")
+
+
     def draw_timeseries_with_categorization_v2(self):
         # Bが立ったときのjsonを取得
         # data=self.load_json(self.simulation_common_dir_path+"/standing.json")
@@ -476,15 +481,19 @@ if __name__=="__main__":
     simulation_name="20250113SimulationPositionA"
     strage="NASK"
     cls=Visualizer(simulation_name=simulation_name,strage=strage)
-    cls.check_with_rank(stand="A",attribution_risk_dict={"A":2,"B":1,"C":0})
+    # cls.check_with_rank(stand="A",attribution_risk_dict={"A":2,"B":1,"C":0})
+    cls.analyze_comparison_with_truth()
     simulation_name="20250113SimulationPositionB"
     strage="NASK"
     cls=Visualizer(simulation_name=simulation_name,strage=strage)
-    cls.check_with_rank(stand="B",attribution_risk_dict={"A":2,"B":1,"C":0})
+    # cls.check_with_rank(stand="B",attribution_risk_dict={"A":2,"B":1,"C":0})
+    cls.analyze_comparison_with_truth()
+    
     simulation_name="20250113SimulationPositionC2"
     strage="NASK"
     cls=Visualizer(simulation_name=simulation_name,strage=strage)
-    cls.check_with_rank(stand="C",attribution_risk_dict={"A":2,"B":1,"C":0})
+    # cls.check_with_rank(stand="C",attribution_risk_dict={"A":2,"B":1,"C":0})
+    cls.analyze_comparison_with_truth()
 
     # cls.draw_timeseries_with_categorization_v2()
     # cls.main()

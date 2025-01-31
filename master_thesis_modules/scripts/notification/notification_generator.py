@@ -188,7 +188,7 @@ class NotificationGenerator(Manager,GraphManager):
         static_factor_node,factor_df=self.guess_static_factor(data_dict_roi,most_risky_patient)
 
         alert_text=self.get_alert_sentence(most_risky_patient=most_risky_patient,dynamic_factor_node=dynamic_factor_node,static_factor_node=static_factor_node)
-        alert_text=self.translate_person_name(alert_text)
+        # alert_text=self.translate_person_name(alert_text)
         return alert_text,dynamic_factor_node,static_factor_node,data_corr,factor_df
     
     def judge_time_interval(self,notify_history,row,alert_type):
@@ -395,16 +395,17 @@ class NotificationGenerator(Manager,GraphManager):
         pass
 
 if __name__=="__main__":
-    trial_name="20250124NotifyForNagasakiStaff2"
+    trial_name="20250130ChangeCriteriaAfter"
     # result_trial_name="20250113NormalSimulation"
     # result_trial_name="20250110SimulationMultipleRisks/no_00005"
     # result_trial_name="20250108DevMewThrottlingExp"
-    result_trial_name="20250115PullWheelchairObaachan2"
+    # result_trial_name="20250115PullWheelchairObaachan2"
     # trial_name="20250110NotificationGeneratorExp"
     # result_trial_name="20250121ChangeCriteriaBefore"
+    result_trial_name="20250121ChangeCriteriaAfter"
     strage="NASK"
 
     cls=NotificationGenerator(trial_name=trial_name,strage=strage,result_trial_name=result_trial_name)
     cls.main_new()
     cls.plot_timeseries_with_notification_point()
-    cls.create_mp4_with_audio()
+    # cls.create_mp4_with_audio()
