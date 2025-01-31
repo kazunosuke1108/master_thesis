@@ -680,7 +680,7 @@ class Visualizer(Manager):
         fig.show()
 
     def plot_matplotlib(self):
-        plt.rcParams["figure.figsize"] = (10,5)
+        # plt.rcParams["figure.figsize"] = (10,5)
         csv_paths=sorted(glob(self.data_dir_dict["trial_dir_path"]+"/data_*_eval.csv"))
         data_dict={}
         id_names=[]
@@ -698,11 +698,11 @@ class Visualizer(Manager):
                 # if int(export_label) in ["10000000","20000001"]:
                 w=40
                 try:
-                    plt.plot(data_dict[id_name]["timestamp"],data_dict[id_name][export_label].rolling(w).mean(),"-o",label=id_name)
+                    plt.plot(data_dict[id_name]["timestamp"],data_dict[id_name][export_label].rolling(w).mean(),"-o",linewidth=0.25,markersize=1,label=id_name)
                     # plt.title(export_label+f" window: {w}")
                 except pd.errors.DataError:
                     try:
-                        plt.plot(data_dict[id_name]["timestamp"],data_dict[id_name][export_label],"-o",label=id_name)
+                        plt.plot(data_dict[id_name]["timestamp"],data_dict[id_name][export_label],"-o",linewidth=0.25,markersize=1,label=id_name)
                     except TypeError:
                         pass
                     plt.title(export_label)
@@ -710,7 +710,7 @@ class Visualizer(Manager):
             plt.grid()
             plt.xlabel("Time [s]")
             plt.ylabel("Risk value")
-            plt.savefig(self.data_dir_dict["trial_dir_path"]+f"/result_{export_label}.jpg")
+            plt.savefig(self.data_dir_dict["trial_dir_path"]+f"/result_{export_label}.pdf")
             plt.close()
 
         # for csv_path in csv_paths:
@@ -769,9 +769,10 @@ class Visualizer(Manager):
         pass
 
 if __name__=="__main__":
-    trial_name="20250113NormalSimulation"
+    # trial_name="20250113NormalSimulation"
     # trial_name="20250110SimulationMultipleRisks/no_00005"
-    # trial_name="20250120FPScontrolTrue"
+    # trial_name="20250120FPScontrolFalse"
+    trial_name="20250120FPScontrolTrue"
     # trial_name="20250108DevMewThrottlingExp"
     # trial_name="20250115PullWheelchairObaachan2"
     # trial_name="20250121ChangeCriteriaBefore"

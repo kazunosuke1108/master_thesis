@@ -77,7 +77,12 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
                     self.data_dicts[patient].rename(columns=renew_dict,inplace=True)
         elif self.runtype=="basic_check":
             print("# basic checkのデータをロード中 #")
-            self.data_dicts=PseudoDataGenerator(trial_name=self.trial_name,strage=self.strage).get_basic_check_data(graph_dicts=default_graph,patients=self.patients)
+            # self.data_dicts=PseudoDataGenerator(trial_name=self.trial_name,strage=self.strage).get_basic_check_data(graph_dicts=default_graph,patients=self.patients)
+            df=pd.read_csv(self.data_dir_dict["trial_dir_path"]+"/data_A_eval.csv",header=0)
+            df_columns=[int(k) for k in df.keys() if k!="timestamp"]
+            df_columns=["timestamp"]+df_columns
+            df.columns=df_columns
+            self.data_dicts={"A":df}
             # raise NotImplementedError
 
         # data_dictsに不足した列がないか確認
@@ -758,7 +763,7 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
         pass
 
 if __name__=="__main__":
-    trial_name="20250120DevBasicCheck"
+    trial_name="20250129DevBasicCheck"
     strage="NASK"
     runtype="basic_check"
     cls=Master(trial_name,strage,runtype=runtype)
