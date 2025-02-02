@@ -44,7 +44,7 @@ class VideoVisualizer(Manager):
         sensing_csv_path=sorted(glob(f"/media/hayashide/MobileSensing/{self.sensing_trial_name}/csv/annotation/*_fixposition.csv"))[0]
         # sensing_csv_path="/media/hayashide/MobileSensing/PullWheelchairObaachan/csv/annotation/PullWheelchairObaachan_annotation_ytnpc2021h_20240827_192540New_fixposition.csv"
         # sensing_csv_path="//NASK/common/FY2024/09_MobileSensing/Nagasaki20241205193158/csv/annotation/Nagasaki20241205193158_annotation_ytpc2024j_20241205_193158_fixposition.csv"
-        self.sensing_data=pd.read_csv(sensing_csv_path,header=0)
+        self.sensing_data=pd.read_csv(sensing_csv_path,header=0).interpolate(method="bfill")
 
         # リスク評価のデータ
         evaluation_csv_paths=sorted(glob(self.evaluation_dir_dict["trial_dir_path"]+"/data_*_eval.csv"))
@@ -297,10 +297,17 @@ if __name__=="__main__":
     # notification_trial_name="20250202ChangeCriteriaAfter"
     # visualize_trial_name="20250202VisualizeVideoAfter"
     # 
-    sensing_trial_name="PullWheelchairObaachan"
-    evaluation_trial_name="20250115PullWheelchairObaachan2"
-    notification_trial_name="20250202NotifyPull"
-    visualize_trial_name="20250202VisualizeVideoPull"
+    # sensing_trial_name="PullWheelchairObaachan"
+    # evaluation_trial_name="20250115PullWheelchairObaachan2"
+    # notification_trial_name="20250202NotifyPull"
+    # visualize_trial_name="20250202VisualizeVideoPull"
+    # 
+    sensing_trial_name="Nagasaki20241205193158"
+    evaluation_trial_name="20250121ChangeCriteriaBefore"
+    notification_trial_name="20250202NotifyDevIntervalBefore"
+    visualize_trial_name="20250202VisualizeVideoDevInterval"
+
+    
 
     cls=VideoVisualizer(
         sensing_trial_name=sensing_trial_name,
