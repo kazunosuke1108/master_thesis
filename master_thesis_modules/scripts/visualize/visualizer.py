@@ -723,6 +723,9 @@ class Visualizer(Manager):
         # plt.show()
 
     def plot_fps(self):
+        # plt.rcParams["figure.figsize"] = (8*2/2.54,6*2/2.54)
+        # plt.rcParams["figure.figsize"] = (8/2.54,10/2.54)
+        plt.rcParams["figure.figsize"] = (6/2.54,8/2.54)
         csv_paths=sorted(glob(self.data_dir_dict["trial_dir_path"]+"/fps_*.csv"))
         id_names=[os.path.basename(p)[len("fps_"):-len(".csv")] for p in csv_paths]
         data_dicts={}
@@ -745,7 +748,7 @@ class Visualizer(Manager):
             # plt.ylabel("Frame rate [Hz]")
             # plt.savefig(self.data_dir_dict["trial_dir_path"]+f"/result_fps_{plot_node}.jpg")
             # plt.close()
-            timestamps = data_dicts[id_names[0]]["timestamp"]
+            timestamps = data_dicts[id_names[0]]["timestamp"]-data_dicts[id_names[0]]["timestamp"].values[0]
             stacked_data = [data_dicts[id_name][plot_node] for id_name in id_names]
 
             # 積み上げ折れ線グラフを描画
@@ -757,11 +760,12 @@ class Visualizer(Manager):
             )
 
             # グラフの装飾
-            plt.legend()
+            plt.legend( loc='lower center', bbox_to_anchor=(.5, 1.1), ncol=3)
+            # plt.legend()
             plt.grid()
             plt.xlabel("Time [s]")
             plt.ylabel("Frame rate [Hz]")
-            plt.savefig(self.data_dir_dict["trial_dir_path"]+f"/result_fps_{plot_node}.jpg")
+            plt.savefig(self.data_dir_dict["trial_dir_path"]+f"/result_fps_{plot_node}.pdf")
             plt.show()
         print(csv_paths)
         pass
@@ -779,8 +783,8 @@ if __name__=="__main__":
     strage="NASK"
     cls=Visualizer(trial_name=trial_name,strage=strage)
     # cls.visualize_graph(trial_name="20241229BuildSimulator",strage="NASK",name="A",show=True)
-    cls.plot_matplotlib()
-    # cls.plot_fps()
+    # cls.plot_matplotlib()
+    cls.plot_fps()
     # cls.draw_positions()
     # cls.draw_features()
     # cls.draw_weight()
