@@ -686,7 +686,7 @@ class Visualizer(Manager):
         id_names=[]
         for csv_path in csv_paths:
             data=pd.read_csv(csv_path,header=0)
-            data=data[data["timestamp"]<9]
+            # data=data[data["timestamp"]<9]
             id_name=os.path.basename(csv_path).split("_")[1]
             id_names.append(id_name)
             data_dict[id_name]=data
@@ -779,7 +779,7 @@ if __name__=="__main__":
     trial_name="20250120FPScontrolTrue"
     # trial_name="20250108DevMewThrottlingExp"
     # trial_name="20250115PullWheelchairObaachan2"
-    # trial_name="20250121ChangeCriteriaBefore"
+    trial_name="20250121ChangeCriteriaBefore"
     strage="NASK"
     cls=Visualizer(trial_name=trial_name,strage=strage)
     # cls.visualize_graph(trial_name="20241229BuildSimulator",strage="NASK",name="A",show=True)
