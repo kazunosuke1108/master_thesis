@@ -29,16 +29,23 @@ class VideoVisualizer(Manager):
         self.evaluation_dir_dict=self.get_database_dir(trial_name=evaluation_trial_name,strage="NASK")
         self.notification_dir_dict=self.get_database_dir(trial_name=notification_trial_name,strage="NASK")
         self.visualize_dir_dict=self.get_database_dir(trial_name=visualize_trial_name,strage="NASK")
+        os.makedirs(self.visualize_dir_dict["trial_dir_path"]+"/temp",exist_ok=True)
         
+        speaker_icon_red_path=self.notification_dir_dict["common_dir_path"]+"/icon_speaker_red.png"
+        self.speaker_red_img=cv2.resize(cv2.imread(speaker_icon_red_path), (50,50),fx=0,fy=0)
+        speaker_icon_blue_path=self.notification_dir_dict["common_dir_path"]+"/icon_speaker_blue.png"
+        self.speaker_blue_img=cv2.resize(cv2.imread(speaker_icon_blue_path), (50,50),fx=0,fy=0)
+
         # parameters
-        smoothing_window=40
+        smoothing_window=10
         
         # MobileSensing系のデータ
+        # sensing_csv_path="/media/hayashide/MobileSensing/Nagasaki20241205193158/csv/annotation/Nagasaki20241205193158_annotation_ytpc2024j_20241205_193158_fixposition.csv"
         sensing_csv_path="//NASK/common/FY2024/09_MobileSensing/Nagasaki20241205193158/csv/annotation/Nagasaki20241205193158_annotation_ytpc2024j_20241205_193158_fixposition.csv"
         self.sensing_data=pd.read_csv(sensing_csv_path,header=0)
 
         # リスク評価のデータ
-        evaluation_csv_paths=sorted(glob("//192.168.1.5/common/FY2024/01_M2/05_hayashide/MasterThesis_database/20250108DevMewThrottlingExp/data_*_eval.csv"))
+        evaluation_csv_paths=sorted(glob(self.evaluation_dir_dict["trial_dir_path"]+"/data_*_eval.csv"))
         self.patients=[os.path.basename(k)[len("data_"):-len("_eval.csv")] for k in evaluation_csv_paths]
         self.evaluation_data_dict={k:pd.read_csv(path) for k,path in zip(self.patients,evaluation_csv_paths)}
         ## 平滑化処理を入れておく（window幅は通知側と揃えないとまずい）
@@ -54,7 +61,7 @@ class VideoVisualizer(Manager):
             self.evaluation_data_dict[patient]=self.evaluation_data_dict[patient].rolling(smoothing_window).mean()
 
         # 通知のデータ
-        notification_csv_path="//192.168.1.5/common/FY2024/01_M2/05_hayashide/MasterThesis_database/20250124NotifyForNagasakiStaff1/20250124NotifyForNagasakiStaff1_20250108DevMewThrottlingExp_notify_history.csv"
+        notification_csv_path=self.notification_dir_dict["trial_dir_path"]+"/20250202ChangeCriteriaBefore_20250121ChangeCriteriaBefore_notify_history.csv"
         self.notification_data=pd.read_csv(notification_csv_path,header=0)
 
         if len(self.sensing_data)!=len(self.evaluation_data_dict[self.patients[0]]):
@@ -118,26 +125,119 @@ class VideoVisualizer(Manager):
             cv2.rectangle(img,bbox_info[0],bbox_info[1],self.patient_color_dict[patient], thickness=thickness)
         return img
         
+    def draw_timestamp(self,i,img):
+        bbox_info=[
+            (0,0),
+            (250,40),
+        ]
+        cv2.rectangle(img,bbox_info[0],bbox_info[1],color=(255,255,255),thickness=cv2.FILLED)
+        cv2.putText(
+            img=img,
+            text="Time: "+str(np.round(self.sensing_data.loc[i,"timestamp"]-self.sensing_data.loc[0,"timestamp"],2))+" [s]",
+            fontFace=cv2.FONT_HERSHEY_DUPLEX,
+            fontScale=1,
+            org=(0,30),
+            color=(0,0,255),
+            thickness=2,
+            )
+        return img
+    
+    def draw_rank(self,i,img):
+        def get_bbox_info(rank):
+            x_width=250
+            y_interval=50
+            y_width=40
+            bbox_info=[
+                (0,int(50+rank*y_interval)),
+                (x_width,int(50+rank*y_interval+y_width))
+                ]
+            return bbox_info
         
+        cv2.rectangle(img,(0,40),(280,50*(len(self.patients)+2)),color=(255,255,255),thickness=cv2.FILLED)
+        for patient in self.patients:
+            rank=self.rank_data.loc[i,patient+"_rank"]
+            if np.isnan(rank):
+                continue
+            bbox_info=get_bbox_info(rank)
+            cv2.rectangle(img,(bbox_info[0][0]+90,bbox_info[0][1]),bbox_info[1],color=self.patient_color_dict[patient],thickness=cv2.FILLED)
+            cv2.putText(
+                img=img,
+                text=f"No.{int(rank)+1}: "+"ID_"+patient,
+                fontFace=cv2.FONT_HERSHEY_DUPLEX,
+                fontScale=1,
+                org=(bbox_info[0][0],bbox_info[1][1]),
+                color=(0,0,0),
+                thickness=2,
+                )            
+            # 通知中か判定
+            notify_for_the_patient_data=self.notification_data[self.notification_data.fillna(99999)["patient"]==float(patient)]
+            for j,_ in notify_for_the_patient_data.iterrows():
+                if (notify_for_the_patient_data.loc[j,"timestamp"]<self.rank_data.loc[i,"timestamp"]) and (self.rank_data.loc[i,"timestamp"]<=notify_for_the_patient_data.loc[j,"timestamp"]+4):
+                    img[bbox_info[0][1]:bbox_info[0][1]+self.speaker_red_img.shape[0],bbox_info[1][0]:bbox_info[1][0]+self.speaker_red_img.shape[1]]=self.speaker_red_img
+            # raise NotImplementedError
+        # 応援要請の状況
+        notify_help_data=self.notification_data[self.notification_data["type"]=="help"]
+        bbox_info=get_bbox_info(len(self.patients))
+        for j,_ in notify_help_data.iterrows():
+            if (notify_help_data.loc[j,"timestamp"]<self.rank_data.loc[i,"timestamp"]) and (self.rank_data.loc[i,"timestamp"]<=notify_help_data.loc[j,"timestamp"]+4):
+                cv2.putText(
+                        img=img,
+                        text="Ask for help:",
+                        fontFace=cv2.FONT_HERSHEY_DUPLEX,
+                        fontScale=1,
+                        org=(bbox_info[0][0],bbox_info[1][1]),
+                        color=(255,0,0),
+                        thickness=2,
+                        )
+                img[bbox_info[0][1]:bbox_info[0][1]+self.speaker_blue_img.shape[0],bbox_info[1][0]:bbox_info[1][0]+self.speaker_blue_img.shape[1]]=self.speaker_blue_img
+                break
+            else:
+                cv2.putText(
+                        img=img,
+                        text="Ask for help:",
+                        fontFace=cv2.FONT_HERSHEY_DUPLEX,
+                        fontScale=1,
+                        org=(bbox_info[0][0],bbox_info[1][1]),
+                        color=(200,200,200),
+                        thickness=2,
+                        )
+
+            # 通知中なら，スピーカーアイコンを描く
+
+        return img
+
+    # def draw_speaker(self,i,img):
+    #     for patient in self.patients:
+    #     return img
 
     def main(self):
         # 画像を1枚ずつ取り出す
         for i,row in self.sensing_data.iterrows():
+            if i%10==0:
+                print(f"Now processing... {i}/{len(self.sensing_data)}")
             # print(self.sensing_data.loc[i,"fullrgb_imagePath"])
+            # elp_img_path="/media/hayashide/MobileSensing"+"/"+self.sensing_data.loc[i,"fullrgb_imagePath"]
             elp_img_path="//NASK/common/FY2024/09_MobileSensing"+"/"+self.sensing_data.loc[i,"fullrgb_imagePath"]
             elp_img=cv2.imread(elp_img_path)
             # bounding boxを描く
-            elp_img_with_box=self.draw_bbox(i,elp_img)
-            cv2.imshow("ELP with BBOX",elp_img_with_box)
-            cv2.waitKey(1)
-
+            elp_img=self.draw_bbox(i,elp_img)
+            # timestampを描く
+            elp_img=self.draw_timestamp(i,elp_img)
+            # rankを描く
+            elp_img=self.draw_rank(i,elp_img)
+            # 危険pop upを描く
+            cv2.imwrite(self.visualize_dir_dict["trial_dir_path"]+f"/temp/{str(i).zfill(5)}.jpg",elp_img)
+            # cv2.imshow("ELP",elp_img)
+            # cv2.waitKey(1)
             # raise NotImplementedError
+        
+        self.jpg2mp4(sorted(glob(self.visualize_dir_dict["trial_dir_path"]+"/temp/*.jpg")),mp4_path=self.visualize_dir_dict["trial_dir_path"]+"/output.mp4",fps=20)
 
         pass
 
 if __name__=="__main__":
     sensing_trial_name="Nagasaki20241205193158"
-    evaluation_trial_name="20250108DevMewThrottlingExp"
+    evaluation_trial_name="20250121ChangeCriteriaBefore"
     notification_trial_name="20250124NotifyForNagasakiStaff1"
     visualize_trial_name="20250201VisualizeVideo"
     cls=VideoVisualizer(
