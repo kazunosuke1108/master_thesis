@@ -41,11 +41,14 @@ class VideoVisualizer(Manager):
         
         # MobileSensing系のデータ
         # sensing_csv_path="/media/hayashide/MobileSensing/Nagasaki20241205193158/csv/annotation/Nagasaki20241205193158_annotation_ytpc2024j_20241205_193158_fixposition.csv"
-        sensing_csv_path="//NASK/common/FY2024/09_MobileSensing/Nagasaki20241205193158/csv/annotation/Nagasaki20241205193158_annotation_ytpc2024j_20241205_193158_fixposition.csv"
+        sensing_csv_path=sorted(glob(f"/media/hayashide/MobileSensing/{self.sensing_trial_name}/csv/annotation/*_fixposition.csv"))[0]
+        # sensing_csv_path="/media/hayashide/MobileSensing/PullWheelchairObaachan/csv/annotation/PullWheelchairObaachan_annotation_ytnpc2021h_20240827_192540New_fixposition.csv"
+        # sensing_csv_path="//NASK/common/FY2024/09_MobileSensing/Nagasaki20241205193158/csv/annotation/Nagasaki20241205193158_annotation_ytpc2024j_20241205_193158_fixposition.csv"
         self.sensing_data=pd.read_csv(sensing_csv_path,header=0)
 
         # リスク評価のデータ
         evaluation_csv_paths=sorted(glob(self.evaluation_dir_dict["trial_dir_path"]+"/data_*_eval.csv"))
+        print(evaluation_csv_paths)
         self.patients=[os.path.basename(k)[len("data_"):-len("_eval.csv")] for k in evaluation_csv_paths]
         self.evaluation_data_dict={k:pd.read_csv(path) for k,path in zip(self.patients,evaluation_csv_paths)}
         ## 平滑化処理を入れておく（window幅は通知側と揃えないとまずい）
@@ -58,11 +61,17 @@ class VideoVisualizer(Manager):
             if int(k)<40000000 or ((int(k)>=40000010) and int(k)<50000000):
                 smoothing_cols.append(k)
         for patient in self.patients:
-            self.evaluation_data_dict[patient]=self.evaluation_data_dict[patient].rolling(smoothing_window).mean()
+            print(patient)
+            self.evaluation_data_dict[patient]=self.evaluation_data_dict[patient][smoothing_cols].rolling(smoothing_window).mean()
 
         # 通知のデータ
-        notification_csv_path=self.notification_dir_dict["trial_dir_path"]+"/20250202ChangeCriteriaBefore_20250121ChangeCriteriaBefore_notify_history.csv"
+        notification_csv_path=sorted(glob(self.notification_dir_dict["trial_dir_path"]+"/*_notify_history.csv"))[0]
         self.notification_data=pd.read_csv(notification_csv_path,header=0)
+
+        print(self.sensing_data)
+        print(self.evaluation_data_dict)
+        print(self.notification_data)
+        # raise NotImplementedError
 
         if len(self.sensing_data)!=len(self.evaluation_data_dict[self.patients[0]]):
             raise Exception("MobileSensingとリスク評価でデータの長さが一致しない")
@@ -113,6 +122,8 @@ class VideoVisualizer(Manager):
 
     def draw_bbox(self,i,img):
         for patient in self.patients:
+            if np.isnan(self.sensing_data.loc[i,f"ID_{patient}_bbox_higherX"]):
+                continue
             # patient_rank
             bbox_info=[
                 (int(self.sensing_data.loc[i,f"ID_{patient}_bbox_higherX"]),int(self.sensing_data.loc[i,f"ID_{patient}_bbox_higherY"])),
@@ -206,18 +217,41 @@ class VideoVisualizer(Manager):
 
         return img
 
-    # def draw_speaker(self,i,img):
-    #     for patient in self.patients:
-    #     return img
+    def create_mp4_with_audio(self):
+        from moviepy import VideoFileClip, AudioFileClip, concatenate_videoclips,CompositeAudioClip
+        mp4_path=self.visualize_dir_dict["trial_dir_path"]+"/output.mp4"
+        video = VideoFileClip(mp4_path)
+        # 動画のもともとの音声を削除（音声がなければ無視してOK）
+        video = video.without_audio()
+        audio_clips = []
+        for i,row in self.notification_data.iterrows():
+            mp3_path=sorted(glob(self.notification_dir_dict["trial_dir_path"]+f"/*_{str(i).zfill(5)}.mp3"))[0]
+            audio = AudioFileClip(mp3_path).with_start(row["relativeTimestamp"])
+            audio_clips.append(audio)
+        composite_audio = CompositeAudioClip(audio_clips)
+
+        # 音声の長さを動画に合わせて調整（必要に応じてトリミング）
+        # if composite_audio.duration > video.duration:
+        #     composite_audio = composite_audio.subclipped(0, video.duration)
+        
+        video_with_audio = video.with_audio(composite_audio)
+
+        # 出力ファイルとして保存
+        video_with_audio.write_videofile(mp4_path.replace("output","output_with_audio"), codec="libx264", audio_codec="aac")
+
+        pass
 
     def main(self):
         # 画像を1枚ずつ取り出す
-        for i,row in self.sensing_data.iterrows():
+        def draw(i):
+
             if i%10==0:
                 print(f"Now processing... {i}/{len(self.sensing_data)}")
             # print(self.sensing_data.loc[i,"fullrgb_imagePath"])
-            # elp_img_path="/media/hayashide/MobileSensing"+"/"+self.sensing_data.loc[i,"fullrgb_imagePath"]
-            elp_img_path="//NASK/common/FY2024/09_MobileSensing"+"/"+self.sensing_data.loc[i,"fullrgb_imagePath"]
+            elp_img_path="/media/hayashide/MobileSensing"+"/"+self.sensing_data.loc[i,"fullrgb_imagePath"]
+            if "//" in elp_img_path:
+                elp_img_path=self.sensing_data.loc[i,"fullrgb_imagePath"]
+            # elp_img_path="//NASK/common/FY2024/09_MobileSensing"+"/"+self.sensing_data.loc[i,"fullrgb_imagePath"]
             elp_img=cv2.imread(elp_img_path)
             # bounding boxを描く
             elp_img=self.draw_bbox(i,elp_img)
@@ -227,19 +261,47 @@ class VideoVisualizer(Manager):
             elp_img=self.draw_rank(i,elp_img)
             # 危険pop upを描く
             cv2.imwrite(self.visualize_dir_dict["trial_dir_path"]+f"/temp/{str(i).zfill(5)}.jpg",elp_img)
+            # print(elp_img_path)
             # cv2.imshow("ELP",elp_img)
-            # cv2.waitKey(1)
-            # raise NotImplementedError
+            # cv2.waitKey(0)
+        
+        n_cpu=cpu_count()
+        p_list=[]
+        for i,row in self.sensing_data.iterrows():
+            # draw(i)
+            p=Process(target=draw,args=(i,))
+            p_list.append(p)
+            if (len(p_list)>=n_cpu) or (i+1==len(self.sensing_data)):
+                for p in p_list:
+                    p.start()
+                for p in p_list:
+                    p.join()
+                p_list=[]
+        
+
         
         self.jpg2mp4(sorted(glob(self.visualize_dir_dict["trial_dir_path"]+"/temp/*.jpg")),mp4_path=self.visualize_dir_dict["trial_dir_path"]+"/output.mp4",fps=20)
 
+        self.create_mp4_with_audio()
         pass
 
 if __name__=="__main__":
-    sensing_trial_name="Nagasaki20241205193158"
-    evaluation_trial_name="20250121ChangeCriteriaBefore"
-    notification_trial_name="20250124NotifyForNagasakiStaff1"
-    visualize_trial_name="20250201VisualizeVideo"
+    # 
+    # sensing_trial_name="Nagasaki20241205193158"
+    # evaluation_trial_name="20250121ChangeCriteriaBefore"
+    # notification_trial_name="20250202ChangeCriteriaBefore"
+    # visualize_trial_name="20250201VisualizeVideo"
+    # 
+    # sensing_trial_name="Nagasaki20241205193158"
+    # evaluation_trial_name="20250121ChangeCriteriaAfter"
+    # notification_trial_name="20250202ChangeCriteriaAfter"
+    # visualize_trial_name="20250202VisualizeVideoAfter"
+    # 
+    sensing_trial_name="PullWheelchairObaachan"
+    evaluation_trial_name="20250115PullWheelchairObaachan2"
+    notification_trial_name="20250202NotifyPull"
+    visualize_trial_name="20250202VisualizeVideoPull"
+
     cls=VideoVisualizer(
         sensing_trial_name=sensing_trial_name,
         evaluation_trial_name=evaluation_trial_name,

@@ -313,7 +313,7 @@ class NotificationGenerator(Manager,GraphManager):
                 if notify:
                     notify_history.loc[len(notify_history),:]=[self.notification_id,self.df_rank.loc[i,"timestamp"],self.df_rank.loc[i,"timestamp"]-self.df_rank.loc[0,"timestamp"],most_risky_patient,alert_text,"notice",data_of_risky_patient["10000000"].values.mean()]
                     notification_mp3_path=self.data_dir_dict["trial_dir_path"]+"/"+f"notification_{self.trial_name}_{str(self.notification_id).zfill(5)}.mp3"
-                    # Notification().export_audio(text=alert_text,mp3_path=notification_mp3_path,chime_type=1)
+                    Notification().export_audio(text=alert_text,mp3_path=notification_mp3_path,chime_type=1)
                     self.logger.warning(f"通知しました: 「{alert_text}」")
                     self.save(self.df_rank,data_corr,factor_df,notification_id=self.notification_id)
                     self.notification_id+=1
@@ -322,7 +322,7 @@ class NotificationGenerator(Manager,GraphManager):
                 alert_text=self.get_help_sentence()
                 notify_history.loc[len(notify_history),:]=[self.notification_id,self.df_rank.loc[i,"timestamp"],self.df_rank.loc[i,"timestamp"]-self.df_rank.loc[0,"timestamp"],"",alert_text,"help",np.nan]
                 notification_mp3_path=self.data_dir_dict["trial_dir_path"]+"/"+f"notification_{self.trial_name}_{str(self.notification_id).zfill(5)}.mp3"
-                # Notification().export_audio(text=alert_text,mp3_path=notification_mp3_path,chime_type=2)
+                Notification().export_audio(text=alert_text,mp3_path=notification_mp3_path,chime_type=2)
                 self.logger.warning(f"応援を要請しました: 「{alert_text}」")
                 self.save(self.df_rank,data_corr,factor_df,notification_id=self.notification_id)
                 self.notification_id+=1
@@ -395,14 +395,14 @@ class NotificationGenerator(Manager,GraphManager):
         pass
 
 if __name__=="__main__":
-    trial_name="20250202ChangeCriteriaBefore"
+    trial_name="20250202NotifyPull"
     # result_trial_name="20250113NormalSimulation"
     # result_trial_name="20250110SimulationMultipleRisks/no_00005"
     # result_trial_name="20250108DevMewThrottlingExp"
-    # result_trial_name="20250115PullWheelchairObaachan2"
+    result_trial_name="20250115PullWheelchairObaachan2"
     # trial_name="20250110NotificationGeneratorExp"
-    # result_trial_name="20250121ChangeCriteriaBefore"
-    result_trial_name="20250121ChangeCriteriaBefore"
+    # result_trial_name="20250121ChangeCriteriaAfter"
+    # result_trial_name="20250121ChangeCriteriaAfter"
     strage="NASK"
 
     cls=NotificationGenerator(trial_name=trial_name,strage=strage,result_trial_name=result_trial_name)
