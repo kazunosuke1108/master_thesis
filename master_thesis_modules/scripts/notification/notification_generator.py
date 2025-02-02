@@ -313,7 +313,7 @@ class NotificationGenerator(Manager,GraphManager):
                 if notify:
                     notify_history.loc[len(notify_history),:]=[self.notification_id,self.df_rank.loc[i,"timestamp"],self.df_rank.loc[i,"timestamp"]-self.df_rank.loc[0,"timestamp"],alert_text,"notice",data_of_risky_patient["10000000"].values.mean()]
                     notification_mp3_path=self.data_dir_dict["trial_dir_path"]+"/"+f"notification_{self.trial_name}_{str(self.notification_id).zfill(5)}.mp3"
-                    Notification().export_audio(text=alert_text,mp3_path=notification_mp3_path,chime_type=1)
+                    # Notification().export_audio(text=alert_text,mp3_path=notification_mp3_path,chime_type=1)
                     self.logger.warning(f"通知しました: 「{alert_text}」")
                     self.save(self.df_rank,data_corr,factor_df,notification_id=self.notification_id)
                     self.notification_id+=1
@@ -322,7 +322,7 @@ class NotificationGenerator(Manager,GraphManager):
                 alert_text=self.get_help_sentence()
                 notify_history.loc[len(notify_history),:]=[self.notification_id,self.df_rank.loc[i,"timestamp"],self.df_rank.loc[i,"timestamp"]-self.df_rank.loc[0,"timestamp"],alert_text,"help",np.nan]
                 notification_mp3_path=self.data_dir_dict["trial_dir_path"]+"/"+f"notification_{self.trial_name}_{str(self.notification_id).zfill(5)}.mp3"
-                Notification().export_audio(text=alert_text,mp3_path=notification_mp3_path,chime_type=2)
+                # Notification().export_audio(text=alert_text,mp3_path=notification_mp3_path,chime_type=2)
                 self.logger.warning(f"応援を要請しました: 「{alert_text}」")
                 self.save(self.df_rank,data_corr,factor_df,notification_id=self.notification_id)
                 self.notification_id+=1
@@ -340,20 +340,31 @@ class NotificationGenerator(Manager,GraphManager):
         return alert_text
 
     def plot_timeseries_with_notification_point(self):
+        plt.rcParams["figure.figsize"] = (8*2/2.54,6*2/2.54)
         for patient in self.id_names:
-            plt.plot(self.data_dicts[patient]["timestamp"],self.data_dicts[patient]["10000000"],"-o",label=patient)
+            plt.plot(self.data_dicts[patient]["timestamp"]-self.data_dicts[patient]["timestamp"].values[0],self.data_dicts[patient]["10000000"],"-o",linewidth=0.25,markersize=1,label=patient)
 
+        first_notice=True
+        first_help=True
         for i,row in self.notify_history.iterrows():
             if row["type"]=="notice":
                 color="red"
             elif row["type"]=="help":
                 color="blue"
-            plt.plot([row["timestamp"],row["timestamp"]],[0.1,0.7],color=color,linewidth=4,label=row["type"])
+            if ((row["type"]=="notice") and first_notice) or ((row["type"]=="help") and first_help):
+                plt.plot([row["timestamp"]-self.data_dicts[patient]["timestamp"].values[0],row["timestamp"]-self.data_dicts[patient]["timestamp"].values[0]],[0.1,0.7],color=color,linewidth=1,label=row["type"])
+                if ((row["type"]=="notice") & first_notice):
+                    first_notice=False
+                if ((row["type"]=="help") & first_help):
+                    first_help=False
+            else:
+                plt.plot([row["timestamp"]-self.data_dicts[patient]["timestamp"].values[0],row["timestamp"]-self.data_dicts[patient]["timestamp"].values[0]],[0.1,0.7],color=color,linewidth=1)
         plt.xlabel("Time [s]")
         plt.ylabel("Risk value")
-        plt.legend()
+        # plt.legend()
+        plt.legend( loc='lower center', bbox_to_anchor=(.5, 1.1), ncol=3)
         plt.grid()
-        plt.savefig(self.data_dir_dict["trial_dir_path"]+f"/{self.trial_name}_{self.result_trial_name.replace('/','_')}_notify_history.png")
+        plt.savefig(self.data_dir_dict["trial_dir_path"]+f"/{self.trial_name}_{self.result_trial_name.replace('/','_')}_notify_history.pdf")
         # plt.show()
 
     def save(self,df_rank,data_corr,factor_df,notification_id):
@@ -395,7 +406,7 @@ class NotificationGenerator(Manager,GraphManager):
         pass
 
 if __name__=="__main__":
-    trial_name="20250130ChangeCriteriaAfter"
+    trial_name="20250131GraphCriteria"
     # result_trial_name="20250113NormalSimulation"
     # result_trial_name="20250110SimulationMultipleRisks/no_00005"
     # result_trial_name="20250108DevMewThrottlingExp"
