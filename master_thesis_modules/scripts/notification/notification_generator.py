@@ -55,7 +55,7 @@ class NotificationGenerator(Manager,GraphManager):
             "40000000":0.3,
             "40000001":0.4,
             "40000010":0.2,
-            "40000011":0.3,
+            "40000011":0.33,
             "40000012":0.4,
             "40000013":0.6,
             "40000014":0.6,
@@ -196,13 +196,13 @@ class NotificationGenerator(Manager,GraphManager):
         if len(df)==0:
             return True
         if row["timestamp"]-df.loc[len(df)-1,"timestamp"]>self.notify_interval_dict[alert_type]:
-            # if alert_type=="help":
-            #     df=notify_history[notify_history["type"]=="notice"].reset_index()
-            #     if row["timestamp"]-df.loc[len(df)-1,"timestamp"]>self.notify_interval_dict["notice2help"]:
-            #         return True
-            #     else:
-            #         return False
-            # else:
+            if alert_type=="help":
+                df=notify_history[notify_history["type"]=="notice"].reset_index()
+                if row["timestamp"]-df.loc[len(df)-1,"timestamp"]>self.notify_interval_dict["notice2help"]:
+                    return True
+                else:
+                    return False
+            else:
                 return True
         else:
             return False
@@ -306,8 +306,8 @@ class NotificationGenerator(Manager,GraphManager):
                 self.logger.warning("応援要請 条件合致")
                 need_help=True
             
+            notify=False
             if need_notify:
-                notify=False
                 if len(notify_history[notify_history["type"]=="notice"]["sentence"].values)!=0:
                     if alert_text != notify_history[notify_history["type"]=="notice"]["sentence"].values[-1]:
                         self.logger.warning("通知内容 直前通知と違うのでOK")
@@ -320,7 +320,7 @@ class NotificationGenerator(Manager,GraphManager):
                 if notify:
                     notify_history.loc[len(notify_history),:]=[self.notification_id,self.df_rank.loc[i,"timestamp"],self.df_rank.loc[i,"timestamp"]-self.df_rank.loc[0,"timestamp"],most_risky_patient,alert_text,"notice",data_of_risky_patient["10000000"].values.mean()]
                     notification_mp3_path=self.data_dir_dict["trial_dir_path"]+"/"+f"notification_{self.trial_name}_{str(self.notification_id).zfill(5)}.mp3"
-                    # Notification().export_audio(text=alert_text,mp3_path=notification_mp3_path,chime_type=1)
+                    Notification().export_audio(text=alert_text,mp3_path=notification_mp3_path,chime_type=1)
                     self.logger.warning(f"通知しました: 「{alert_text}」")
                     self.save(self.df_rank,data_corr,factor_df,notification_id=self.notification_id)
                     self.notification_id+=1
@@ -330,7 +330,7 @@ class NotificationGenerator(Manager,GraphManager):
                 alert_text=self.get_help_sentence()
                 notify_history.loc[len(notify_history),:]=[self.notification_id,self.df_rank.loc[i,"timestamp"],self.df_rank.loc[i,"timestamp"]-self.df_rank.loc[0,"timestamp"],"",alert_text,"help",np.nan]
                 notification_mp3_path=self.data_dir_dict["trial_dir_path"]+"/"+f"notification_{self.trial_name}_{str(self.notification_id).zfill(5)}.mp3"
-                # Notification().export_audio(text=alert_text,mp3_path=notification_mp3_path,chime_type=2)
+                Notification().export_audio(text=alert_text,mp3_path=notification_mp3_path,chime_type=2)
                 self.logger.warning(f"応援を要請しました: 「{alert_text}」")
                 self.save(self.df_rank,data_corr,factor_df,notification_id=self.notification_id)
                 self.notification_id+=1
@@ -414,14 +414,14 @@ class NotificationGenerator(Manager,GraphManager):
         pass
 
 if __name__=="__main__":
-    trial_name="20250202NotifyDevIntervalBefore"
+    trial_name="20250202NotifyDevIntervalPull"
     # result_trial_name="20250113NormalSimulation"
     # result_trial_name="20250110SimulationMultipleRisks/no_00005"
     # result_trial_name="20250108DevMewThrottlingExp"
     # trial_name="20250110NotificationGeneratorExp"
-    result_trial_name="20250121ChangeCriteriaBefore"
     # result_trial_name="20250121ChangeCriteriaAfter"
-    # result_trial_name="20250115PullWheelchairObaachan2"
+    # result_trial_name="20250121ChangeCriteriaAfter"
+    result_trial_name="20250115PullWheelchairObaachan2"
     strage="NASK"
 
     cls=NotificationGenerator(trial_name=trial_name,strage=strage,result_trial_name=result_trial_name)

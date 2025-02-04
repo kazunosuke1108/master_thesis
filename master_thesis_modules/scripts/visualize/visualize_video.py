@@ -302,10 +302,20 @@ if __name__=="__main__":
     # notification_trial_name="20250202NotifyPull"
     # visualize_trial_name="20250202VisualizeVideoPull"
     # 
-    sensing_trial_name="Nagasaki20241205193158"
-    evaluation_trial_name="20250121ChangeCriteriaBefore"
-    notification_trial_name="20250202NotifyDevIntervalBefore"
-    visualize_trial_name="20250202VisualizeVideoDevInterval"
+    # sensing_trial_name="Nagasaki20241205193158"
+    # evaluation_trial_name="20250121ChangeCriteriaBefore"
+    # notification_trial_name="20250202NotifyDevIntervalBefore"
+    # visualize_trial_name="20250202VisualizeVideoDevInterval"
+    # 
+    # sensing_trial_name="Nagasaki20241205193158"
+    # evaluation_trial_name="20250121ChangeCriteriaAfter"
+    # notification_trial_name="20250202NotifyDevIntervalAfter"
+    # visualize_trial_name="20250202VisualizeVideoDevIntervalAfter"
+    # 
+    sensing_trial_name="PullWheelchairObaachan"
+    evaluation_trial_name="20250115PullWheelchairObaachan2"
+    notification_trial_name="20250202NotifyDevIntervalPull"
+    visualize_trial_name="20250202VisualizeVideoDevIntervalPull"
 
     
 
