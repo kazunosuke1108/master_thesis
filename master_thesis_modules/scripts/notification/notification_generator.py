@@ -188,7 +188,7 @@ class NotificationGenerator(Manager,GraphManager):
         static_factor_node,factor_df=self.guess_static_factor(data_dict_roi,most_risky_patient)
 
         alert_text=self.get_alert_sentence(most_risky_patient=most_risky_patient,dynamic_factor_node=dynamic_factor_node,static_factor_node=static_factor_node)
-        # alert_text=self.translate_person_name(alert_text)
+        alert_text=self.translate_person_name(alert_text)
         return alert_text,dynamic_factor_node,static_factor_node,data_corr,factor_df
     
     def judge_time_interval(self,notify_history,row,alert_type):
@@ -318,7 +318,7 @@ class NotificationGenerator(Manager,GraphManager):
                 else:
                     notify=True
                 if notify:
-                    notify_history.loc[len(notify_history),:]=[self.notification_id,self.df_rank.loc[i,"timestamp"],self.df_rank.loc[i,"timestamp"]-self.df_rank.loc[0,"timestamp"],most_risky_patient,alert_text,"notice",data_of_risky_patient["10000000"].values.mean()]
+                    notify_history.loc[len(notify_history),:]=[self.notification_id,self.df_rank.loc[i,"timestamp"],self.df_rank.loc[i,"timestamp"]-self.df_rank.loc[0,"timestamp"],self.translate_person_name(most_risky_patient),alert_text,"notice",data_of_risky_patient["10000000"].values.mean()]
                     notification_mp3_path=self.data_dir_dict["trial_dir_path"]+"/"+f"notification_{self.trial_name}_{str(self.notification_id).zfill(5)}.mp3"
                     Notification().export_audio(text=alert_text,mp3_path=notification_mp3_path,chime_type=1)
                     self.logger.warning(f"通知しました: 「{alert_text}」")
@@ -414,7 +414,7 @@ class NotificationGenerator(Manager,GraphManager):
         pass
 
 if __name__=="__main__":
-    trial_name="20250202NotifyDevIntervalPull"
+    trial_name="20250204NotifyIntervalBefore"
     # result_trial_name="20250113NormalSimulation"
     # result_trial_name="20250110SimulationMultipleRisks/no_00005"
     # result_trial_name="20250108DevMewThrottlingExp"

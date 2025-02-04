@@ -769,6 +769,40 @@ class Visualizer(Manager):
             plt.show()
         print(csv_paths)
         pass
+
+    def plot_across_trial(self):
+        trial_name_1="20250121ChangeCriteriaBefore"
+        trial_name_2="20250121ChangeCriteriaAfter"
+        data_1_dir_dict=self.get_database_dir(trial_name=trial_name_1,strage="NASK")
+        data_2_dir_dict=self.get_database_dir(trial_name=trial_name_2,strage="NASK")
+        data_1_00000_data=pd.read_csv(data_1_dir_dict["trial_dir_path"]+"/data_00000_eval.csv",header=0)
+        cols=[k for k in data_1_00000_data.keys() if k != "timestamp"]
+        data_1_00000_data.loc[:,cols]=data_1_00000_data.loc[:,cols].rolling(40).mean().fillna(method="bfill")
+        data_2_00000_data=pd.read_csv(data_2_dir_dict["trial_dir_path"]+"/data_00000_eval.csv",header=0)
+        data_2_00000_data.loc[:,cols]=data_2_00000_data.loc[:,cols].rolling(40).mean().fillna(method="bfill")
+        data_1_00004_data=pd.read_csv(data_1_dir_dict["trial_dir_path"]+"/data_00004_eval.csv",header=0)
+        data_1_00004_data.loc[:,cols]=data_1_00004_data.loc[:,cols].rolling(40).mean().fillna(method="bfill")
+        data_2_00004_data=pd.read_csv(data_2_dir_dict["trial_dir_path"]+"/data_00004_eval.csv",header=0)
+        data_2_00004_data.loc[:,cols]=data_2_00004_data.loc[:,cols].rolling(40).mean().fillna(method="bfill")
+        plt.plot(data_1_00000_data["timestamp"]-data_1_00000_data["timestamp"].values[0],data_1_00000_data["10000000"],label="A")
+        plt.plot(data_1_00004_data["timestamp"]-data_1_00004_data["timestamp"].values[0],data_1_00004_data["10000000"],label="E",color="purple")
+        plt.xlabel("Time [s]")
+        plt.ylabel("Total risk")
+        plt.legend()
+        plt.ylim([0.2,0.8])
+        plt.savefig(self.data_dir_dict["trial_dir_path"]+"/compare_before.pdf")
+        plt.savefig(self.data_dir_dict["trial_dir_path"]+"/compare_before.png")
+        plt.close()
+        plt.plot(data_2_00000_data["timestamp"]-data_2_00000_data["timestamp"].values[0],data_2_00000_data["10000000"],label="A")
+        plt.plot(data_2_00004_data["timestamp"]-data_2_00004_data["timestamp"].values[0],data_2_00004_data["10000000"],label="E",color="purple")
+        plt.xlabel("Time [s]")
+        plt.ylabel("Total risk")
+        plt.legend()
+        plt.ylim([0.2,0.8])
+        plt.savefig(self.data_dir_dict["trial_dir_path"]+"/compare_after.pdf")
+        plt.savefig(self.data_dir_dict["trial_dir_path"]+"/compare_after.png")
+        plt.close()
+        pass
     def main(self):
         pass
 
@@ -776,18 +810,20 @@ if __name__=="__main__":
     # trial_name="20250113NormalSimulation"
     # trial_name="20250110SimulationMultipleRisks/no_00005"
     # trial_name="20250120FPScontrolFalse"
-    trial_name="20250120FPScontrolTrue"
+    # trial_name="20250120FPScontrolTrue"
     # trial_name="20250108DevMewThrottlingExp"
     # trial_name="20250115PullWheelchairObaachan2"
-    trial_name="20250121ChangeCriteriaBefore"
+    # trial_name="20250121ChangeCriteriaBefore"
+    trial_name="20250203ComparePlot"
     strage="NASK"
     cls=Visualizer(trial_name=trial_name,strage=strage)
     # cls.visualize_graph(trial_name="20241229BuildSimulator",strage="NASK",name="A",show=True)
     # cls.plot_matplotlib()
-    cls.plot_fps()
+    # cls.plot_fps()
     # cls.draw_positions()
     # cls.draw_features()
     # cls.draw_weight()
     # cls.draw_fps()
     # cls.draw_nActive()
+    cls.plot_across_trial()
     pass
