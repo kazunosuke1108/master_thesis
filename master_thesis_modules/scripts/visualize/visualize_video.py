@@ -36,8 +36,23 @@ class VideoVisualizer(Manager):
         speaker_icon_blue_path=self.notification_dir_dict["common_dir_path"]+"/icon_speaker_blue.png"
         self.speaker_blue_img=cv2.resize(cv2.imread(speaker_icon_blue_path), (50,50),fx=0,fy=0)
 
+        self.patient_dict={
+            "00000":"A",
+            "00001":"B",
+            "00002":"C",
+            "00003":"D",
+            "00004":"E",
+            "00005":"F",
+            "00006":"G",
+            "00007":"H",
+            "00008":"I",
+            "00009":"J",
+            "00010":"K",
+            "00011":"L"
+        }
+
         # parameters
-        smoothing_window=10
+        smoothing_window=20
         
         # MobileSensing系のデータ
         # sensing_csv_path="/media/hayashide/MobileSensing/Nagasaki20241205193158/csv/annotation/Nagasaki20241205193158_annotation_ytpc2024j_20241205_193158_fixposition.csv"
@@ -50,6 +65,7 @@ class VideoVisualizer(Manager):
         evaluation_csv_paths=sorted(glob(self.evaluation_dir_dict["trial_dir_path"]+"/data_*_eval.csv"))
         print(evaluation_csv_paths)
         self.patients=[os.path.basename(k)[len("data_"):-len("_eval.csv")] for k in evaluation_csv_paths]
+
         self.evaluation_data_dict={k:pd.read_csv(path) for k,path in zip(self.patients,evaluation_csv_paths)}
         ## 平滑化処理を入れておく（window幅は通知側と揃えないとまずい）
         smoothing_cols=[]
@@ -155,45 +171,59 @@ class VideoVisualizer(Manager):
     
     def draw_rank(self,i,img):
         def get_bbox_info(rank):
-            x_width=250
+            x_width=125
             y_interval=50
             y_width=40
             bbox_info=[
-                (0,int(50+rank*y_interval)),
-                (x_width,int(50+rank*y_interval+y_width))
+                (0,int(100+rank*y_interval)),
+                (x_width,int(100+rank*y_interval+y_width))
                 ]
             return bbox_info
         
-        cv2.rectangle(img,(0,40),(280,50*(len(self.patients)+2)),color=(255,255,255),thickness=cv2.FILLED)
+        # 背景色の白
+        cv2.rectangle(img,(0,40),(250,50*(len(self.patients)+3)),color=(255,255,255),thickness=cv2.FILLED)
+        cv2.putText(
+                img=img,
+                # text=f"No.{int(rank)+1}: "+"ID_"+patient,
+                text=f"Priority Order",
+                fontFace=cv2.FONT_HERSHEY_DUPLEX,
+                fontScale=1,
+                org=(0,100-20),
+                color=(0,0,0),
+                thickness=2,
+        )
         for patient in self.patients:
+            patient_str=self.patient_dict[patient]
             rank=self.rank_data.loc[i,patient+"_rank"]
             if np.isnan(rank):
                 continue
             bbox_info=get_bbox_info(rank)
+            # 患者カラーの帯
             cv2.rectangle(img,(bbox_info[0][0]+90,bbox_info[0][1]),bbox_info[1],color=self.patient_color_dict[patient],thickness=cv2.FILLED)
             cv2.putText(
                 img=img,
-                text=f"No.{int(rank)+1}: "+"ID_"+patient,
+                # text=f"No.{int(rank)+1}: "+"ID_"+patient,
+                text=f"No.{int(rank)+1}: "+patient_str,
                 fontFace=cv2.FONT_HERSHEY_DUPLEX,
                 fontScale=1,
-                org=(bbox_info[0][0],bbox_info[1][1]),
+                org=(bbox_info[0][0],bbox_info[1][1]-10),
                 color=(0,0,0),
                 thickness=2,
                 )            
             # 通知中か判定
-            notify_for_the_patient_data=self.notification_data[self.notification_data.fillna(99999)["patient"]==float(patient)]
+            notify_for_the_patient_data=self.notification_data[self.notification_data.fillna(99999)["patient"]==patient_str]
             for j,_ in notify_for_the_patient_data.iterrows():
-                if (notify_for_the_patient_data.loc[j,"timestamp"]<self.rank_data.loc[i,"timestamp"]) and (self.rank_data.loc[i,"timestamp"]<=notify_for_the_patient_data.loc[j,"timestamp"]+4):
+                if (notify_for_the_patient_data.loc[j,"timestamp"]<self.rank_data.loc[i,"timestamp"]) and (self.rank_data.loc[i,"timestamp"]<=notify_for_the_patient_data.loc[j,"timestamp"]+8):
                     img[bbox_info[0][1]:bbox_info[0][1]+self.speaker_red_img.shape[0],bbox_info[1][0]:bbox_info[1][0]+self.speaker_red_img.shape[1]]=self.speaker_red_img
             # raise NotImplementedError
         # 応援要請の状況
         notify_help_data=self.notification_data[self.notification_data["type"]=="help"]
         bbox_info=get_bbox_info(len(self.patients))
         for j,_ in notify_help_data.iterrows():
-            if (notify_help_data.loc[j,"timestamp"]<self.rank_data.loc[i,"timestamp"]) and (self.rank_data.loc[i,"timestamp"]<=notify_help_data.loc[j,"timestamp"]+4):
+            if (notify_help_data.loc[j,"timestamp"]<self.rank_data.loc[i,"timestamp"]) and (self.rank_data.loc[i,"timestamp"]<=notify_help_data.loc[j,"timestamp"]+7):
                 cv2.putText(
                         img=img,
-                        text="Ask for help:",
+                        text="Help:",
                         fontFace=cv2.FONT_HERSHEY_DUPLEX,
                         fontScale=1,
                         org=(bbox_info[0][0],bbox_info[1][1]),
@@ -205,7 +235,7 @@ class VideoVisualizer(Manager):
             else:
                 cv2.putText(
                         img=img,
-                        text="Ask for help:",
+                        text="Help:",
                         fontFace=cv2.FONT_HERSHEY_DUPLEX,
                         fontScale=1,
                         org=(bbox_info[0][0],bbox_info[1][1]),
@@ -302,23 +332,10 @@ if __name__=="__main__":
     # notification_trial_name="20250202NotifyPull"
     # visualize_trial_name="20250202VisualizeVideoPull"
     # 
-    # sensing_trial_name="Nagasaki20241205193158"
-    # evaluation_trial_name="20250121ChangeCriteriaBefore"
-    # notification_trial_name="20250202NotifyDevIntervalBefore"
-    # visualize_trial_name="20250202VisualizeVideoDevInterval"
-    # 
-    # sensing_trial_name="Nagasaki20241205193158"
-    # evaluation_trial_name="20250121ChangeCriteriaAfter"
-    # notification_trial_name="20250202NotifyDevIntervalAfter"
-    # visualize_trial_name="20250202VisualizeVideoDevIntervalAfter"
-    # 
-    sensing_trial_name="PullWheelchairObaachan"
-    evaluation_trial_name="20250115PullWheelchairObaachan2"
-    notification_trial_name="20250202NotifyDevIntervalPull"
-    visualize_trial_name="20250202VisualizeVideoDevIntervalPull"
-
-    
-
+    sensing_trial_name="Nagasaki20241205193158"
+    evaluation_trial_name="20250121ChangeCriteriaBefore"
+    notification_trial_name="20250204NotifyIntervalBefore"
+    visualize_trial_name="20250204VisualizeVideoBefore"
     cls=VideoVisualizer(
         sensing_trial_name=sensing_trial_name,
         evaluation_trial_name=evaluation_trial_name,
@@ -326,6 +343,32 @@ if __name__=="__main__":
         visualize_trial_name=visualize_trial_name,
     )
     cls.main()
+    
+    sensing_trial_name="Nagasaki20241205193158"
+    evaluation_trial_name="20250121ChangeCriteriaAfter"
+    notification_trial_name="20250204NotifyIntervalAfter"
+    visualize_trial_name="20250204VisualizeVideoAfter"
+    cls=VideoVisualizer(
+        sensing_trial_name=sensing_trial_name,
+        evaluation_trial_name=evaluation_trial_name,
+        notification_trial_name=notification_trial_name,
+        visualize_trial_name=visualize_trial_name,
+    )
+    cls.main()
+    sensing_trial_name="PullWheelchairObaachan"
+    evaluation_trial_name="20250115PullWheelchairObaachan2"
+    notification_trial_name="20250204NotifyIntervalPull"
+    visualize_trial_name="20250204VisualizeVideoPull"
+    cls=VideoVisualizer(
+        sensing_trial_name=sensing_trial_name,
+        evaluation_trial_name=evaluation_trial_name,
+        notification_trial_name=notification_trial_name,
+        visualize_trial_name=visualize_trial_name,
+    )
+    cls.main()
+
+    
+
 
 """
 'ID_00003_x', 'ID_00003_y',

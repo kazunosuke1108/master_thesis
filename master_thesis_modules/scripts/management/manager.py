@@ -175,6 +175,24 @@ class Manager():
             print(f"now processing: {os.path.basename(image)} {idx}/{len(image_paths)}")
         video.release()
 
+    def putText_japanese(img, text, point, size, color):
+        from PIL import ImageFont, ImageDraw, Image
+
+        #Notoフォントとする
+        font = ImageFont.truetype('/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc', size)
+
+        #imgをndarrayからPILに変換
+        img_pil = Image.fromarray(img)
+
+        #drawインスタンス生成
+        draw = ImageDraw.Draw(img_pil)
+
+        #テキスト描画
+        draw.text(point, text, fill=color, font=font)
+
+        #PILからndarrayに変換して返す
+        return np.array(img_pil)
+
 if __name__=="__main__":
     cls=Manager()
     cls.get_database_dir("NASK")

@@ -194,7 +194,17 @@ class NotificationGenerator(Manager,GraphManager):
     def judge_time_interval(self,notify_history,row,alert_type):
         df=notify_history[notify_history["type"]==alert_type].reset_index()
         if len(df)==0:
-            return True
+            if len(notify_history)==0:
+                return True
+            if alert_type=="help":
+                df=notify_history[notify_history["type"]=="notice"].reset_index()
+                if row["timestamp"]-df.loc[len(df)-1,"timestamp"]>self.notify_interval_dict["notice2help"]:
+                    return True
+                else:
+                    return False
+            else:
+                return True
+
         if row["timestamp"]-df.loc[len(df)-1,"timestamp"]>self.notify_interval_dict[alert_type]:
             if alert_type=="help":
                 df=notify_history[notify_history["type"]=="notice"].reset_index()
@@ -327,6 +337,7 @@ class NotificationGenerator(Manager,GraphManager):
                     need_help=False
 
             if need_help and not notify:
+                
                 alert_text=self.get_help_sentence()
                 notify_history.loc[len(notify_history),:]=[self.notification_id,self.df_rank.loc[i,"timestamp"],self.df_rank.loc[i,"timestamp"]-self.df_rank.loc[0,"timestamp"],"",alert_text,"help",np.nan]
                 notification_mp3_path=self.data_dir_dict["trial_dir_path"]+"/"+f"notification_{self.trial_name}_{str(self.notification_id).zfill(5)}.mp3"
@@ -342,7 +353,9 @@ class NotificationGenerator(Manager,GraphManager):
         self.notify_history=notify_history
 
     def translate_person_name(self,alert_text):
-        name_list=["浅田","井澤","梅木","江川","奥田","柿沼","岸本","久保","毛塚","小林","佐藤","下山"]
+        # name_list=["浅田","井澤","梅木","江川","奥田","柿沼","岸川","久保","毛塚","小林","佐藤","下山"]
+        # name_list=["佐藤","鈴木","高橋","渡辺","山本","中村","小林","吉田","山口","松本","斎藤","清水"]
+        name_list=["A","B","C","D","E","F","G","H","I","J","K","L"]
         for i in range(len(name_list)):
             alert_text=alert_text.replace(str(i).zfill(5),name_list[i])
         return alert_text
@@ -414,14 +427,14 @@ class NotificationGenerator(Manager,GraphManager):
         pass
 
 if __name__=="__main__":
-    trial_name="20250204NotifyIntervalBefore"
+    trial_name="20250204NotifyIntervalAfter"
     # result_trial_name="20250113NormalSimulation"
     # result_trial_name="20250110SimulationMultipleRisks/no_00005"
     # result_trial_name="20250108DevMewThrottlingExp"
     # trial_name="20250110NotificationGeneratorExp"
-    # result_trial_name="20250121ChangeCriteriaAfter"
-    # result_trial_name="20250121ChangeCriteriaAfter"
-    result_trial_name="20250115PullWheelchairObaachan2"
+    # result_trial_name="20250121ChangeCriteriaBefore"
+    result_trial_name="20250121ChangeCriteriaAfter"
+    # result_trial_name="20250115PullWheelchairObaachan2"
     strage="NASK"
 
     cls=NotificationGenerator(trial_name=trial_name,strage=strage,result_trial_name=result_trial_name)
