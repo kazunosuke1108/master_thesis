@@ -16,6 +16,9 @@ sys.path.append(".")
 sys.path.append("..")
 sys.path.append(os.path.expanduser("~")+"/kazu_ws/master_thesis/master_thesis_modules")
 from scripts.management.manager import Manager
+from scripts.preprocess.preprocess_blip_snapshot import PreprocessBlip
+
+cls_blip=PreprocessBlip()
 
 
 json_path="/media/hayashide/MobileSensing/20250207Dev/json/dict_after_reid.json"
@@ -41,9 +44,11 @@ for patient in patients:
     data_dicts[patient]["60010001"]=json_data[patient+"_y"]
 
     # feature (5)
-    ## 属性
+    ## BLIP系 属性・物体(手すり以外)
+    data_dicts[patient]=cls_blip.blip_snapshot(data_dicts[patient],elp_img,t,b,l,r,)
+    print(data_dicts[patient])
+    ## 物体(手すり)
     ## 動作
-    ## 物体
     ## 見守り状況
     
 # 5000/0000 ~ 7000/0000 の特徴量が入ったdictを作っていく．
