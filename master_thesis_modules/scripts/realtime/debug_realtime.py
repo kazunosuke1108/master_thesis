@@ -14,7 +14,10 @@ import pandas as pd
 
 sys.path.append(".")
 sys.path.append("..")
-sys.path.append(os.path.expanduser("~")+"/kazu_ws/master_thesis/master_thesis_modules")
+if "catkin_ws" in os.getcwd():
+    sys.path.append("/catkin_ws/src/master_thesis_modules")
+else:
+    sys.path.append(os.path.expanduser("~")+"/kazu_ws/master_thesis/master_thesis_modules")
 from scripts.management.manager import Manager
 from scripts.preprocess.preprocess_blip_snapshot import PreprocessBlip
 
