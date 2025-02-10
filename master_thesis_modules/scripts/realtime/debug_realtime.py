@@ -21,9 +21,11 @@ else:
 from scripts.management.manager import Manager
 from scripts.preprocess.preprocess_blip_snapshot import PreprocessBlip
 from scripts.preprocess.preprocess_yolo_snapshot import PreprocessYolo
+from scripts.preprocess.preprocess_handrail_snapshot import PreprocessHandrail
 
 cls_blip=PreprocessBlip()
 cls_yolo=PreprocessYolo()
+cls_handrail=PreprocessHandrail()
 
 
 json_path="/media/hayashide/MobileSensing/20250207Dev/json/dict_after_reid.json"
@@ -55,11 +57,13 @@ for patient in patients:
     
     ## 動作
     data_dicts[patient]=cls_yolo.yolo_snapshot(data_dicts[patient],elp_img,t,b,l,r,)
-    pprint(data_dicts[patient])
+    # pprint(data_dicts[patient])
     
     ## 物体(手すり)
-    
-    ## 見守り状況
+    data_dicts[patient]=cls_handrail.handrail_snapshot(data_dicts[patient])
+    pprint(data_dicts[patient])
+
+## 見守り状況
     
 # 5000/0000 ~ 7000/0000 の特徴量が入ったdictを作っていく．
 
