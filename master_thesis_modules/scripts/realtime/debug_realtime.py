@@ -55,7 +55,7 @@ for patient in patients:
     
     ## 動作
     data_dicts[patient]=cls_yolo.yolo_snapshot(data_dicts[patient],elp_img,t,b,l,r,)
-    # print(data_dicts[patient])
+    pprint(data_dicts[patient])
     
     ## 物体(手すり)
     
