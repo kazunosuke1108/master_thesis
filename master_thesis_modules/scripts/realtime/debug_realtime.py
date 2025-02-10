@@ -27,28 +27,39 @@ cls_blip=PreprocessBlip()
 cls_yolo=PreprocessYolo()
 cls_handrail=PreprocessHandrail()
 
+dayroom_structure_dict={"xrange":[6,15],"yrange":[-11,-4]} # 11月
+# dayroom_structure_dict={"xrange":[-4,6],"yrange":[5,10]} # 08月
+ss_structure_dict={"pos":[6,-7.5],"direction":[0,0.1]} # 11月
+# ss_structure_dict={"pos":[-4,7.5],"direction":[0.1,0]} # 08月
 
-json_path="/media/hayashide/MobileSensing/20250207Dev/json/dict_after_reid.json"
 
-json_data=Manager().load_json(json_path)
-patients=sorted(list(set([k.split("_")[0] for k in json_data.keys()])))
+json_latest_path="/media/hayashide/MobileSensing/20250207Dev/json/dict_after_reid.json"
+json_previous_path="/media/hayashide/MobileSensing/20250207Dev/json/dict_after_reid_old.json"
+
+json_latest_data=Manager().load_json(json_latest_path)
+json_previous_data=Manager().load_json(json_previous_path)
+patients=sorted(list(set([k.split("_")[0] for k in json_latest_data.keys()])))
 
 elp_img_path=sorted(glob("/media/hayashide/MobileSensing/20250207Dev/jpg/elp/left/*.jpg"))[-1]
 elp_img=cv2.imread(elp_img_path)
 
 data_dicts={}
 for patient in patients:
-    data_dicts[patient]={}
     # bbox img
-    t,b,l,r=json_data[patient+"_bboxLowerY"],json_data[patient+"_bboxHigherY"],json_data[patient+"_bboxLowerX"],json_data[patient+"_bboxHigherX"]
-    t,b,l,r=int(t),int(b),int(l),int(r)
+    t,b,l,r=json_latest_data[patient+"_bboxLowerY"],json_latest_data[patient+"_bboxHigherY"],json_latest_data[patient+"_bboxLowerX"],json_latest_data[patient+"_bboxHigherX"]
+    try:
+        t,b,l,r=int(t),int(b),int(l),int(r)
+    except ValueError: # NaNが入っていた場合
+        patients.remove(patient)
+        continue
     bbox_img=elp_img[t:b,l:r]
 
+    data_dicts[patient]={}
     # luminance (7)
 
     # position (6)
-    data_dicts[patient]["60010000"]=json_data[patient+"_x"]
-    data_dicts[patient]["60010001"]=json_data[patient+"_y"]
+    data_dicts[patient]["60010000"]=json_latest_data[patient+"_x"]
+    data_dicts[patient]["60010001"]=json_latest_data[patient+"_y"]
 
     # feature (5)
     ## BLIP系 属性・物体(手すり以外)
@@ -60,17 +71,49 @@ for patient in patients:
     # pprint(data_dicts[patient])
     
     ## 物体(手すり)
-    data_dicts[patient]=cls_handrail.handrail_snapshot(data_dicts[patient])
+    data_dicts[patient]=cls_handrail.handrail_snapshot(data_dicts[patient],dayroom_structure_dict)
     pprint(data_dicts[patient])
 
 ## 見守り状況
-# スタッフがいるかどうかを判定
+# ========= debug用のデータ =========
+data_dicts["00000"]["50000000"]="no"
+data_dicts["00001"]["50000000"]="yes"
+data_dicts["00003"]["50000000"]="yes"
+data_dicts["00006"]["50000000"]="yes"
+data_dicts["00007"]["50000000"]="yes"
+# data_dicts["00009"]["50000000"]="yes"
 
+def get_relative_distance(data_dicts,p,s,):
+    d=np.linalg.norm(np.array([data_dicts[p]["60010000"],data_dicts[p]["60010001"]])-np.array([data_dicts[s]["60010000"],data_dicts[s]["60010001"]]))
+    return d
+
+# スタッフがいるかどうかを判定
+staff=[patient for patient in patients if data_dicts[patient]["50000000"]=="no"]
+if len(staff)>0:
+    print(staff)
+    # いる
+    for patient in patients:
+        # 最近傍の看護師を見つける
+        distances=[get_relative_distance(data_dicts,patient,s) for s in staff]
+        closest_staff=staff[np.array(distances).argmin()]
+        data_dicts[patient]["50001100"]=data_dicts[closest_staff]["60010000"]
+        data_dicts[patient]["50001101"]=data_dicts[closest_staff]["60010001"]
+        data_dicts[patient]["50001110"]=data_dicts[closest_staff]["60010000"]-json_previous_data[closest_staff+"_x"]
+        data_dicts[patient]["50001111"]=data_dicts[closest_staff]["60010001"]-json_previous_data[closest_staff+"_y"]
+
+else:
+    # いない
+    # いなければ、SSのデフォルトを設定
+    for patient in patients:
+        data_dicts[patient]["50001100"]=ss_structure_dict["pos"][0]
+        data_dicts[patient]["50001101"]=ss_structure_dict["pos"][1]
+        data_dicts[patient]["50001110"]=ss_structure_dict["direction"][0]
+        data_dicts[patient]["50001111"]=ss_structure_dict["direction"][1]
+    pass
 # いれば、その人の位置をNurseの位置・速度に設定
 
 # 複数人いる場合は、最寄りのNSを設定
-
-# いなければ、SSのデフォルトを設定
+pprint(data_dicts)
 
 """
             # 背景差分値の取得
