@@ -7,7 +7,6 @@ import json
 import cv2
 
 from icecream import ic
-from pprint import pprint
 
 import numpy as np
 import pandas as pd
@@ -19,30 +18,35 @@ if "catkin_ws" in os.getcwd():
 else:
     sys.path.append(os.path.expanduser("~")+"/kazu_ws/master_thesis/master_thesis_modules")
 from scripts.management.manager import Manager
+from scripts.master_v3 import Master
 from scripts.preprocess.preprocess_blip_snapshot import PreprocessBlip
 from scripts.preprocess.preprocess_yolo_snapshot import PreprocessYolo
 from scripts.preprocess.preprocess_handrail_snapshot import PreprocessHandrail
 
+# preprocessorのインスタンス
 cls_blip=PreprocessBlip()
 cls_yolo=PreprocessYolo()
 cls_handrail=PreprocessHandrail()
+cls_master=Master()
 
+# 施設構造の事前情報
 dayroom_structure_dict={"xrange":[6,15],"yrange":[-11,-4]} # 11月
 # dayroom_structure_dict={"xrange":[-4,6],"yrange":[5,10]} # 08月
 ss_structure_dict={"pos":[6,-7.5],"direction":[0,0.1]} # 11月
 # ss_structure_dict={"pos":[-4,7.5],"direction":[0.1,0]} # 08月
 
-
+# 計測結果の取得
 json_latest_path="/media/hayashide/MobileSensing/20250207Dev/json/dict_after_reid.json"
 json_previous_path="/media/hayashide/MobileSensing/20250207Dev/json/dict_after_reid_old.json"
-
 json_latest_data=Manager().load_json(json_latest_path)
 json_previous_data=Manager().load_json(json_previous_path)
-patients=sorted(list(set([k.split("_")[0] for k in json_latest_data.keys()])))
 
+# 基本情報の取得
+patients=sorted(list(set([k.split("_")[0] for k in json_latest_data.keys()])))
 elp_img_path=sorted(glob("/media/hayashide/MobileSensing/20250207Dev/jpg/elp/left/*.jpg"))[-1]
 elp_img=cv2.imread(elp_img_path)
 
+# 1人ずつ評価
 data_dicts={}
 for patient in patients:
     # bbox img
@@ -64,15 +68,10 @@ for patient in patients:
     # feature (5)
     ## BLIP系 属性・物体(手すり以外)
     data_dicts[patient]=cls_blip.blip_snapshot(data_dicts[patient],elp_img,t,b,l,r,)
-    # print(data_dicts[patient])
-    
     ## 動作
     data_dicts[patient]=cls_yolo.yolo_snapshot(data_dicts[patient],elp_img,t,b,l,r,)
-    # pprint(data_dicts[patient])
-    
     ## 物体(手すり)
     data_dicts[patient]=cls_handrail.handrail_snapshot(data_dicts[patient],dayroom_structure_dict)
-    pprint(data_dicts[patient])
 
 ## 見守り状況
 # ========= debug用のデータ =========
@@ -93,7 +92,6 @@ if len(staff)>0:
     print(staff)
     # いる
     for patient in patients:
-        # 最近傍の看護師を見つける
         distances=[get_relative_distance(data_dicts,patient,s) for s in staff]
         closest_staff=staff[np.array(distances).argmin()]
         data_dicts[patient]["50001100"]=data_dicts[closest_staff]["60010000"]
@@ -103,17 +101,15 @@ if len(staff)>0:
 
 else:
     # いない
-    # いなければ、SSのデフォルトを設定
     for patient in patients:
         data_dicts[patient]["50001100"]=ss_structure_dict["pos"][0]
         data_dicts[patient]["50001101"]=ss_structure_dict["pos"][1]
         data_dicts[patient]["50001110"]=ss_structure_dict["direction"][0]
         data_dicts[patient]["50001111"]=ss_structure_dict["direction"][1]
     pass
-# いれば、その人の位置をNurseの位置・速度に設定
 
-# 複数人いる場合は、最寄りのNSを設定
-pprint(data_dicts)
+# data_dictsに対してリスクを計算
+cls_master.evaluate(data_dicts)
 
 """
             # 背景差分値の取得
