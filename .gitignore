@@ -11,3 +11,4 @@
 *.log
 *.pyc
 /docker/ros_workspace
+/master_thesis_modules/models

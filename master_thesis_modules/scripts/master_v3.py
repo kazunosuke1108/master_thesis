@@ -13,9 +13,9 @@ sys.path.append(".")
 sys.path.append("..")
 sys.path.append(os.path.expanduser("~")+"/kazu_ws/master_thesis/master_thesis_modules")
 from scripts.management.manager import Manager
-from scripts.network.graph_manager import GraphManager
-from scripts.AHP.get_comparison_mtx import getConsistencyMtx
-from scripts.fuzzy.fuzzy_reasoning import FuzzyReasoning
+from scripts.network.graph_manager_v3 import GraphManager
+from scripts.AHP.get_comparison_mtx_v3 import getConsistencyMtx
+from scripts.fuzzy.fuzzy_reasoning_v3 import FuzzyReasoning
 from scripts.entropy.entropy_weight_generator import EntropyWeightGenerator
 from scripts.pseudo_data.pseudo_data_generator import PseudoDataGenerator
 
@@ -121,28 +121,27 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
                 self.data_dicts[patient][risk]=get_similarity(risk,self.data_dicts[patient])
                 # self.data_dicts[patient][risk]=list(map(get_similarity,[risk for i in range(len(self.data_dicts[patient]))],self.data_dicts[patient].iterrows()))
                 self.data_dicts[patient][risk]=self.activation_func(self.data_dicts[patient][risk])
-            print(patient,risk)
             
     def object_risk(self):
         for patient in self.data_dicts.keys():
             # 点滴
             self.data_dicts[patient]["40000100"]=1-np.clip(np.sqrt(
-                (self.data_dicts[patient]["50001000"]-self.data_dicts[patient][60010000])**2+\
-                (self.data_dicts[patient]["50001001"]-self.data_dicts[patient][60010001])**2
+                (self.data_dicts[patient]["50001000"]-self.data_dicts[patient]["60010000"])**2+\
+                (self.data_dicts[patient]["50001001"]-self.data_dicts[patient]["60010001"])**2
             )/self.spatial_normalization_param,0,1)
             self.data_dicts[patient]["40000100"]=self.activation_func(self.data_dicts[patient]["40000100"])
 
             # 車椅子
             self.data_dicts[patient]["40000101"]=1-np.clip(np.sqrt(
-                (self.data_dicts[patient]["50001010"]-self.data_dicts[patient][60010000])**2+\
-                (self.data_dicts[patient]["50001011"]-self.data_dicts[patient][60010001])**2
+                (self.data_dicts[patient]["50001010"]-self.data_dicts[patient]["60010000"])**2+\
+                (self.data_dicts[patient]["50001011"]-self.data_dicts[patient]["60010001"])**2
             )/self.spatial_normalization_param,0,1)
             self.data_dicts[patient]["40000101"]=self.activation_func(self.data_dicts[patient]["40000101"])
 
             # 手すり (逆数ではない)
             self.data_dicts[patient]["40000102"]=np.clip(np.sqrt(
-                (self.data_dicts[patient]["50001020"]-self.data_dicts[patient][60010000])**2+\
-                (self.data_dicts[patient]["50001021"]-self.data_dicts[patient][60010001])**2
+                (self.data_dicts[patient]["50001020"]-self.data_dicts[patient]["60010000"])**2+\
+                (self.data_dicts[patient]["50001021"]-self.data_dicts[patient]["60010001"])**2
             )/self.spatial_normalization_param,0,1)
             self.data_dicts[patient]["40000102"]=self.activation_func(self.data_dicts[patient]["40000102"])
 
@@ -162,21 +161,19 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
         for patient in self.data_dicts.keys():
             # 距離リスク
             self.data_dicts[patient]["40000110"]=np.clip(np.sqrt(
-                (self.data_dicts[patient]["50001100"]-self.data_dicts[patient][60010000])**2+\
-                (self.data_dicts[patient]["50001101"]-self.data_dicts[patient][60010001])**2
+                (self.data_dicts[patient]["50001100"]-self.data_dicts[patient]["60010000"])**2+\
+                (self.data_dicts[patient]["50001101"]-self.data_dicts[patient]["60010001"])**2
             )/self.spatial_normalization_param,0,1)
             self.data_dicts[patient]["40000110"]=self.activation_func(self.data_dicts[patient]["40000110"])
             # 向きリスク
-            self.data_dicts[patient]["40000111"]=list(map(direction_risk,
-                                                        self.data_dicts[patient][60010000],
-                                                        self.data_dicts[patient][60010001],
+            self.data_dicts[patient]["40000111"]=direction_risk(
+                                                        self.data_dicts[patient]["60010000"],
+                                                        self.data_dicts[patient]["60010001"],
                                                         self.data_dicts[patient]["50001100"],
                                                         self.data_dicts[patient]["50001101"],
                                                         self.data_dicts[patient]["50001110"],
                                                         self.data_dicts[patient]["50001111"],
-                                                        ))
-            self.data_dicts[patient]["40000111"].fillna(method="ffill",inplace=True)
-            self.data_dicts[patient]["40000111"].fillna(method="bfill",inplace=True)
+            )
             self.data_dicts[patient]["40000111"]=self.activation_func(self.data_dicts[patient]["40000111"])
             pass
 
@@ -199,47 +196,52 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
             return x_cross
         for patient in self.data_dicts.keys():
             # 三角形の左右判別
-            sort_tri=np.array(list(map(judge_left_or_right,self.data_dicts[patient]["40000000"],self.data_dicts[patient]["40000001"])))
-            left_tri,right_tri=sort_tri[:,0,:],sort_tri[:,1,:]
+            sort_tri=judge_left_or_right(self.data_dicts[patient]["40000000"],self.data_dicts[patient]["40000001"])#np.array(list(map(judge_left_or_right,self.data_dicts[patient]["40000000"],self.data_dicts[patient]["40000001"])))
+            left_tri,right_tri=sort_tri[0],sort_tri[1]
+            # sort_tri=np.array(list(map(judge_left_or_right,self.data_dicts[patient]["40000000"],self.data_dicts[patient]["40000001"])))
+            # left_tri,right_tri=sort_tri[:,0,:],sort_tri[:,1,:]
             
             # 交点の計算
-            x_cross=np.array(list(map(calc_cross_point,left_tri,right_tri)))
+            x_cross=np.array(calc_cross_point(left_tri,right_tri))#np.array(list(map(calc_cross_point,left_tri,right_tri)))
+            # x_cross=np.array(list(map(calc_cross_point,left_tri,right_tri)))
 
             # 重心の算出
-            x_gravity=(left_tri[:,2]+right_tri[:,0]+x_cross)/3
-            print(x_gravity)
-            self.data_dicts[patient][30000000]=x_gravity
+            x_gravity=(left_tri[2]+right_tri[0]+x_cross)/3
+            # x_gravity=(left_tri[:,2]+right_tri[:,0]+x_cross)/3
+            self.data_dicts[patient]["30000000"]=x_gravity
         pass
 
     def AHP_weight_sum(self,input_node_codes,output_node_code):
-        def weight_sum(row):
-            features=np.nan_to_num(row[1].values)
+        def weight_sum(input_node_codes):
+            features=np.nan_to_num(input_node_codes)
             w_sum=self.AHP_dict[output_node_code]["weights"]@features
             for i,k in enumerate(input_node_codes):
                 self.graph_dicts[patient]["weight_dict"][output_node_code][k]=self.AHP_dict[output_node_code]["weights"][i]
             return w_sum
         for patient in self.data_dicts.keys():
-            self.data_dicts[patient][output_node_code]=list(map(weight_sum,self.data_dicts[patient][input_node_codes].iterrows()))
+            self.data_dicts[patient][output_node_code]=weight_sum([self.data_dicts[patient][input_node_code] for input_node_code in input_node_codes])#list(map(weight_sum,self.data_dicts[patient][input_node_codes].iterrows()))
         pass
 
     def simple_weight_sum(self,input_node_codes,output_node_code,weights):
-        def weight_sum(row):
-            features=np.nan_to_num(row[1].values)
+        def weight_sum(input_node_codes):
+            features=np.nan_to_num(input_node_codes)
             w_sum=np.array(weights)@features
             for i,k in enumerate(input_node_codes):
                 self.graph_dicts[patient]["weight_dict"][output_node_code][k]=weights[i]
             return w_sum
         for patient in self.data_dicts.keys():
-            self.data_dicts[patient][output_node_code]=list(map(weight_sum,self.data_dicts[patient][input_node_codes].iterrows()))
+            self.data_dicts[patient][output_node_code]=weight_sum([self.data_dicts[patient][input_node_code] for input_node_code in input_node_codes])#list(map(weight_sum,self.data_dicts[patient][input_node_codes].iterrows()))
     
     def fuzzy_reasoning_master(self,input_node_codes,output_node_code):
-        def ask_risk_to_calculator(row):
-            features=row[1].fillna(0)
-            input_nodes=features.to_dict()
+        def ask_risk_to_calculator(input_nodes):
+            for k in input_nodes.keys():
+                if np.isnan(input_nodes[k]):
+                    input_nodes[k]=0
             risk=self.calculate_fuzzy(input_nodes=input_nodes,output_node=output_node_code)
             return risk
         for patient in self.data_dicts.keys():
-            self.data_dicts[patient][output_node_code]=list(map(ask_risk_to_calculator,self.data_dicts[patient][input_node_codes].iterrows()))
+            self.data_dicts[patient][output_node_code]=ask_risk_to_calculator({input_node_code:self.data_dicts[patient][input_node_code] for input_node_code in input_node_codes})#list(map(ask_risk_to_calculator,self.data_dicts[patient][input_node_codes].iterrows()))
+            # self.data_dicts[patient][output_node_code]=list(map(ask_risk_to_calculator,self.data_dicts[patient][input_node_codes].iterrows()))
 
     def ewm_master(self,input_node_codes,output_node_code,dim="t"):
         horizon=100
@@ -302,25 +304,25 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
         # 内定・静的
         self.fuzzy_multiply()
         # 内的・動的
-        self.AHP_weight_sum(input_node_codes=["40000010","40000011","40000012","40000013","40000014","40000015","40000016"],output_node_code=30000001)
+        self.AHP_weight_sum(input_node_codes=["40000010","40000011","40000012","40000013","40000014","40000015","40000016"],output_node_code="30000001")
         # 外的・静的
-        self.AHP_weight_sum(input_node_codes=["40000100","40000101","40000102"],output_node_code=30000010)
+        self.AHP_weight_sum(input_node_codes=["40000100","40000101","40000102"],output_node_code="30000010")
         # 外的・動的
-        self.fuzzy_reasoning_master(input_node_codes=["40000110","40000111"],output_node_code=30000011)
+        self.fuzzy_reasoning_master(input_node_codes=["40000110","40000111"],output_node_code="30000011")
 
         print("# 3 -> 2層推論 #")
         # 内的
-        # self.ewm_master(input_node_codes=[30000000,30000001],output_node_code=20000000,dim="p")
-        # self.fuzzy_reasoning_master(input_node_codes=[30000000,30000001],output_node_code=20000000)
-        self.simple_weight_sum(input_node_codes=[30000000,30000001],output_node_code=20000000,weights=[0.1,0.9])
+        # self.ewm_master(input_node_codes=["30000000","30000001"],output_node_code=20000000,dim="p")
+        # self.fuzzy_reasoning_master(input_node_codes=["30000000","30000001"],output_node_code=20000000)
+        self.simple_weight_sum(input_node_codes=["30000000","30000001"],output_node_code="20000000",weights=[0.1,0.9])
         # 外的
-        # self.ewm_master(input_node_codes=[30000010,30000011],output_node_code=20000001)
-        self.fuzzy_reasoning_master(input_node_codes=[30000010,30000011],output_node_code=20000001)
+        # self.ewm_master(input_node_codes=["30000010","30000011"],output_node_code=20000001)
+        self.fuzzy_reasoning_master(input_node_codes=["30000010","30000011"],output_node_code="20000001")
         
         print("# 2 -> 1層推論 #")
         # self.ewm_master(input_node_codes=[20000000,20000001],output_node_code=10000000)
-        self.fuzzy_reasoning_master(input_node_codes=[20000000,20000001],output_node_code=10000000)
-        pass
+        self.fuzzy_reasoning_master(input_node_codes=["20000000","20000001"],output_node_code="10000000")
+        return self.data_dicts
 
 if __name__=="__main__":
     trial_name="20250126EnvCheck"

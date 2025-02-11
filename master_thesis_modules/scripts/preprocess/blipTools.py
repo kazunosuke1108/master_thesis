@@ -2,13 +2,34 @@ import torch
 class blipTools():
     def activate_blip(self):
         from transformers import Blip2Processor, Blip2ForConditionalGeneration
-        model_name="Salesforce/blip2-flan-t5-xl"
+        """
+        localにモデルを落とす方法
+        rm -rf ~/.cache/huggingface
+        python3 (local)
+        model_name = "Salesforce/blip2-flan-t5-xl"
+        save_dir = "/catkin_ws/src/master_thesis_modules/models/blip2-flan-t5-xl"
+        # Processor の保存
+        processor = Blip2Processor.from_pretrained(model_name)
+        processor.save_pretrained(save_dir, push_to_hub=False)
+
+        # モデルの保存
+        model = Blip2ForConditionalGeneration.from_pretrained(model_name)
+        model.save_pretrained(save_dir, push_to_hub=False)
+        """
+        try:
+            model_name="/catkin_ws/src/master_thesis_modules/models/blip2-flan-t5-xl"
+            blip_processor = Blip2Processor.from_pretrained(model_name)#,revision="51572668da0eb669e01a189dc22abe6088589a24")
+            print("load local model")
+        except Exception:
+            model_name="Salesforce/blip2-flan-t5-xl"
+            blip_processor = Blip2Processor.from_pretrained(model_name)#,revision="51572668da0eb669e01a189dc22abe6088589a24")
+            print("load online model")
         # model_name="Salesforce/blip2-opt-2.7b"
-        blip_processor = Blip2Processor.from_pretrained(model_name)#,revision="51572668da0eb669e01a189dc22abe6088589a24")
         blip_model = Blip2ForConditionalGeneration.from_pretrained(model_name, torch_dtype=torch.float32) 
         device = "cuda" if torch.cuda.is_available() else "cpu"
         blip_model.to(device)
         return blip_processor,blip_model,device
+    
 
     def get_caption(self,blip_processor,blip_model,device,image,):
         caption_inputs = blip_processor(image, return_tensors="pt").to(device)

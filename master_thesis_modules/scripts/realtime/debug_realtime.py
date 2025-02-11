@@ -119,7 +119,17 @@ else:
 
 # data_dictsに対してリスクを計算
 cls_master=Master(data_dicts)
-cls_master.evaluate()
+data_dicts=cls_master.evaluate()
+print(data_dicts)
+
+# データの吐き出し
+## json_latest_data (特徴量) と評価結果をまとめてjson
+export_data={
+    "sources":json_latest_data,
+    "results":data_dicts,
+}
+Manager().write_json(export_data,json_path=os.path.split(json_latest_path)[0]+"/data_dicts_eval.json")
+print(export_data)
 
 """
             # 背景差分値の取得
@@ -137,7 +147,7 @@ cls_master.evaluate()
                     continue
                 if ((l_e<self.occlusion_dict[opponent_id_name]["bbox_l"]) & (self.occlusion_dict[opponent_id_name]["bbox_l"]<r_e)) and \
                     ((l_e<self.occlusion_dict[opponent_id_name]["bbox_r"]) & (self.occlusion_dict[opponent_id_name]["bbox_r"]<r_e)):
-                    if (opponent_id_name!="ID_00004") and (opponent_id_name!="ID_00007") and (opponent_id_name!="ID_00008") and (opponent_id_name!="ID_00009"):# 一番手前になるのがほぼ明らかなのでID_00004は除外する。それ以外に関しては、IDが若い番号の方を消す                    
+                    if (opponent_id_name!="ID_00004") and (opponent_id_name!="ID_00007") and (opponent_id_name!="ID_00008") and (opponent_id_name!="ID_00009"):# 一番手前になるのがほぼ明らかなのでID_00004は除外する。それ以外に関しては、IDが若い番号の方を消す
                         print(f"{opponent_id_name} is occluded by {id_name}. Remove {opponent_id_name}")
                         print(l_e,self.occlusion_dict[opponent_id_name]["bbox_l"],self.occlusion_dict[opponent_id_name]["bbox_r"],r_e)
                         self.feature_dict[opponent_id_name].loc[i,["50000100","50000101","50000102","50000103","70000000"]]=np.nan
