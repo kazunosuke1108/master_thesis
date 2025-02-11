@@ -175,13 +175,13 @@ class PreprocessYolo(Manager,blipTools):
         try:
             results=self.model(extended_bbox_rgb_img)
         except ZeroDivisionError:
-            return data_dict
+            return data_dict,False
         kp=results[0].keypoints
         try:
             kp_xy=np.array(kp.xy[0].tolist())
             kp_conf=np.array(kp.conf[0].tolist())
         except TypeError:
-            return data_dict
+            return data_dict,False
         kp_dict={}
         for j,k in enumerate(self.KEYPOINTS_NAMES):
             kp_dict[k]={
@@ -203,7 +203,7 @@ class PreprocessYolo(Manager,blipTools):
         data_dict["50000102"]=features[2]
         data_dict["50000103"]=features[3]
 
-        return data_dict
+        return data_dict,True
 
 if __name__=="__main__":
     trial_name="20250115PullWheelchairObaachan2"

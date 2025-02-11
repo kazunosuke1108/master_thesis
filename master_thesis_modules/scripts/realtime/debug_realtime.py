@@ -1,13 +1,12 @@
 import os
 import sys
 import copy
-import dill
 from glob import glob
 import json
 import cv2
 
 from icecream import ic
-
+from pprint import pprint
 import numpy as np
 import pandas as pd
 
@@ -27,7 +26,6 @@ from scripts.preprocess.preprocess_handrail_snapshot import PreprocessHandrail
 cls_blip=PreprocessBlip()
 cls_yolo=PreprocessYolo()
 cls_handrail=PreprocessHandrail()
-cls_master=Master()
 
 # 施設構造の事前情報
 dayroom_structure_dict={"xrange":[6,15],"yrange":[-11,-4]} # 11月
@@ -48,13 +46,15 @@ elp_img=cv2.imread(elp_img_path)
 
 # 1人ずつ評価
 data_dicts={}
+print(f"評価開始前のpatients: {patients}")
 for patient in patients:
     # bbox img
     t,b,l,r=json_latest_data[patient+"_bboxLowerY"],json_latest_data[patient+"_bboxHigherY"],json_latest_data[patient+"_bboxLowerX"],json_latest_data[patient+"_bboxHigherX"]
     try:
         t,b,l,r=int(t),int(b),int(l),int(r)
     except ValueError: # NaNが入っていた場合
-        patients.remove(patient)
+        # patients.remove(patient)
+        print(f"bbox情報が不正のため削除 {patient}")
         continue
     bbox_img=elp_img[t:b,l:r]
 
@@ -69,24 +69,33 @@ for patient in patients:
     ## BLIP系 属性・物体(手すり以外)
     data_dicts[patient]=cls_blip.blip_snapshot(data_dicts[patient],elp_img,t,b,l,r,)
     ## 動作
-    data_dicts[patient]=cls_yolo.yolo_snapshot(data_dicts[patient],elp_img,t,b,l,r,)
+    data_dicts[patient],success_flag=cls_yolo.yolo_snapshot(data_dicts[patient],elp_img,t,b,l,r,)
+    if not success_flag:
+        print(f"姿勢推定が不正のため削除 {patient}")
+        # patients.remove(patient)
+        del data_dicts[patient]
+        continue
     ## 物体(手すり)
     data_dicts[patient]=cls_handrail.handrail_snapshot(data_dicts[patient],dayroom_structure_dict)
 
+patients=list(data_dicts.keys())
+
 ## 見守り状況
 # ========= debug用のデータ =========
-data_dicts["00000"]["50000000"]="no"
-data_dicts["00001"]["50000000"]="yes"
-data_dicts["00003"]["50000000"]="yes"
-data_dicts["00006"]["50000000"]="yes"
-data_dicts["00007"]["50000000"]="yes"
-# data_dicts["00009"]["50000000"]="yes"
+# data_dicts["00000"]["50000000"]="no"
+# # data_dicts["00001"]["50000000"]="yes"
+# data_dicts["00003"]["50000000"]="yes"
+# data_dicts["00006"]["50000000"]="yes"
+# data_dicts["00007"]["50000000"]="yes"
+# # data_dicts["00009"]["50000000"]="yes"
 
 def get_relative_distance(data_dicts,p,s,):
     d=np.linalg.norm(np.array([data_dicts[p]["60010000"],data_dicts[p]["60010001"]])-np.array([data_dicts[s]["60010000"],data_dicts[s]["60010001"]]))
     return d
 
 # スタッフがいるかどうかを判定
+print(patients)
+pprint(data_dicts)
 staff=[patient for patient in patients if data_dicts[patient]["50000000"]=="no"]
 if len(staff)>0:
     print(staff)
@@ -109,7 +118,8 @@ else:
     pass
 
 # data_dictsに対してリスクを計算
-cls_master.evaluate(data_dicts)
+cls_master=Master(data_dicts)
+cls_master.evaluate()
 
 """
             # 背景差分値の取得
