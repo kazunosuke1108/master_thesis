@@ -4,7 +4,7 @@ from glob import glob
 
 root=tkinter.Tk()
 root.title("test")
-root.geometry("2000x1000")
+root.geometry("1000x700")
 jpg_path=sorted(glob("//192.168.1.5/common/FY2024/09_MobileSensing/20250207Dev/jpg/elp/left/*.jpg"))[-1]
 img=Image.open(jpg_path)
 img = img.convert("RGB")  # RGBモードに変換

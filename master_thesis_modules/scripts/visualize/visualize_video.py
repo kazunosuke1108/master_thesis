@@ -297,16 +297,19 @@ class VideoVisualizer(Manager):
         
         n_cpu=cpu_count()
         p_list=[]
+        import time
         for i,row in self.sensing_data.iterrows():
-            # draw(i)
-            p=Process(target=draw,args=(i,))
-            p_list.append(p)
-            if (len(p_list)>=n_cpu) or (i+1==len(self.sensing_data)):
-                for p in p_list:
-                    p.start()
-                for p in p_list:
-                    p.join()
-                p_list=[]
+            start=time.time()
+            draw(i)
+            print(np.round(1/(time.time()-start),2),"Hz")
+            # p=Process(target=draw,args=(i,))
+            # p_list.append(p)
+            # if (len(p_list)>=n_cpu) or (i+1==len(self.sensing_data)):
+            #     for p in p_list:
+            #         p.start()
+            #     for p in p_list:
+            #         p.join()
+            #     p_list=[]
         
 
         
