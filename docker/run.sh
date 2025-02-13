@@ -31,6 +31,7 @@ else
     -v "/$(pwd)/global_ros_setting.sh:/ros_setting.sh" \
     -v "/$(pwd)/ros_workspace:/catkin_ws/" \
     -v "/$(pwd)/../master_thesis_modules:/catkin_ws/src/master_thesis_modules" \
+    -v "/home/${USER}/ytlab_ros_ws/ytlab_handheld_sensoring_system/ytlab_handheld_sensoring_system_modules/database:/catkin_ws/src/database" \
     -v /etc/group:/etc/group:ro \
     -v /etc/passwd:/etc/passwd:ro \
     -v /etc/localtime:/etc/localtime:ro \
@@ -39,3 +40,5 @@ else
     --net host \
     ${USER}/master_thesis
 fi
+
+# /home/ytpc2024n/ytlab_ros_ws/ytlab_handheld_sensoring_system/ytlab_handheld_sensoring_system_modules/database

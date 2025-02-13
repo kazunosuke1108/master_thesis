@@ -53,16 +53,28 @@ class RealtimeEvaluator(Manager):
         self.df_eval=pd.DataFrame()
 
     def load_data(self):
-        # json
-        json_latest_path="/catkin_ws/src/master_thesis_modules/scripts/realtime/debug/dict_after_reid.json"
-        json_previous_path="/catkin_ws/src/master_thesis_modules/scripts/realtime/debug/dict_after_reid_old.json"
-        self.json_latest_data=Manager().load_json(json_latest_path)
-        self.json_previous_data=Manager().load_json(json_previous_path)
-        # 患者情報
-        self.patients=sorted(list(set([k.split("_")[0] for k in self.json_latest_data.keys()])))
-        # ELP
-        elp_img_path=sorted(glob("/catkin_ws/src/master_thesis_modules/scripts/realtime/debug/*.jpg"))[-1]
-        self.elp_img=cv2.imread(elp_img_path)
+        all_files_found=False
+        while not all_files_found:
+            try:
+                # json
+                json_latest_path=self.data_dir_dict["mobilesensing_dir_path"]+"/json/dict_after_reid.json"
+                json_previous_path=self.data_dir_dict["mobilesensing_dir_path"]+"/json/dict_after_reid_old.json"
+                self.json_latest_data=Manager().load_json(json_latest_path)
+                self.json_previous_data=Manager().load_json(json_previous_path)
+                # 患者情報
+                self.patients=sorted(list(set([k.split("_")[0] for k in self.json_latest_data.keys()])))
+                # ELP
+                elp_img_path=sorted(glob(f"/catkin_ws/src/database/{self.trial_name}/jpg/elp/left/*.jpg"))[-1]
+                self.elp_img=cv2.imread(elp_img_path)
+                all_files_found=True
+            except FileNotFoundError:
+                print(self.get_timestamp(),"json not found")
+                time.sleep(0.1)
+                continue
+            except IndexError:
+                print(self.get_timestamp(),"ELP not found")
+                time.sleep(0.1)
+                continue
         return json_latest_path,self.json_latest_data
 
     def get_features(self):
@@ -167,6 +179,8 @@ class RealtimeEvaluator(Manager):
                 else:
                     data_dicts_flatten[f"{p}_{k}"]=data_dicts[p][k]
         # data_dicts_flatten={f"{p}_{k}":data_dicts[p][k] for k in data_dicts[p].keys() for p in data_dicts.keys()}
+        if len(list(data_dicts_flatten.keys()))>0:
+            data_dicts_flatten["timestamp"]=json_latest_data[f"{p}_timestamp"]
         pprint(data_dicts_flatten)
         print(pd.DataFrame(data_dicts_flatten,index=[0]))
         self.df_eval=pd.concat([self.df_eval,pd.DataFrame(data_dicts_flatten,index=[0])],axis=0)
@@ -180,6 +194,8 @@ class RealtimeEvaluator(Manager):
 if __name__=="__main__":
     trial_name="20250207Dev"
     strage="local"
+    json_dir_path="/catkin_ws/src/database"+"/"+trial_name+"/json"
+
 
     cls=RealtimeEvaluator(trial_name=trial_name,strage=strage)
     print("RealtimeEvaluator has woken up")
@@ -192,10 +208,9 @@ if __name__=="__main__":
 
     cls.evaluate_main()
     # path = "/media/hayashide/MobileSensing/20250207Dev/json"  # 監視するディレクトリ
-    path="/catkin_ws/src/master_thesis_modules/scripts/realtime/debug"
     event_handler = JSONFileChangeHandler()
     observer = Observer()
-    observer.schedule(event_handler, path, recursive=False)
+    observer.schedule(event_handler, json_dir_path, recursive=False)
     observer.start()    
     print("Observation started")
 
