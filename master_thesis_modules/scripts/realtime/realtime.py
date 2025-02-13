@@ -54,14 +54,14 @@ class RealtimeEvaluator(Manager):
 
     def load_data(self):
         # json
-        json_latest_path="/media/hayashide/MobileSensing/20250207Dev/json/dict_after_reid.json"
-        json_previous_path="/media/hayashide/MobileSensing/20250207Dev/json/dict_after_reid_old.json"
+        json_latest_path="/catkin_ws/src/master_thesis_modules/scripts/realtime/debug/dict_after_reid.json"
+        json_previous_path="/catkin_ws/src/master_thesis_modules/scripts/realtime/debug/dict_after_reid_old.json"
         self.json_latest_data=Manager().load_json(json_latest_path)
         self.json_previous_data=Manager().load_json(json_previous_path)
         # 患者情報
         self.patients=sorted(list(set([k.split("_")[0] for k in self.json_latest_data.keys()])))
         # ELP
-        elp_img_path=sorted(glob("/media/hayashide/MobileSensing/20250207Dev/jpg/elp/left/*.jpg"))[-1]
+        elp_img_path=sorted(glob("/catkin_ws/src/master_thesis_modules/scripts/realtime/debug/*.jpg"))[-1]
         self.elp_img=cv2.imread(elp_img_path)
         return json_latest_path,self.json_latest_data
 
@@ -179,7 +179,7 @@ class RealtimeEvaluator(Manager):
 
 if __name__=="__main__":
     trial_name="20250207Dev"
-    strage="NASK"
+    strage="local"
 
     cls=RealtimeEvaluator(trial_name=trial_name,strage=strage)
     print("RealtimeEvaluator has woken up")

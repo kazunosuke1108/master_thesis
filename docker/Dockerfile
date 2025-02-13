@@ -166,6 +166,7 @@ RUN pip install ultralytics
 #######################################################################
 RUN pip install icecream
 RUN pip install plotly
+RUN pip install watchdog
 
 #######################################################################
 ##                            delete cash                            ##

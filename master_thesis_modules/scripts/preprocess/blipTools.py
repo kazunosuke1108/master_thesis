@@ -1,7 +1,13 @@
+import os
 import torch
 class blipTools():
     def activate_blip(self):
         from transformers import Blip2Processor, Blip2ForConditionalGeneration
+        # os.system("export CUDA_LAUNCH_BLOCKING=1")
+        print("############# WARNING ############")
+        print("- Run 'export CUDA_LAUNCH_BLOCKING=1'")
+        print("- Check Fan FPS")
+        print("############# WARNING ############")
         """
         localにモデルを落とす方法
         rm -rf ~/.cache/huggingface
@@ -68,6 +74,24 @@ class blipTools():
         answer=self.get_vqa(blip_processor=blip_processor,blip_model=blip_model,device=device,image=image,question=question)
         print(answer)
         pass
+
+    def check(self,blip_processor,blip_model,device):
+        import time
+        import numpy as np
+        from PIL import Image
+        import requests
+        img_url = 'https://storage.googleapis.com/sfr-vision-language-research/BLIP/demo.jpg' 
+        raw_image = Image.open(requests.get(img_url, stream=True).raw).convert('RGB')
+
+        hz=7
+        for i in range(10000):
+            start=time.time()
+            # time.sleep(1/hz)
+            question = "how many dogs are in the picture?"
+            inputs = blip_processor(raw_image, question, return_tensors="pt").to("cuda")
+
+            out = blip_model.generate(**inputs)
+            print("No.",i,np.round(1/(time.time()-start),2),"Hz ",blip_processor.decode(out[0], skip_special_tokens=True).strip())
 
     def segment_person(self,image_path, model):
         from PIL import Image
@@ -144,5 +168,7 @@ class blipTools():
             # plt.close()
 if __name__=="__main__":
     cls=blipTools()
+    blip_processor,blip_model,device=cls.activate_blip()
+    cls.check(blip_processor,blip_model,device)
     # cls.main()
     # cls.main_multiple_images()
