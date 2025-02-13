@@ -10,6 +10,8 @@ from pprint import pprint
 import numpy as np
 import pandas as pd
 
+import watchdog
+
 sys.path.append(".")
 sys.path.append("..")
 if "catkin_ws" in os.getcwd():
@@ -21,7 +23,6 @@ from scripts.master_v3 import Master
 from scripts.preprocess.preprocess_blip_snapshot import PreprocessBlip
 from scripts.preprocess.preprocess_yolo_snapshot import PreprocessYolo
 from scripts.preprocess.preprocess_handrail_snapshot import PreprocessHandrail
-
 # preprocessorのインスタンス
 cls_blip=PreprocessBlip()
 cls_yolo=PreprocessYolo()
@@ -38,6 +39,8 @@ json_latest_path="/media/hayashide/MobileSensing/20250207Dev/json/dict_after_rei
 json_previous_path="/media/hayashide/MobileSensing/20250207Dev/json/dict_after_reid_old.json"
 json_latest_data=Manager().load_json(json_latest_path)
 json_previous_data=Manager().load_json(json_previous_path)
+
+
 
 # 基本情報の取得
 patients=sorted(list(set([k.split("_")[0] for k in json_latest_data.keys()])))
