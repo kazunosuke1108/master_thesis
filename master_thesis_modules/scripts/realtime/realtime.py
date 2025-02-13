@@ -150,7 +150,7 @@ class RealtimeEvaluator(Manager):
         print("Calculating feature values...")
         data_dicts=self.get_features()
         # 危険性評価
-        cls_master=Master(data_dicts)
+        cls_master=Master(data_dicts,strage=self.strage)
         data_dicts=cls_master.evaluate()
         print(data_dicts)
         export_data={
@@ -192,7 +192,7 @@ if __name__=="__main__":
 
     cls.evaluate_main()
     # path = "/media/hayashide/MobileSensing/20250207Dev/json"  # 監視するディレクトリ
-    path="/catkin_ws/src/master_thesis_modules/scripts/realtime"
+    path="/catkin_ws/src/master_thesis_modules/scripts/realtime/debug"
     event_handler = JSONFileChangeHandler()
     observer = Observer()
     observer.schedule(event_handler, path, recursive=False)

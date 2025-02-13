@@ -6,7 +6,10 @@ from pprint import pprint
 
 sys.path.append(".")
 sys.path.append("..")
-sys.path.append(os.path.expanduser("~")+"/kazu_ws/master_thesis/master_thesis_modules")
+if "catkin_ws" in os.getcwd():
+    sys.path.append("/catkin_ws/src/master_thesis_modules")
+else:
+    sys.path.append(os.path.expanduser("~")+"/kazu_ws/master_thesis/master_thesis_modules")
 from scripts.management.manager import Manager
 
 class getConsistencyMtx(Manager):
@@ -118,7 +121,7 @@ class getConsistencyMtx(Manager):
 
 if __name__=="__main__":
     cls=getConsistencyMtx()
-    AHP_dict=cls.get_all_comparison_mtx_and_weight(trial_name="20241229BuildSimulator",strage="NASK",array_type=2)
+    AHP_dict=cls.get_all_comparison_mtx_and_weight(trial_name="",strage="local",save_mtx=True,array_type=1)
     print(AHP_dict["30000001"])
     print(AHP_dict["30000001"]["CI"])
     print(AHP_dict["30000010"])

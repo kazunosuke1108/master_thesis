@@ -12,3 +12,4 @@
 *.pyc
 /docker/ros_workspace
 /master_thesis_modules/models
+/master_thesis_modules/database

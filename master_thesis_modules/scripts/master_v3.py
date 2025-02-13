@@ -20,8 +20,9 @@ from scripts.entropy.entropy_weight_generator import EntropyWeightGenerator
 from scripts.pseudo_data.pseudo_data_generator import PseudoDataGenerator
 
 class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
-    def __init__(self,data_dicts):
+    def __init__(self,data_dicts,strage="NASK"):
         super().__init__()
+        self.strage=strage
         default_graph=self.get_default_graph()
 
         # parameters
@@ -67,7 +68,7 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
             },
         }
         # AHP 一対比較行列の作成
-        self.AHP_dict=getConsistencyMtx().get_all_comparison_mtx_and_weight(trial_name="",strage="NASK",array_type=self.AHP_array_type)
+        self.AHP_dict=getConsistencyMtx().get_all_comparison_mtx_and_weight(trial_name="",strage=self.strage,array_type=self.AHP_array_type)
 
     def activation_func(self,val):
         return val
