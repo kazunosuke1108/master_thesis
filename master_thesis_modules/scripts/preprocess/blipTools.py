@@ -82,16 +82,27 @@ class blipTools():
         import requests
         img_url = 'https://storage.googleapis.com/sfr-vision-language-research/BLIP/demo.jpg' 
         raw_image = Image.open(requests.get(img_url, stream=True).raw).convert('RGB')
+        raw_image=Image.open("/catkin_ws/src/master_thesis_modules/database/common/elp_sample.jpg")
 
         hz=7
         for i in range(10000):
             start=time.time()
             # time.sleep(1/hz)
-            question = "how many dogs are in the picture?"
+            question = "How many people are there in the picture?"
             inputs = blip_processor(raw_image, question, return_tensors="pt").to("cuda")
 
             out = blip_model.generate(**inputs)
             print("No.",i,np.round(1/(time.time()-start),2),"Hz ",blip_processor.decode(out[0], skip_special_tokens=True).strip())
+
+    def idle(self,blip_processor,blip_model,device):
+        import time
+        s=time.time()
+        while True:
+            time.sleep(1)
+            print(time.time()-s)
+            if time.time()-s>10*60:
+                print("idling test done")
+                break
 
     def segment_person(self,image_path, model):
         from PIL import Image
@@ -170,5 +181,6 @@ if __name__=="__main__":
     cls=blipTools()
     blip_processor,blip_model,device=cls.activate_blip()
     cls.check(blip_processor,blip_model,device)
+    # cls.idle(blip_processor,blip_model,device)
     # cls.main()
     # cls.main_multiple_images()
