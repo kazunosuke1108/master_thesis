@@ -193,6 +193,16 @@ class Manager():
 
         #PILからndarrayに変換して返す
         return np.array(img_pil)
+    
+    def flattern_dict(self,d):
+        d_flatten={}
+        for p in d.keys():
+            for k in d[p].keys():
+                if type(d[p][k]) in [list,tuple]:
+                    d_flatten[f"{p}_{k}"]=str(d[p][k])
+                else:
+                    d_flatten[f"{p}_{k}"]=d[p][k]
+        return d_flatten
 
 if __name__=="__main__":
     cls=Manager()

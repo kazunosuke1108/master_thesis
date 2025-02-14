@@ -23,6 +23,7 @@ else:
     sys.path.append(os.path.expanduser("~")+"/kazu_ws/master_thesis/master_thesis_modules")
 from scripts.management.manager import Manager
 from scripts.master_v3 import Master
+from scripts.network.graph_manager_v3 import GraphManager
 from scripts.preprocess.preprocess_blip_snapshot import PreprocessBlip
 from scripts.preprocess.preprocess_yolo_snapshot import PreprocessYolo
 from scripts.preprocess.preprocess_handrail_snapshot import PreprocessHandrail
@@ -44,13 +45,15 @@ class JSONFileChangeHandler(FileSystemEventHandler):
             print(f"File changed: {event.src_path}")
             cls.evaluate_main()
 
-class RealtimeEvaluator(Manager):
+class RealtimeEvaluator(Manager,GraphManager):
     def __init__(self,trial_name,strage):
         super().__init__()
         self.trial_name=trial_name
         self.strage=strage
         self.data_dir_dict=self.get_database_dir(trial_name=self.trial_name,strage=self.strage)
+        self.default_graph=self.get_default_graph()
         self.df_eval=pd.DataFrame()
+        self.df_post=pd.DataFrame()
 
     def load_data(self):
         all_files_found=False
@@ -151,6 +154,116 @@ class RealtimeEvaluator(Manager):
                 data_dicts[patient]["50001111"]=ss_structure_dict["direction"][1]
         
         return data_dicts
+    
+    def get_rank_and_text(self,data_dicts,additional_data_dicts):
+        def guess_static_factor(data_dicts,focus_patient,additional_data_dicts):
+            additional_data_dicts["static_factor"]={}
+            focus_keys=[]
+            # 4000番台だけを採用
+            for k in data_dicts[list(data_dicts.keys())[0]].keys():
+                if k=="timestamp":
+                    continue
+                elif (int(k[0])>=5) or (int(k[0])<=3):
+                    continue
+                else:
+                    focus_keys.append(k)
+            focus_keys_static=[]
+            for k in focus_keys:
+                if int(k[-2])==0: # static node
+                    focus_keys_static.append(k)
+
+            additional_data_dicts["static_factor"]["significance"]={}
+            # 顕著なノードの検出
+            patients=list(data_dicts.keys())
+            
+            for patient in patients:
+                # if patient==focus_patient:
+                #     continue
+                additional_data_dicts["static_factor"]["significance"][patient]={}
+                for k in focus_keys_static:
+                    try:
+                        additional_data_dicts["static_factor"]["significance"][patient][k]=data_dicts[focus_patient][k]-data_dicts[patient][k]
+                    except TypeError:
+                        additional_data_dicts["static_factor"]["significance"][patient][k]=data_dicts[focus_patient][k][1]-data_dicts[patient][k][1]
+            
+            additional_data_dicts["static_factor"]["significance"]["max"]={}
+            for k in focus_keys_static:
+                additional_data_dicts["static_factor"]["significance"]["max"][k]=np.array([additional_data_dicts["static_factor"]["significance"][p][k] for p in patients]).max()
+            most_significant_node=focus_keys_static[np.array([additional_data_dicts["static_factor"]["significance"]["max"][k] for k in focus_keys_static]).argmax()]
+            additional_data_dicts["static_factor"]["most_significant_node"]=most_significant_node
+            return additional_data_dicts
+
+        def guess_dynamic_factor(data_dicts,focus_patient,additional_data_dicts):
+            print("!!!!!!!!!!!! dynamic factorの算出方法は仮 !!!!!!!!!!!!")
+            additional_data_dicts["dynamic_factor"]={}
+            focus_keys=[]
+            # 4000番台だけを採用
+            for k in data_dicts[list(data_dicts.keys())[0]].keys():
+                if k=="timestamp":
+                    continue
+                elif (int(k[0])>=5) or (int(k[0])<=3):
+                    continue
+                else:
+                    focus_keys.append(k)
+            focus_keys_dynamic=[]
+            for k in focus_keys:
+                if int(k[-2])==1: # dynamic node 【ここが仮】
+                    focus_keys_dynamic.append(k)
+
+            additional_data_dicts["dynamic_factor"]["significance"]={}
+            # 顕著なノードの検出
+            patients=list(data_dicts.keys())
+            
+            for patient in patients:
+                # if patient==focus_patient:
+                #     continue
+                additional_data_dicts["dynamic_factor"]["significance"][patient]={}
+                for k in focus_keys_dynamic:
+                    try:
+                        additional_data_dicts["dynamic_factor"]["significance"][patient][k]=data_dicts[focus_patient][k]-data_dicts[patient][k]
+                    except TypeError:
+                        additional_data_dicts["dynamic_factor"]["significance"][patient][k]=data_dicts[focus_patient][k][1]-data_dicts[patient][k][1]
+            
+            additional_data_dicts["dynamic_factor"]["significance"]["max"]={}
+            for k in focus_keys_dynamic:
+                additional_data_dicts["dynamic_factor"]["significance"]["max"][k]=np.array([additional_data_dicts["dynamic_factor"]["significance"][p][k] for p in patients]).max()
+            most_significant_node=focus_keys_dynamic[np.array([additional_data_dicts["dynamic_factor"]["significance"]["max"][k] for k in focus_keys_dynamic]).argmax()]
+            additional_data_dicts["dynamic_factor"]["most_significant_node"]=most_significant_node
+            return additional_data_dicts
+        
+        def get_alert_sentence(most_risky_patient,static_factor_node,dynamic_factor_node):
+            if static_factor_node=="":
+                text_dynamic=self.default_graph["node_dict"][dynamic_factor_node]["description_ja"]
+                alert_text=f"{most_risky_patient}さんが，{text_dynamic}ので，危険です．"
+            else:
+                text_static=self.default_graph["node_dict"][static_factor_node]["description_ja"]
+                text_dynamic=self.default_graph["node_dict"][dynamic_factor_node]["description_ja"]
+                alert_text=f"{most_risky_patient}さんが，元々{text_static}のに，{text_dynamic}ので，危険です．"
+            return alert_text
+
+        additional_data_dicts["rank"]={}
+        patients=list(data_dicts.keys())
+        total_risks=[]
+        for patient in patients:
+            total_risks.append(data_dicts[patient]["10000000"])
+        patients_rank=(-np.array(total_risks)).argsort()
+
+        most_risky_patient=patients[np.array(total_risks).argmax()]
+
+        additional_data_dicts=guess_static_factor(data_dicts,most_risky_patient,additional_data_dicts)
+        additional_data_dicts=guess_dynamic_factor(data_dicts,most_risky_patient,additional_data_dicts)
+        text=get_alert_sentence(most_risky_patient,
+                                static_factor_node=additional_data_dicts["static_factor"]["most_significant_node"],
+                                dynamic_factor_node=additional_data_dicts["dynamic_factor"]["most_significant_node"],
+                                )
+        print(text)
+        additional_data_dicts["alert"]=text
+
+        for patient,rank in zip(patients,patients_rank):
+            additional_data_dicts["rank"][patient]={}
+            additional_data_dicts["rank"][patient]["10000000"]=rank
+        return additional_data_dicts
+
 
     
     def evaluate_main(self):
@@ -162,33 +275,32 @@ class RealtimeEvaluator(Manager):
         print("Calculating feature values...")
         data_dicts=self.get_features()
         # 危険性評価
+        print("Evaluating risk...")
         cls_master=Master(data_dicts,strage=self.strage)
         data_dicts=cls_master.evaluate()
-        print(data_dicts)
         export_data={
             "sources":json_latest_data,
             "results":data_dicts,
         }
         Manager().write_json(export_data,json_path=os.path.split(json_latest_path)[0]+"/data_dicts_eval.json")
-        print(export_data)
-        data_dicts_flatten = {}
-        for p in data_dicts.keys():
-            for k in data_dicts[p].keys():
-                if type(data_dicts[p][k]) in [list,tuple]:
-                    data_dicts_flatten[f"{p}_{k}"]=str(data_dicts[p][k])
-                else:
-                    data_dicts_flatten[f"{p}_{k}"]=data_dicts[p][k]
-        # data_dicts_flatten={f"{p}_{k}":data_dicts[p][k] for k in data_dicts[p].keys() for p in data_dicts.keys()}
+        data_dicts_flatten = self.flattern_dict(data_dicts)
         if len(list(data_dicts_flatten.keys()))>0:
             data_dicts_flatten["timestamp"]=json_latest_data[f"{p}_timestamp"]
-        pprint(data_dicts_flatten)
-        print(pd.DataFrame(data_dicts_flatten,index=[0]))
         self.df_eval=pd.concat([self.df_eval,pd.DataFrame(data_dicts_flatten,index=[0])],axis=0)
         self.df_eval.reset_index(inplace=True,drop=True)
+        
+        additional_data_dicts={}
+        # リスク優先順位付け
+        additional_data_dicts=self.get_rank_and_text(data_dicts,additional_data_dicts)
+        additional_data_dicts_flatten=self.flattern_dict(additional_data_dicts)
+        self.df_post=pd.concat([self.df_post,pd.DataFrame(additional_data_dicts_flatten,index=[0])],axis=0)
+        self.df_post.reset_index(inplace=True,drop=True)
         
     def save(self):
         self.df_eval.sort_index(axis=1,inplace=True)
         self.df_eval.to_csv(self.data_dir_dict["trial_dir_path"]+"/df_eval.csv",index=False)
+        self.df_post.sort_index(axis=1,inplace=True)
+        self.df_post.to_csv(self.data_dir_dict["trial_dir_path"]+"/df_post.csv",index=False)
     
 
 if __name__=="__main__":
