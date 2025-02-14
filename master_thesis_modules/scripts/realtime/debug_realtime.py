@@ -23,6 +23,7 @@ from scripts.master_v3 import Master
 from scripts.preprocess.preprocess_blip_snapshot import PreprocessBlip
 from scripts.preprocess.preprocess_yolo_snapshot import PreprocessYolo
 from scripts.preprocess.preprocess_handrail_snapshot import PreprocessHandrail
+from scripts.network.graph_manager_v3 import GraphManager
 # preprocessorのインスタンス
 cls_blip=PreprocessBlip()
 cls_yolo=PreprocessYolo()
@@ -136,8 +137,10 @@ pprint(export_data)
 
 # ランク評価
 
-def guess_static_factor(self,data_dicts,most_risky_patient):
+def guess_static_factor(data_dicts,focus_patient,additional_data_dicts):
+    additional_data_dicts["static_factor"]={}
     focus_keys=[]
+    # 4000番台だけを採用
     for k in data_dicts[list(data_dicts.keys())[0]].keys():
         if k=="timestamp":
             continue
@@ -145,56 +148,142 @@ def guess_static_factor(self,data_dicts,most_risky_patient):
             continue
         else:
             focus_keys.append(k)
+    focus_keys_static=[]
+    for k in focus_keys:
+        if int(k[-2])==0: # static node
+            focus_keys_static.append(k)
 
-    average_df=pd.DataFrame(index=focus_keys)
-    # 4000番台の各項目について，患者間比較用の代表値を算出
-    for patient in data_dicts.keys():
-        for node_code in focus_keys:
-            if node_code in ["40000000","40000001"]:
-                average_df.loc[node_code,patient]=np.mean([eval(v)[1] if not type(v)==float else np.nan for v in data_dicts[patient][node_code].values])
+    additional_data_dicts["static_factor"]["significance"]={}
+    # 顕著なノードの検出
+    patients=list(data_dicts.keys())
+    
+    for patient in patients:
+        # if patient==focus_patient:
+        #     continue
+        additional_data_dicts["static_factor"]["significance"][patient]={}
+        for k in focus_keys_static:
+            try:
+                additional_data_dicts["static_factor"]["significance"][patient][k]=data_dicts[focus_patient][k]-data_dicts[patient][k]
+            except TypeError:
+                additional_data_dicts["static_factor"]["significance"][patient][k]=data_dicts[focus_patient][k][1]-data_dicts[patient][k][1]
+    
+    additional_data_dicts["static_factor"]["significance"]["max"]={}
+    for k in focus_keys_static:
+        additional_data_dicts["static_factor"]["significance"]["max"][k]=np.array([additional_data_dicts["static_factor"]["significance"][p][k] for p in patients]).max()
+    most_significant_node=focus_keys_static[np.array([additional_data_dicts["static_factor"]["significance"]["max"][k] for k in focus_keys_static]).argmax()]
+    additional_data_dicts["static_factor"]["most_significant_node"]=most_significant_node
+    return additional_data_dicts
 
-            else:
-                average_df.loc[node_code,patient]=data_dicts[patient][node_code].mean()
-    average_df["risky"]=average_df.idxmax(axis=1)
-    average_df["significance"]=np.nan
-    average_df["node_type"]=[self.default_graph["node_dict"][int(idx)]["node_type"] for idx in list(average_df.index)]
-    for i,row in average_df.iterrows():
-        patients=list(data_dicts.keys())
-        total=row[patients].sum()
-        others=total-row[row["risky"]]
-        significance=abs(row[row["risky"]]-others/(len(patients)-1))
-        average_df.loc[i,"significance"]=significance
+def guess_dynamic_factor(data_dicts,focus_patient,additional_data_dicts):
+    print("!!!!!!!!!!!! dynamic factorの算出方法は仮 !!!!!!!!!!!!")
+    additional_data_dicts["dynamic_factor"]={}
+    focus_keys=[]
+    # 4000番台だけを採用
+    for k in data_dicts[list(data_dicts.keys())[0]].keys():
+        if k=="timestamp":
+            continue
+        elif (int(k[0])>=5) or (int(k[0])<=3):
+            continue
+        else:
+            focus_keys.append(k)
+    focus_keys_dynamic=[]
+    for k in focus_keys:
+        if int(k[-2])==1: # dynamic node 【ここが仮】
+            focus_keys_dynamic.append(k)
 
-    factor_df=average_df[(average_df["risky"]==most_risky_patient)].sort_values("significance")
-    static_factor_df=factor_df[factor_df["node_type"]=="static"]
-    static_factor_nodes=static_factor_df.index[static_factor_df["significance"]==static_factor_df["significance"].max()].tolist()
-    if len(static_factor_nodes)>0:
-        static_factor_node=static_factor_nodes[0]
+    additional_data_dicts["dynamic_factor"]["significance"]={}
+    # 顕著なノードの検出
+    patients=list(data_dicts.keys())
+    
+    for patient in patients:
+        # if patient==focus_patient:
+        #     continue
+        additional_data_dicts["dynamic_factor"]["significance"][patient]={}
+        for k in focus_keys_dynamic:
+            try:
+                additional_data_dicts["dynamic_factor"]["significance"][patient][k]=data_dicts[focus_patient][k]-data_dicts[patient][k]
+            except TypeError:
+                additional_data_dicts["dynamic_factor"]["significance"][patient][k]=data_dicts[focus_patient][k][1]-data_dicts[patient][k][1]
+    
+    additional_data_dicts["dynamic_factor"]["significance"]["max"]={}
+    for k in focus_keys_dynamic:
+        additional_data_dicts["dynamic_factor"]["significance"]["max"][k]=np.array([additional_data_dicts["dynamic_factor"]["significance"][p][k] for p in patients]).max()
+    most_significant_node=focus_keys_dynamic[np.array([additional_data_dicts["dynamic_factor"]["significance"]["max"][k] for k in focus_keys_dynamic]).argmax()]
+    additional_data_dicts["dynamic_factor"]["most_significant_node"]=most_significant_node
+    return additional_data_dicts
+
+    # # average_df=pd.DataFrame(index=focus_keys)
+    # # 4000番台の各項目について，患者間比較用の代表値を算出
+    # for patient in data_dicts.keys():
+    #     for node_code in focus_keys:
+    #         if node_code in ["40000000","40000001"]:
+    #             average_df.loc[node_code,patient]=np.mean([eval(v)[1] if not type(v)==float else np.nan for v in data_dicts[patient][node_code].values])
+
+    #         else:
+    #             average_df.loc[node_code,patient]=data_dicts[patient][node_code].mean()
+    # average_df["risky"]=average_df.idxmax(axis=1)
+    # average_df["significance"]=np.nan
+    # average_df["node_type"]=[self.default_graph["node_dict"][int(idx)]["node_type"] for idx in list(average_df.index)]
+    # for i,row in average_df.iterrows():
+    #     patients=list(data_dicts.keys())
+    #     total=row[patients].sum()
+    #     others=total-row[row["risky"]]
+    #     significance=abs(row[row["risky"]]-others/(len(patients)-1))
+    #     average_df.loc[i,"significance"]=significance
+
+    # factor_df=average_df[(average_df["risky"]==most_risky_patient)].sort_values("significance")
+    # static_factor_df=factor_df[factor_df["node_type"]=="static"]
+    # static_factor_nodes=static_factor_df.index[static_factor_df["significance"]==static_factor_df["significance"].max()].tolist()
+    # if len(static_factor_nodes)>0:
+    #     static_factor_node=static_factor_nodes[0]
+    # else:
+    #     static_factor_node=""
+    # print(average_df)
+    # print(factor_df)
+    # return static_factor_node,factor_df
+
+default_graph=GraphManager().get_default_graph()
+
+def get_alert_sentence(most_risky_patient,static_factor_node,dynamic_factor_node):
+    if static_factor_node=="":
+        text_dynamic=default_graph["node_dict"][dynamic_factor_node]["description_ja"]
+        alert_text=f"{most_risky_patient}さんが，{text_dynamic}ので，危険です．"
     else:
-        static_factor_node=""
-    print(average_df)
-    print(factor_df)
-    return static_factor_node,factor_df
+        text_static=default_graph["node_dict"][static_factor_node]["description_ja"]
+        text_dynamic=default_graph["node_dict"][dynamic_factor_node]["description_ja"]
+        alert_text=f"{most_risky_patient}さんが，元々{text_static}のに，{text_dynamic}ので，危険です．"
+    return alert_text
 
-def evaluate_rank(data_dicts):
-    additional_data_dicts={}
+def evaluate_rank(data_dicts,additional_data_dicts):
+    additional_data_dicts["rank"]={}
     patients=list(data_dicts.keys())
     total_risks=[]
     for patient in patients:
         total_risks.append(data_dicts[patient]["10000000"])
     patients_rank=(-np.array(total_risks)).argsort()
 
-    static_factor=""
-    dynamic_factor=""
+    most_risky_patient=patients[np.array(total_risks).argmax()]
+
+    additional_data_dicts=guess_static_factor(data_dicts,most_risky_patient,additional_data_dicts)
+    additional_data_dicts=guess_dynamic_factor(data_dicts,most_risky_patient,additional_data_dicts)
+    text=get_alert_sentence(most_risky_patient,
+                            static_factor_node=additional_data_dicts["static_factor"]["most_significant_node"],
+                            dynamic_factor_node=additional_data_dicts["dynamic_factor"]["most_significant_node"],
+                            )
+    print(text)
+    additional_data_dicts["alert"]=text
 
     for patient,rank in zip(patients,patients_rank):
-        additional_data_dicts[patient]={}
-        additional_data_dicts[patient]["10000000_rank"]=rank
+        additional_data_dicts["rank"][patient]={}
+        additional_data_dicts["rank"][patient]["10000000"]=rank
     return additional_data_dicts
-# 通知文章生成
-additional_data_dicts=evaluate_rank(data_dicts)
-print(additional_data_dicts)
-# 保存
+
+additional_data_dicts={}
+additional_data_dicts=evaluate_rank(data_dicts,additional_data_dicts)
+pprint(additional_data_dicts)
+# Manager().write_json()
+
+
 
 """
             # 背景差分値の取得
