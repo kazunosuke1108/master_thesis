@@ -192,7 +192,7 @@ class RealtimeEvaluator(Manager):
     
 
 if __name__=="__main__":
-    trial_name="20250213EvaluationON"
+    trial_name="20250214realtimeR"
     strage="local"
     json_dir_path="/catkin_ws/src/database"+"/"+trial_name+"/json"
 
