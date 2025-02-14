@@ -132,7 +132,69 @@ export_data={
     "results":data_dicts,
 }
 Manager().write_json(export_data,json_path=os.path.split(json_latest_path)[0]+"/data_dicts_eval.json")
-print(export_data)
+pprint(export_data)
+
+# ランク評価
+
+def guess_static_factor(self,data_dicts,most_risky_patient):
+    focus_keys=[]
+    for k in data_dicts[list(data_dicts.keys())[0]].keys():
+        if k=="timestamp":
+            continue
+        elif (int(k[0])>=5) or (int(k[0])<=3):
+            continue
+        else:
+            focus_keys.append(k)
+
+    average_df=pd.DataFrame(index=focus_keys)
+    # 4000番台の各項目について，患者間比較用の代表値を算出
+    for patient in data_dicts.keys():
+        for node_code in focus_keys:
+            if node_code in ["40000000","40000001"]:
+                average_df.loc[node_code,patient]=np.mean([eval(v)[1] if not type(v)==float else np.nan for v in data_dicts[patient][node_code].values])
+
+            else:
+                average_df.loc[node_code,patient]=data_dicts[patient][node_code].mean()
+    average_df["risky"]=average_df.idxmax(axis=1)
+    average_df["significance"]=np.nan
+    average_df["node_type"]=[self.default_graph["node_dict"][int(idx)]["node_type"] for idx in list(average_df.index)]
+    for i,row in average_df.iterrows():
+        patients=list(data_dicts.keys())
+        total=row[patients].sum()
+        others=total-row[row["risky"]]
+        significance=abs(row[row["risky"]]-others/(len(patients)-1))
+        average_df.loc[i,"significance"]=significance
+
+    factor_df=average_df[(average_df["risky"]==most_risky_patient)].sort_values("significance")
+    static_factor_df=factor_df[factor_df["node_type"]=="static"]
+    static_factor_nodes=static_factor_df.index[static_factor_df["significance"]==static_factor_df["significance"].max()].tolist()
+    if len(static_factor_nodes)>0:
+        static_factor_node=static_factor_nodes[0]
+    else:
+        static_factor_node=""
+    print(average_df)
+    print(factor_df)
+    return static_factor_node,factor_df
+
+def evaluate_rank(data_dicts):
+    additional_data_dicts={}
+    patients=list(data_dicts.keys())
+    total_risks=[]
+    for patient in patients:
+        total_risks.append(data_dicts[patient]["10000000"])
+    patients_rank=(-np.array(total_risks)).argsort()
+
+    static_factor=""
+    dynamic_factor=""
+
+    for patient,rank in zip(patients,patients_rank):
+        additional_data_dicts[patient]={}
+        additional_data_dicts[patient]["10000000_rank"]=rank
+    return additional_data_dicts
+# 通知文章生成
+additional_data_dicts=evaluate_rank(data_dicts)
+print(additional_data_dicts)
+# 保存
 
 """
             # 背景差分値の取得
