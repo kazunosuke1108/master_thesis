@@ -194,16 +194,41 @@ class Manager():
         #PILからndarrayに変換して返す
         return np.array(img_pil)
     
-    def flattern_dict(self,d):
-        d_flatten={}
-        for p in d.keys():
-            for k in d[p].keys():
-                if type(d[p][k]) in [list,tuple]:
-                    d_flatten[f"{p}_{k}"]=str(d[p][k])
+    # def flattern_dict(self,d):
+    #     d_flatten={}
+    #     for p in d.keys():
+    #         try:
+    #             for k in d[p].keys():
+    #                 if type(d[p][k]) in [list,tuple]:
+    #                     d_flatten[f"{p}_{k}"]=str(d[p][k])
+    #                 else:
+    #                     d_flatten[f"{p}_{k}"]=d[p][k]
+    #         except AttributeError:
+    #             return d
+        
+    #     return d_flatten
+    
+    def flatten_dict(self, d, parent_key='', sep='_'):
+        """
+        ネストされた辞書をフラットにする。
+        各キーは「上位キー_下位キー」の形式になる。
+        
+        :param d: 入れ子構造の辞書
+        :param parent_key: 親キー（再帰時に使用）
+        :param sep: キーを結合するセパレータ（デフォルトは'_'）
+        :return: フラット化された辞書
+        """
+        flattened = {}
+        for k, v in d.items():
+            new_key = f"{parent_key}{sep}{k}" if parent_key else k
+            if isinstance(v, dict):
+                flattened.update(self.flatten_dict(v, new_key, sep=sep))
+            else:
+                if type(v) in [list,tuple]:
+                    flattened[new_key] = str(v)
                 else:
-                    d_flatten[f"{p}_{k}"]=d[p][k]
-        return d_flatten
-
+                    flattened[new_key] = v
+        return flattened
 if __name__=="__main__":
     cls=Manager()
     cls.get_database_dir("NASK")

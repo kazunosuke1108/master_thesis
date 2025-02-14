@@ -283,18 +283,20 @@ class RealtimeEvaluator(Manager,GraphManager):
             "results":data_dicts,
         }
         Manager().write_json(export_data,json_path=os.path.split(json_latest_path)[0]+"/data_dicts_eval.json")
-        data_dicts_flatten = self.flattern_dict(data_dicts)
+        data_dicts_flatten = self.flatten_dict(data_dicts)
         if len(list(data_dicts_flatten.keys()))>0:
-            data_dicts_flatten["timestamp"]=json_latest_data[f"{p}_timestamp"]
+            data_dicts_flatten["timestamp"]=json_latest_data[f"{list(data_dicts.keys())[0]}_timestamp"]
         self.df_eval=pd.concat([self.df_eval,pd.DataFrame(data_dicts_flatten,index=[0])],axis=0)
         self.df_eval.reset_index(inplace=True,drop=True)
         
-        additional_data_dicts={}
-        # リスク優先順位付け
-        additional_data_dicts=self.get_rank_and_text(data_dicts,additional_data_dicts)
-        additional_data_dicts_flatten=self.flattern_dict(additional_data_dicts)
-        self.df_post=pd.concat([self.df_post,pd.DataFrame(additional_data_dicts_flatten,index=[0])],axis=0)
-        self.df_post.reset_index(inplace=True,drop=True)
+        patients=list(data_dicts.keys())
+        if len(patients)>0:
+            additional_data_dicts={}
+            # リスク優先順位付け
+            additional_data_dicts=self.get_rank_and_text(data_dicts,additional_data_dicts)
+            additional_data_dicts_flatten=self.flatten_dict(additional_data_dicts)
+            self.df_post=pd.concat([self.df_post,pd.DataFrame(additional_data_dicts_flatten,index=[0])],axis=0)
+            self.df_post.reset_index(inplace=True,drop=True)
         
     def save(self):
         self.df_eval.sort_index(axis=1,inplace=True)
@@ -304,7 +306,7 @@ class RealtimeEvaluator(Manager,GraphManager):
     
 
 if __name__=="__main__":
-    trial_name="20250214realtimeR"
+    trial_name="20250214CheckRank"
     strage="local"
     json_dir_path="/catkin_ws/src/database"+"/"+trial_name+"/json"
 
