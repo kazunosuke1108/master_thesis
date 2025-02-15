@@ -54,9 +54,12 @@ class RealtimeEvaluator(Manager,GraphManager):
         self.default_graph=self.get_default_graph()
         self.df_eval=pd.DataFrame()
         self.df_post=pd.DataFrame()
+        self.logger=self.prepare_log(self.data_dir_dict["mobilesensing_dir_path"]+"/log")
+        self.logger.info(f"RealtimeEvaluator has woken up")
 
     def load_data(self):
         all_files_found=False
+        self.logger.info(f"jsonのload開始")
         while not all_files_found:
             try:
                 # json
@@ -66,8 +69,13 @@ class RealtimeEvaluator(Manager,GraphManager):
                 self.json_previous_data=Manager().load_json(json_previous_path)
                 # 患者情報
                 self.patients=sorted(list(set([k.split("_")[0] for k in self.json_latest_data.keys()])))
+                # 時刻
+                self.timestamp=self.json_latest_data[self.patients[0]+"_timestamp"]
+                self.logger.info(f"解析時刻: {self.timestamp}")
                 # ELP
-                elp_img_path=sorted(glob(f"/catkin_ws/src/database/{self.trial_name}/jpg/elp/left/*.jpg"))[-1]
+                elp_img_paths=sorted(glob(f"/catkin_ws/src/database/{self.trial_name}/jpg/elp/left/*.jpg"))
+                elp_img_path=elp_img_paths[abs(np.array([float(os.path.basename(p).split("_")[1][:-len(".jpg")])-self.timestamp for p in elp_img_paths])).argmin()]
+                self.logger.info(f"解析ELP: {elp_img_path}")
                 self.elp_img=cv2.imread(elp_img_path)
                 all_files_found=True
             except FileNotFoundError:
@@ -82,8 +90,9 @@ class RealtimeEvaluator(Manager,GraphManager):
 
     def get_features(self):
         # 1人ずつ評価
+        self.logger.info(f"特徴量の算出開始")
         data_dicts={}
-        print(f"評価開始前のpatients: {self.patients}")
+        self.logger.info(f"評価開始前のpatients: {self.patients}")
         for patient in self.patients:
             # bbox img
             t,b,l,r=self.json_latest_data[patient+"_bboxLowerY"],self.json_latest_data[patient+"_bboxHigherY"],self.json_latest_data[patient+"_bboxLowerX"],self.json_latest_data[patient+"_bboxHigherX"]
@@ -91,7 +100,7 @@ class RealtimeEvaluator(Manager,GraphManager):
                 t,b,l,r=int(t),int(b),int(l),int(r)
             except ValueError: # NaNが入っていた場合
                 # self.patients.remove(patient)
-                print(f"bbox情報が不正のため削除 {patient}")
+                self.logger.info(f"bbox情報が不正のため削除 {patient}")
                 continue
             bbox_img=self.elp_img[t:b,l:r]
 
@@ -108,7 +117,7 @@ class RealtimeEvaluator(Manager,GraphManager):
             ## 動作
             data_dicts[patient],success_flag=cls_yolo.yolo_snapshot(data_dicts[patient],self.elp_img,t,b,l,r,)
             if not success_flag:
-                print(f"姿勢推定が不正のため削除 {patient}")
+                self.logger.info(f"姿勢推定が不正のため削除 {patient}")
                 # self.patients.remove(patient)
                 del data_dicts[patient]
                 continue
@@ -131,8 +140,6 @@ class RealtimeEvaluator(Manager,GraphManager):
             return d
 
         # スタッフがいるかどうかを判定
-        print(self.patients)
-        pprint(data_dicts)
         staff=[patient for patient in self.patients if data_dicts[patient]["50000000"]=="no"]
         if len(staff)>0:
             print(staff)
@@ -263,19 +270,22 @@ class RealtimeEvaluator(Manager,GraphManager):
             additional_data_dicts["rank"][patient]={}
             additional_data_dicts["rank"][patient]["10000000"]=rank
         return additional_data_dicts
+    
+    
 
 
     
     def evaluate_main(self):
-        print("RealtimeEvaluator called")
+        s=time.time()
+        self.logger.info(f"RealtimeEvaluator called. Time: {np.round(time.time()-s,4)}")
         # 情報の読込
-        print("Loading info...")
+        self.logger.info(f"Loading info...")
         json_latest_path,json_latest_data=self.load_data()
         # 特徴量の算出
-        print("Calculating feature values...")
+        self.logger.info(f"Calculating feature values...Time: {np.round(time.time()-s,4)}")
         data_dicts=self.get_features()
         # 危険性評価
-        print("Evaluating risk...")
+        self.logger.info(f"Evaluating risk...Time: {np.round(time.time()-s,4)}")
         cls_master=Master(data_dicts,strage=self.strage)
         data_dicts=cls_master.evaluate()
         export_data={
@@ -289,6 +299,7 @@ class RealtimeEvaluator(Manager,GraphManager):
         self.df_eval=pd.concat([self.df_eval,pd.DataFrame(data_dicts_flatten,index=[0])],axis=0)
         self.df_eval.reset_index(inplace=True,drop=True)
         
+        self.logger.info(f"Analyzing results...Time: {np.round(time.time()-s,4)}")
         patients=list(data_dicts.keys())
         if len(patients)>0:
             additional_data_dicts={}
@@ -298,6 +309,11 @@ class RealtimeEvaluator(Manager,GraphManager):
             self.df_post=pd.concat([self.df_post,pd.DataFrame(additional_data_dicts_flatten,index=[0])],axis=0)
             self.df_post.reset_index(inplace=True,drop=True)
         
+        self.logger.info(f"Drawing bbox image...Time: {np.round(time.time()-s,4)}")
+        self.draw_bbox_img()
+        
+
+        
     def save(self):
         self.df_eval.sort_index(axis=1,inplace=True)
         self.df_eval.to_csv(self.data_dir_dict["trial_dir_path"]+"/df_eval.csv",index=False)
@@ -306,7 +322,7 @@ class RealtimeEvaluator(Manager,GraphManager):
     
 
 if __name__=="__main__":
-    trial_name="20250214CheckRank"
+    trial_name="20250215NagasakiShort5"
     strage="local"
     json_dir_path="/catkin_ws/src/database"+"/"+trial_name+"/json"
 

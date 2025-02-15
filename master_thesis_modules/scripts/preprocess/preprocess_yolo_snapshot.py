@@ -165,6 +165,9 @@ class PreprocessYolo(Manager,blipTools):
     def yolo_snapshot(self,data_dict,rgb_img,t,b,l,r):
         t,b,l,r=int(t),int(b),int(l),int(r)
         bbox_rgb_img=rgb_img[t:b,l:r]
+        # cv2.imshow("bbox",bbox_rgb_img)
+        # print(bbox_rgb_img.shape)
+        # cv2.waitKey(1)
         # 拡張bounding boxの切り出し
         extend_ratio=0.025
         t_e,b_e,l_e,r_e,=np.max([t-extend_ratio*rgb_img.shape[0],0]),np.min([b+extend_ratio*rgb_img.shape[0],rgb_img.shape[0]]),np.max([l-extend_ratio*rgb_img.shape[1],0]),np.min([r+extend_ratio*rgb_img.shape[1],rgb_img.shape[0]])

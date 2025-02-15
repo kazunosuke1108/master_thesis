@@ -50,7 +50,7 @@ class GUI(Manager):
         w=self.layout_dict["elp"]["r"]-self.layout_dict["elp"]["l"]
         h=self.layout_dict["elp"]["b"]-self.layout_dict["elp"]["t"]
         s=time.time()
-        jpg_path=sorted(glob("//NASK/common/FY2024/09_MobileSensing/20250207Dev/jpg/elp/left/*.jpg"))[-1] # これめちゃめちゃ遅い．path指定にしたい
+        jpg_path=sorted(glob("/catkin_ws/src/database/20250214CheckRank/jpg/elp/left/*.jpg"))[-1] # これめちゃめちゃ遅い．path指定にしたい
         print(time.time()-s)
         elp_image_bgr=self.read_image(jpg_path) 
         print(time.time()-s)

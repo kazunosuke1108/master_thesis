@@ -28,6 +28,11 @@ class Manager():
         import logging
 
         logdir=trial_dir_path
+        try:
+            os.makedirs(logdir,exist_ok=True)
+        except Exception:
+            os.makedirs(os.path.split(logdir)[0],exist_ok=True)
+            os.makedirs(logdir,exist_ok=True)
         
 
         logger = logging.getLogger(os.path.basename(__file__))
