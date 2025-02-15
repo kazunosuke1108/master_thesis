@@ -32,7 +32,7 @@ class PreprocessBlip(Manager,blipTools):
             "wheelchair":{"query":"Question: Are there any wheelchair in this picture? Answer:","node_code":"50001010"},
         }
 
-    def blip_snapshot(self,data_dict,rgb_img,t,b,l,r,extend_ratio_tb=0.2,extend_ratio_lr=0.2):
+    def blip_snapshot(self,data_dict,rgb_img,t,b,l,r,fps_control_dict,extend_ratio_tb=0.2,extend_ratio_lr=0.2):
         # bounding boxの切り出し
         t,b,l,r=int(t),int(b),int(l),int(r)
         bbox_rgb_img=rgb_img[t:b,l:r]
@@ -43,7 +43,7 @@ class PreprocessBlip(Manager,blipTools):
 
         # BLIP
         for q_title,q_info in self.questions.items():
-            if q_title=="patient":
+            if ((q_title=="patient") and fps_control_dict[q_info["node_code"]]):
                 # BLIP 患者？
                 answer,confidence=self.get_vqa(blip_processor=self.blip_processor,blip_model=self.blip_model,device=self.device,image=bbox_rgb_img,question=q_info["query"],confidence=True)
                 # 答えを加工
@@ -54,12 +54,12 @@ class PreprocessBlip(Manager,blipTools):
                 # 答えを記録
                 data_dict[self.questions[q_title]["node_code"]]=answer
                 data_dict["50000001"]=confidence
-            elif q_title=="age":
+            elif ((q_title=="age") and fps_control_dict[q_info["node_code"]]):
                 # BLIP 年齢？
                 answer,confidence=self.get_vqa(blip_processor=self.blip_processor,blip_model=self.blip_model,device=self.device,image=bbox_rgb_img,question=q_info["query"],confidence=True)
                 data_dict[self.questions[q_title]["node_code"]]=answer
                 data_dict["50000011"]=confidence
-            elif q_title=="ivPole":
+            elif ((q_title=="ivPole") and fps_control_dict[q_info["node_code"]]):
                 # BLIP 点滴？
                 answer,confidence=self.get_vqa(blip_processor=self.blip_processor,blip_model=self.blip_model,device=self.device,image=extended_bbox_rgb_img,question=q_info["query"],confidence=True)
                 if (answer=="yes") or (answer=="Yes"):
@@ -71,7 +71,7 @@ class PreprocessBlip(Manager,blipTools):
                 data_dict["50001002"]=confidence
                 data_dict["50001003"]=confidence
                 
-            elif q_title=="wheelchair":
+            elif ((q_title=="wheelchair") and fps_control_dict[q_info["node_code"]]):
                 # BLIP 車椅子？
                 answer,confidence=self.get_vqa(blip_processor=self.blip_processor,blip_model=self.blip_model,device=self.device,image=extended_bbox_rgb_img,question=q_info["query"],confidence=True)
                 if (answer=="yes") or (answer=="Yes"):

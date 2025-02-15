@@ -10,6 +10,7 @@ from icecream import ic
 from pprint import pprint
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
 
 # pip install watchdog
 from watchdog.observers import Observer
@@ -35,7 +36,8 @@ dayroom_structure_dict={"xrange":[6,15],"yrange":[-11,-4]} # 11月
 # dayroom_structure_dict={"xrange":[-4,6],"yrange":[5,10]} # 08月
 ss_structure_dict={"pos":[6,-7.5],"direction":[0,0.1]} # 11月
 # ss_structure_dict={"pos":[-4,7.5],"direction":[0.1,0]} # 08月
-
+colors = plt.get_cmap("tab10").colors
+colors = [(int(b*255), int(g*255), int(r*255)) for r, g, b in colors]
 
 class JSONFileChangeHandler(FileSystemEventHandler):
     def on_modified(self, event):
@@ -74,9 +76,10 @@ class RealtimeEvaluator(Manager,GraphManager):
                 self.logger.info(f"解析時刻: {self.timestamp}")
                 # ELP
                 elp_img_paths=sorted(glob(f"/catkin_ws/src/database/{self.trial_name}/jpg/elp/left/*.jpg"))
-                elp_img_path=elp_img_paths[abs(np.array([float(os.path.basename(p).split("_")[1][:-len(".jpg")])-self.timestamp for p in elp_img_paths])).argmin()]
-                self.logger.info(f"解析ELP: {elp_img_path}")
-                self.elp_img=cv2.imread(elp_img_path)
+                self.elp_img_path=elp_img_paths[abs(np.array([float(os.path.basename(p).split("_")[1][:-len(".jpg")])-self.timestamp for p in elp_img_paths])).argmin()]
+                self.logger.info(f"解析ELP: {self.elp_img_path}")
+                self.elp_img=cv2.imread(self.elp_img_path)
+                # self.elp_img=cv2.cvtColor(self.elp_img, cv2.COLOR_BGR2RGB)
                 all_files_found=True
             except FileNotFoundError:
                 print(self.get_timestamp(),"json not found")
@@ -89,10 +92,32 @@ class RealtimeEvaluator(Manager,GraphManager):
         return json_latest_path,self.json_latest_data
 
     def get_features(self):
-        # 1人ずつ評価
-        self.logger.info(f"特徴量の算出開始")
+        self.logger.info(f"特徴量の算出開始 Time: {np.round(time.time()-self.start,4)}")
         data_dicts={}
+        def fps_judger():
+            fps_control_dicts={}
+            # 属性 (初回のみ)
+            lateset_patients=sorted(list(set([k.split("_")[0] for k in self.json_latest_data.keys()])))
+            previous_patients=sorted(list(set([k.split("_")[0] for k in self.df_eval.keys()])))
+            for patient in lateset_patients:
+                fps_control_dicts[patient]={k:True for k in self.default_graph["node_dict"].keys() if k[0]=="5"}
+                if patient in previous_patients:
+                    for k in fps_control_dicts[patient].keys():
+                        if (("500000" in k)):# or ("5000100" in k) or ("5000101" in k)): 
+                            fps_control_dicts[patient][k]=False
+                
+
+            # 動作 (diff連動)
+
+            # 物体
+
+            # 位置
+            return fps_control_dicts
+        # FPS制御
+        self.fps_control_dicts=fps_judger()
+        self.logger.info(f"fps_control_dicts:{self.fps_control_dicts}")
         self.logger.info(f"評価開始前のpatients: {self.patients}")
+        # 1人ずつ評価
         for patient in self.patients:
             # bbox img
             t,b,l,r=self.json_latest_data[patient+"_bboxLowerY"],self.json_latest_data[patient+"_bboxHigherY"],self.json_latest_data[patient+"_bboxLowerX"],self.json_latest_data[patient+"_bboxHigherX"]
@@ -102,7 +127,7 @@ class RealtimeEvaluator(Manager,GraphManager):
                 # self.patients.remove(patient)
                 self.logger.info(f"bbox情報が不正のため削除 {patient}")
                 continue
-            bbox_img=self.elp_img[t:b,l:r]
+            # bbox_img=self.elp_img[t:b,l:r]
 
             data_dicts[patient]={}
             # luminance (7)
@@ -113,16 +138,26 @@ class RealtimeEvaluator(Manager,GraphManager):
 
             # feature (5)
             ## BLIP系 属性・物体(手すり以外)
-            data_dicts[patient]=cls_blip.blip_snapshot(data_dicts[patient],self.elp_img,t,b,l,r,)
+            self.logger.info(f"BLIP開始 Time: {np.round(time.time()-self.start,4)}")
+            data_dicts[patient]=cls_blip.blip_snapshot(data_dicts[patient],self.elp_img,t,b,l,r,self.fps_control_dicts[patient])
             ## 動作
+            self.logger.info(f"YOLO開始 Time: {np.round(time.time()-self.start,4)}")
             data_dicts[patient],success_flag=cls_yolo.yolo_snapshot(data_dicts[patient],self.elp_img,t,b,l,r,)
             if not success_flag:
                 self.logger.info(f"姿勢推定が不正のため削除 {patient}")
                 # self.patients.remove(patient)
                 del data_dicts[patient]
                 continue
+            self.logger.info(f"手すり開始 Time: {np.round(time.time()-self.start,4)}")
             ## 物体(手すり)
             data_dicts[patient]=cls_handrail.handrail_snapshot(data_dicts[patient],dayroom_structure_dict)
+            
+            # FPS制御で省略されたデータを補う
+            for k in self.fps_control_dicts[patient].keys():
+                if self.fps_control_dicts[patient][k]==False:
+                    data_dicts[patient][k]=self.df_eval.loc[self.df_eval.index[-1], f"{patient}_{k}"]
+
+
 
         self.patients=list(data_dicts.keys())
 
@@ -139,6 +174,7 @@ class RealtimeEvaluator(Manager,GraphManager):
             d=np.linalg.norm(np.array([data_dicts[p]["60010000"],data_dicts[p]["60010001"]])-np.array([data_dicts[s]["60010000"],data_dicts[s]["60010001"]]))
             return d
 
+        self.logger.info(f"見守り関連開始 Time: {np.round(time.time()-self.start,4)}")
         # スタッフがいるかどうかを判定
         staff=[patient for patient in self.patients if data_dicts[patient]["50000000"]=="no"]
         if len(staff)>0:
@@ -270,47 +306,94 @@ class RealtimeEvaluator(Manager,GraphManager):
             additional_data_dicts["rank"][patient]={}
             additional_data_dicts["rank"][patient]["10000000"]=rank
         return additional_data_dicts
-    
-    
+
+    def draw_bbox(self,elp_img,json_latest_data,patients):
+        for patient in patients:
+            if np.isnan(json_latest_data[f"{patient}_bboxHigherX"]):
+                continue
+            # patient_rank
+            bbox_info=[
+                (int(json_latest_data[f"{patient}_bboxHigherX"]),int(json_latest_data[f"{patient}_bboxHigherY"])),
+                (int(json_latest_data[f"{patient}_bboxLowerX"]),int(json_latest_data[f"{patient}_bboxLowerY"])),
+            ]
+            # if not np.isnan(self.rank_data.loc[i,patient+"_rank"]):
+            #     thickness=len(self.patients)-int(self.rank_data.loc[i,patient+"_rank"])
+            # else:
+            thickness=4
+            cv2.rectangle(elp_img,bbox_info[0],bbox_info[1],colors[int(patient)], thickness=thickness)
+        return elp_img
+        
+    def draw_timestamp(self,elp_img,json_latest_data):
+        bbox_info=[
+            (0,0),
+            (250,40),
+        ]
+        cv2.rectangle(elp_img,bbox_info[0],bbox_info[1],color=(255,255,255),thickness=cv2.FILLED)
+        cv2.putText(
+            img=elp_img,
+            text="Time: "+str(np.round(self.timestamp,2))+" [s]",
+            fontFace=cv2.FONT_HERSHEY_DUPLEX,
+            fontScale=1,
+            org=(0,30),
+            color=(0,0,255),
+            thickness=2,
+            )
+        return elp_img
+        
+    def draw_export_img(self,elp_img_path,elp_img,json_latest_data,patients):
+        # ELP画像
+        # bbox情報を用意（rank連携要検討）
+        # 描画
+        elp_img=self.draw_bbox(elp_img=elp_img,json_latest_data=json_latest_data,patients=patients)
+        elp_img=self.draw_timestamp(elp_img=elp_img,json_latest_data=json_latest_data)
+        # 保存
+        cv2.imwrite(self.data_dir_dict["mobilesensing_dir_path"]+"/jpg/bbox/"+os.path.basename(elp_img_path),elp_img)
+        pass
 
 
     
     def evaluate_main(self):
-        s=time.time()
-        self.logger.info(f"RealtimeEvaluator called. Time: {np.round(time.time()-s,4)}")
-        # 情報の読込
-        self.logger.info(f"Loading info...")
-        json_latest_path,json_latest_data=self.load_data()
-        # 特徴量の算出
-        self.logger.info(f"Calculating feature values...Time: {np.round(time.time()-s,4)}")
-        data_dicts=self.get_features()
-        # 危険性評価
-        self.logger.info(f"Evaluating risk...Time: {np.round(time.time()-s,4)}")
-        cls_master=Master(data_dicts,strage=self.strage)
-        data_dicts=cls_master.evaluate()
-        export_data={
-            "sources":json_latest_data,
-            "results":data_dicts,
-        }
-        Manager().write_json(export_data,json_path=os.path.split(json_latest_path)[0]+"/data_dicts_eval.json")
-        data_dicts_flatten = self.flatten_dict(data_dicts)
-        if len(list(data_dicts_flatten.keys()))>0:
-            data_dicts_flatten["timestamp"]=json_latest_data[f"{list(data_dicts.keys())[0]}_timestamp"]
-        self.df_eval=pd.concat([self.df_eval,pd.DataFrame(data_dicts_flatten,index=[0])],axis=0)
-        self.df_eval.reset_index(inplace=True,drop=True)
-        
-        self.logger.info(f"Analyzing results...Time: {np.round(time.time()-s,4)}")
-        patients=list(data_dicts.keys())
-        if len(patients)>0:
-            additional_data_dicts={}
-            # リスク優先順位付け
-            additional_data_dicts=self.get_rank_and_text(data_dicts,additional_data_dicts)
-            additional_data_dicts_flatten=self.flatten_dict(additional_data_dicts)
-            self.df_post=pd.concat([self.df_post,pd.DataFrame(additional_data_dicts_flatten,index=[0])],axis=0)
-            self.df_post.reset_index(inplace=True,drop=True)
-        
-        self.logger.info(f"Drawing bbox image...Time: {np.round(time.time()-s,4)}")
-        self.draw_bbox_img()
+        try:
+            self.start=time.time()
+            self.logger.info(f"RealtimeEvaluator called. Time: {np.round(time.time()-self.start,4)}")
+            # 情報の読込
+            self.logger.info(f"Loading info...")
+            json_latest_path,json_latest_data=self.load_data()
+            # 特徴量の算出
+            self.logger.info(f"Calculating feature values...Time: {np.round(time.time()-self.start,4)}")
+            data_dicts=self.get_features()
+            # 危険性評価
+            self.logger.info(f"Evaluating risk...Time: {np.round(time.time()-self.start,4)}")
+            cls_master=Master(data_dicts,strage=self.strage)
+            data_dicts=cls_master.evaluate()
+            export_data={
+                "sources":json_latest_data,
+                "results":data_dicts,
+            }
+            Manager().write_json(export_data,json_path=os.path.split(json_latest_path)[0]+"/data_dicts_eval.json")
+            data_dicts_flatten = self.flatten_dict(data_dicts)
+            if len(list(data_dicts_flatten.keys()))>0:
+                data_dicts_flatten["timestamp"]=json_latest_data[f"{list(data_dicts.keys())[0]}_timestamp"]
+            self.df_eval=pd.concat([self.df_eval,pd.DataFrame(data_dicts_flatten,index=[0])],axis=0)
+            self.df_eval.reset_index(inplace=True,drop=True)
+            
+            self.logger.info(f"Analyzing results...Time: {np.round(time.time()-self.start,4)}")
+            patients=list(data_dicts.keys())
+            if len(patients)>0:
+                additional_data_dicts={}
+                # リスク優先順位付け
+                additional_data_dicts=self.get_rank_and_text(data_dicts,additional_data_dicts)
+                additional_data_dicts_flatten=self.flatten_dict(additional_data_dicts)
+                self.df_post=pd.concat([self.df_post,pd.DataFrame(additional_data_dicts_flatten,index=[0])],axis=0)
+                self.df_post.reset_index(inplace=True,drop=True)
+            
+            self.logger.info(f"Drawing bbox image...Time: {np.round(time.time()-self.start,4)}")
+            patients=list(data_dicts.keys())
+            self.draw_export_img(self.elp_img_path,self.elp_img,json_latest_data,patients)
+        except Exception as e:
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            self.logger.error(f"line {exc_tb.tb_lineno}: {e}")
+
         
 
         
@@ -322,7 +405,7 @@ class RealtimeEvaluator(Manager,GraphManager):
     
 
 if __name__=="__main__":
-    trial_name="20250215NagasakiShort5"
+    trial_name="20250215NagasakiShort10"
     strage="local"
     json_dir_path="/catkin_ws/src/database"+"/"+trial_name+"/json"
 
