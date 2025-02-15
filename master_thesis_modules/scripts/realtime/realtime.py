@@ -57,6 +57,8 @@ class RealtimeEvaluator(Manager,GraphManager):
         self.df_eval=pd.DataFrame()
         self.df_post=pd.DataFrame()
         self.logger=self.prepare_log(self.data_dir_dict["mobilesensing_dir_path"]+"/log")
+
+        self.luminance_threshold=0.5
         self.logger.info(f"RealtimeEvaluator has woken up")
 
     def load_data(self):
@@ -80,6 +82,11 @@ class RealtimeEvaluator(Manager,GraphManager):
                 self.logger.info(f"解析ELP: {self.elp_img_path}")
                 self.elp_img=cv2.imread(self.elp_img_path)
                 # self.elp_img=cv2.cvtColor(self.elp_img, cv2.COLOR_BGR2RGB)
+                # 背景差分画像
+                diff_img_paths=sorted(glob(f"/catkin_ws/src/database/{self.trial_name}/jpg/diff/left/*.jpg"))
+                self.diff_img_path=diff_img_paths[abs(np.array([float(os.path.basename(p).split("_")[1][:-len(".jpg")])-self.timestamp for p in diff_img_paths])).argmin()]
+                self.logger.info(f"解析diff: {self.diff_img_path}")
+                self.diff_img=cv2.imread(self.diff_img_path)
                 all_files_found=True
             except FileNotFoundError:
                 print(self.get_timestamp(),"json not found")
@@ -92,26 +99,42 @@ class RealtimeEvaluator(Manager,GraphManager):
         return json_latest_path,self.json_latest_data
 
     def get_features(self):
+        def extract_luminance(diff_img,patient):
+            t,b,l,r=self.json_latest_data[patient+"_bboxLowerY"],self.json_latest_data[patient+"_bboxHigherY"],self.json_latest_data[patient+"_bboxLowerX"],self.json_latest_data[patient+"_bboxHigherX"]
+            try:
+                t,b,l,r=int(t),int(b),int(l),int(r)
+                bbox_diff_img=diff_img[t:b,l:r]
+                luminance=bbox_diff_img.mean()/255
+            except ValueError: # NaNが入っていた場合
+                # self.patients.remove(patient)
+                luminance=0
+            return luminance
         self.logger.info(f"特徴量の算出開始 Time: {np.round(time.time()-self.start,4)}")
         data_dicts={}
         def fps_judger():
             fps_control_dicts={}
-            # 属性 (初回のみ)
+
             lateset_patients=sorted(list(set([k.split("_")[0] for k in self.json_latest_data.keys()])))
             previous_patients=sorted(list(set([k.split("_")[0] for k in self.df_eval.keys()])))
             for patient in lateset_patients:
                 fps_control_dicts[patient]={k:True for k in self.default_graph["node_dict"].keys() if k[0]=="5"}
-                if patient in previous_patients:
+                # 属性 (初回のみ)
+                if patient in previous_patients: # 以前観測されていた患者なら，推論をOFFにする
                     for k in fps_control_dicts[patient].keys():
                         if (("500000" in k)):# or ("5000100" in k) or ("5000101" in k)): 
                             fps_control_dicts[patient][k]=False
-                
+                # 物体 (初回または動作を検知したときのみ)
+                if patient in previous_patients: # 以前観測されていた患者なら，推論をOFFにする
+                    # 動作量が一定以下ならば，推論をOFFにする
+                    luminance=extract_luminance(diff_img=self.diff_img,patient=patient)
+                    if luminance<self.luminance_threshold:
+                        for k in fps_control_dicts[patient].keys():
+                            if (("5000100" in k) or ("5000101" in k)): 
+                                fps_control_dicts[patient][k]=False
 
-            # 動作 (diff連動)
+            # 動作（FPSが上限を上回らない見込みのため割愛）
+            # 位置（FPSが上限を上回らない見込みのため割愛）
 
-            # 物体
-
-            # 位置
             return fps_control_dicts
         # FPS制御
         self.fps_control_dicts=fps_judger()
@@ -405,7 +428,7 @@ class RealtimeEvaluator(Manager,GraphManager):
     
 
 if __name__=="__main__":
-    trial_name="20250215NagasakiShort10"
+    trial_name="20250215NagasakiShort11Throttling"
     strage="local"
     json_dir_path="/catkin_ws/src/database"+"/"+trial_name+"/json"
 
