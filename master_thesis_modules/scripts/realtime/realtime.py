@@ -428,7 +428,7 @@ class RealtimeEvaluator(Manager,GraphManager):
     
 
 if __name__=="__main__":
-    trial_name="20250215NagasakiShort11Throttling"
+    trial_name="20250217NagasakiShort01"
     strage="local"
     json_dir_path="/catkin_ws/src/database"+"/"+trial_name+"/json"
 
