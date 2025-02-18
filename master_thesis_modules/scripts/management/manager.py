@@ -112,6 +112,23 @@ class Manager():
             os.makedirs(path,exist_ok=True)
         
         return database_dir_dict
+    
+    def convert_np_types(self,obj):
+        """
+        任意の階層構造を持つdictの中のnumpyデータ型を標準のPythonデータ型に変換する。
+        """
+        if isinstance(obj, dict):
+            return {key: self.convert_np_types(value) for key, value in obj.items()}
+        elif isinstance(obj, list):
+            return [self.convert_np_types(item) for item in obj]
+        elif isinstance(obj, np.integer):
+            return int(obj)
+        elif isinstance(obj, np.floating):
+            return float(obj)
+        elif isinstance(obj, np.ndarray):
+            return obj.tolist()
+        else:
+            return obj
 
     def write_csvlog(self,output_data,csvpath,fmt="%s",dim=1):
         if dim==1:
@@ -129,6 +146,7 @@ class Manager():
         pass  
 
     def write_json(self,dict_data,json_path):
+        dict_data=self.convert_np_types(dict_data)
         with open(json_path,mode="w") as f:
             json.dump(dict_data,f)
 

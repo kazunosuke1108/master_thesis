@@ -25,7 +25,8 @@ else:
 from scripts.management.manager import Manager
 from scripts.master_v3 import Master
 from scripts.network.graph_manager_v3 import GraphManager
-from scripts.preprocess.preprocess_blip_snapshot import PreprocessBlip
+# from scripts.preprocess.preprocess_blip_snapshot import PreprocessBlip
+from scripts.preprocess.preprocess_blipAlternative_snapshot import PreprocessBlip
 from scripts.preprocess.preprocess_yolo_snapshot import PreprocessYolo
 from scripts.preprocess.preprocess_handrail_snapshot import PreprocessHandrail
 
@@ -428,7 +429,7 @@ class RealtimeEvaluator(Manager,GraphManager):
     
 
 if __name__=="__main__":
-    trial_name="20250217NagasakiShort01"
+    trial_name="20250218BLIPAlternative2"
     strage="local"
     json_dir_path="/catkin_ws/src/database"+"/"+trial_name+"/json"
 
