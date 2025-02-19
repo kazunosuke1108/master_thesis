@@ -429,7 +429,7 @@ class RealtimeEvaluator(Manager,GraphManager):
     
 
 if __name__=="__main__":
-    trial_name="20250218BLIPAlternative2"
+    trial_name="20250219BLIPAlternative22a"
     strage="local"
     json_dir_path="/catkin_ws/src/database"+"/"+trial_name+"/json"
 
