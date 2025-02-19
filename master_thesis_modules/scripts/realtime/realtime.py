@@ -251,7 +251,12 @@ class RealtimeEvaluator(Manager,GraphManager):
                     try:
                         additional_data_dicts["static_factor"]["significance"][patient][k]=data_dicts[focus_patient][k]-data_dicts[patient][k]
                     except TypeError:
-                        additional_data_dicts["static_factor"]["significance"][patient][k]=data_dicts[focus_patient][k][1]-data_dicts[patient][k][1]
+                        self.logger.warning(data_dicts[focus_patient][k])
+                        self.logger.warning(data_dicts[patient][k])
+                        if ((type(data_dicts[patient][k])==float) or (type(data_dicts[focus_patient][k])==float)):
+                            additional_data_dicts["static_factor"]["significance"][patient][k]=np.nan
+                        else:
+                            additional_data_dicts["static_factor"]["significance"][patient][k]=data_dicts[focus_patient][k][1]-data_dicts[patient][k][1]
             
             additional_data_dicts["static_factor"]["significance"]["max"]={}
             for k in focus_keys_static:
@@ -308,28 +313,33 @@ class RealtimeEvaluator(Manager,GraphManager):
                 alert_text=f"{most_risky_patient}さんが，元々{text_static}のに，{text_dynamic}ので，危険です．"
             return alert_text
 
-        additional_data_dicts["rank"]={}
-        patients=list(data_dicts.keys())
-        total_risks=[]
-        for patient in patients:
-            total_risks.append(data_dicts[patient]["10000000"])
-        patients_rank=(-np.array(total_risks)).argsort()
+        try:
+            additional_data_dicts["rank"]={}
+            patients=list(data_dicts.keys())
+            total_risks=[]
+            for patient in patients:
+                total_risks.append(data_dicts[patient]["10000000"])
+            patients_rank=(-np.array(total_risks)).argsort()
 
-        most_risky_patient=patients[np.array(total_risks).argmax()]
+            most_risky_patient=patients[np.array(total_risks).argmax()]
 
-        additional_data_dicts=guess_static_factor(data_dicts,most_risky_patient,additional_data_dicts)
-        additional_data_dicts=guess_dynamic_factor(data_dicts,most_risky_patient,additional_data_dicts)
-        text=get_alert_sentence(most_risky_patient,
-                                static_factor_node=additional_data_dicts["static_factor"]["most_significant_node"],
-                                dynamic_factor_node=additional_data_dicts["dynamic_factor"]["most_significant_node"],
-                                )
-        print(text)
-        additional_data_dicts["alert"]=text
+            additional_data_dicts=guess_static_factor(data_dicts,most_risky_patient,additional_data_dicts)
+            additional_data_dicts=guess_dynamic_factor(data_dicts,most_risky_patient,additional_data_dicts)
+            text=get_alert_sentence(most_risky_patient,
+                                    static_factor_node=additional_data_dicts["static_factor"]["most_significant_node"],
+                                    dynamic_factor_node=additional_data_dicts["dynamic_factor"]["most_significant_node"],
+                                    )
+            print(text)
+            additional_data_dicts["alert"]=text
 
-        for patient,rank in zip(patients,patients_rank):
-            additional_data_dicts["rank"][patient]={}
-            additional_data_dicts["rank"][patient]["10000000"]=rank
-        return additional_data_dicts
+            for patient,rank in zip(patients,patients_rank):
+                additional_data_dicts["rank"][patient]={}
+                additional_data_dicts["rank"][patient]["10000000"]=rank
+            return additional_data_dicts
+        except Exception as e:
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            self.logger.error(f"line {exc_tb.tb_lineno}: {e}")
+            return additional_data_dicts
 
     def draw_bbox(self,elp_img,json_latest_data,patients):
         for patient in patients:
@@ -429,7 +439,7 @@ class RealtimeEvaluator(Manager,GraphManager):
     
 
 if __name__=="__main__":
-    trial_name="20250219BLIPAlternative22a"
+    trial_name="20250219BLIPAlternative22aR1"
     strage="local"
     json_dir_path="/catkin_ws/src/database"+"/"+trial_name+"/json"
 
