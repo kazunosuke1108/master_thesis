@@ -22,7 +22,7 @@ from scripts.management.manager import Manager
 from scripts.master_v3 import Master
 from scripts.preprocess.preprocess_blip_snapshot import PreprocessBlip
 from scripts.preprocess.preprocess_yolo_snapshot import PreprocessYolo
-from scripts.preprocess.preprocess_handrail_snapshot import PreprocessHandrail
+from master_thesis_modules.scripts.preprocess.preprocess_objects_snapshot import PreprocessHandrail
 from scripts.network.graph_manager_v3 import GraphManager
 # preprocessorのインスタンス
 cls_blip=PreprocessBlip()

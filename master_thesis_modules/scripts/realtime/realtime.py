@@ -26,15 +26,29 @@ from scripts.management.manager import Manager
 from scripts.master_v3 import Master
 from scripts.network.graph_manager_v3 import GraphManager
 # from scripts.preprocess.preprocess_blip_snapshot import PreprocessBlip
-from scripts.preprocess.preprocess_blipAlternative_snapshot import PreprocessBlip
+from scripts.preprocess.preprocess_zokusei_snapshot import PreprocessZokusei
 from scripts.preprocess.preprocess_yolo_snapshot import PreprocessYolo
-from scripts.preprocess.preprocess_handrail_snapshot import PreprocessHandrail
+from scripts.preprocess.preprocess_objects_snapshot import PreprocessObject
 
 
 # 定数
 WATCHED_FILES = ["dict_after_reid.json","dict_after_reid_old.json"]
 dayroom_structure_dict={"xrange":[6,15],"yrange":[-11,-4]} # 11月
 # dayroom_structure_dict={"xrange":[-4,6],"yrange":[5,10]} # 08月
+structure_dict={
+    "ivPole":[
+        np.array([-4,5]), # muに相当
+        np.array([6,5]),
+        ],
+    "wheelchair":[
+        np.array([0,6]),
+        np.array([0,8]),
+        ],
+    "handrail":{
+        "xrange":[6,15],
+        "yrange":[-11,-4]
+        }
+}
 ss_structure_dict={"pos":[6,-7.5],"direction":[0,0.1]} # 11月
 # ss_structure_dict={"pos":[-4,7.5],"direction":[0.1,0]} # 08月
 colors = plt.get_cmap("tab10").colors
@@ -163,7 +177,7 @@ class RealtimeEvaluator(Manager,GraphManager):
             # feature (5)
             ## BLIP系 属性・物体(手すり以外)
             self.logger.info(f"BLIP開始 Time: {np.round(time.time()-self.start,4)}")
-            data_dicts[patient]=cls_blip.blip_snapshot(data_dicts[patient],self.elp_img,t,b,l,r,self.fps_control_dicts[patient])
+            data_dicts[patient]=cls_zokusei.zokusei_snapshot(data_dict=data_dicts[patient],rgb_img=self.elp_img,t=t,b=b,l=l,r=r,)#(data_dicts[patient],self.elp_img,t,b,l,r,self.fps_control_dicts[patient])
             ## 動作
             self.logger.info(f"YOLO開始 Time: {np.round(time.time()-self.start,4)}")
             data_dicts[patient],success_flag=cls_yolo.yolo_snapshot(data_dicts[patient],self.elp_img,t,b,l,r,)
@@ -174,7 +188,7 @@ class RealtimeEvaluator(Manager,GraphManager):
                 continue
             self.logger.info(f"手すり開始 Time: {np.round(time.time()-self.start,4)}")
             ## 物体(手すり)
-            data_dicts[patient]=cls_handrail.handrail_snapshot(data_dicts[patient],dayroom_structure_dict)
+            data_dicts[patient]=cls_object.object_snapshot(data_dicts[patient],structure_dict)
             
             # FPS制御で省略されたデータを補う
             for k in self.fps_control_dicts[patient].keys():
@@ -439,19 +453,19 @@ class RealtimeEvaluator(Manager,GraphManager):
     
 
 if __name__=="__main__":
-    trial_name="20250219BLIPAlternative22aR1"
+    trial_name="20250219Object"
     strage="local"
     json_dir_path="/catkin_ws/src/database"+"/"+trial_name+"/json"
 
 
     cls=RealtimeEvaluator(trial_name=trial_name,strage=strage)
     print("RealtimeEvaluator has woken up")
-    cls_blip=PreprocessBlip()
+    cls_zokusei=PreprocessZokusei()
     print("PreprocessBlip has woken up")
     cls_yolo=PreprocessYolo()
     print("PreprocessYolo has woken up")
-    cls_handrail=PreprocessHandrail()
-    print("PreprocessHandrail has woken up")
+    cls_object=PreprocessObject()
+    print("PreprocessObject has woken up")
 
     cls.evaluate_main()
     # path = "/media/hayashide/MobileSensing/20250207Dev/json"  # 監視するディレクトリ
