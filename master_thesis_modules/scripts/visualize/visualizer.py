@@ -818,7 +818,7 @@ if __name__=="__main__":
     strage="NASK"
     cls=Visualizer(trial_name=trial_name,strage=strage)
     # cls.visualize_graph(trial_name="20241229BuildSimulator",strage="NASK",name="A",show=True)
-    # cls.plot_matplotlib()
+    cls.plot_matplotlib()
     # cls.plot_fps()
     # cls.draw_positions()
     # cls.draw_features()

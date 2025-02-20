@@ -85,7 +85,7 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
         def mu_old():
             return (0.5,0.75,1.0)
         def patient_or_not(val):
-            print("val:",val)
+            # print("val:",val)
             if val=="yes":
                 return mu_yes()
             elif val=="no":
@@ -112,7 +112,7 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
 
     def pose_similarity(self):
         def get_similarity(risk,data_dict):
-            print(data_dict)
+            # print(data_dict)
             similarity=1-np.nanmean(abs(self.risky_motion_dict[risk]["features"]-np.array([data_dict[k] for k in ["50000100","50000101","50000102","50000103"]])))
             similarity=similarity**4
             # similarity=self.activation_func(similarity)

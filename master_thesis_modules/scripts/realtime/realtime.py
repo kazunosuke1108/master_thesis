@@ -51,8 +51,13 @@ structure_dict={
 }
 ss_structure_dict={"pos":[6,-7.5],"direction":[0,0.1]} # 11月
 # ss_structure_dict={"pos":[-4,7.5],"direction":[0.1,0]} # 08月
-colors = plt.get_cmap("tab10").colors
-colors = [(int(b*255), int(g*255), int(r*255)) for r, g, b in colors]
+colors_01 = plt.get_cmap("tab10").colors
+colors = [(int(b*255), int(g*255), int(r*255)) for r, g, b in colors_01]
+
+
+# switch
+draw_map=False
+draw_bbox=True
 
 class JSONFileChangeHandler(FileSystemEventHandler):
     def on_modified(self, event):
@@ -72,6 +77,7 @@ class RealtimeEvaluator(Manager,GraphManager):
         self.df_eval=pd.DataFrame()
         self.df_post=pd.DataFrame()
         self.logger=self.prepare_log(self.data_dir_dict["mobilesensing_dir_path"]+"/log")
+        self.map_fig,self.map_ax=self.plot_map_matplotlib()
 
         self.luminance_threshold=0.5
         self.logger.info(f"RealtimeEvaluator has woken up")
@@ -126,7 +132,7 @@ class RealtimeEvaluator(Manager,GraphManager):
             return luminance
         self.logger.info(f"特徴量の算出開始 Time: {np.round(time.time()-self.start,4)}")
         data_dicts={}
-        def fps_judger():
+        def fps_judger(active=False):
             fps_control_dicts={}
 
             lateset_patients=sorted(list(set([k.split("_")[0] for k in self.json_latest_data.keys()])))
@@ -134,18 +140,19 @@ class RealtimeEvaluator(Manager,GraphManager):
             for patient in lateset_patients:
                 fps_control_dicts[patient]={k:True for k in self.default_graph["node_dict"].keys() if k[0]=="5"}
                 # 属性 (初回のみ)
-                if patient in previous_patients: # 以前観測されていた患者なら，推論をOFFにする
-                    for k in fps_control_dicts[patient].keys():
-                        if (("500000" in k)):# or ("5000100" in k) or ("5000101" in k)): 
-                            fps_control_dicts[patient][k]=False
-                # 物体 (初回または動作を検知したときのみ)
-                if patient in previous_patients: # 以前観測されていた患者なら，推論をOFFにする
-                    # 動作量が一定以下ならば，推論をOFFにする
-                    luminance=extract_luminance(diff_img=self.diff_img,patient=patient)
-                    if luminance<self.luminance_threshold:
+                if active:
+                    if patient in previous_patients: # 以前観測されていた患者なら，推論をOFFにする
                         for k in fps_control_dicts[patient].keys():
-                            if (("5000100" in k) or ("5000101" in k)): 
+                            if (("500000" in k)):# or ("5000100" in k) or ("5000101" in k)): 
                                 fps_control_dicts[patient][k]=False
+                    # 物体 (初回または動作を検知したときのみ)
+                    if patient in previous_patients: # 以前観測されていた患者なら，推論をOFFにする
+                        # 動作量が一定以下ならば，推論をOFFにする
+                        luminance=extract_luminance(diff_img=self.diff_img,patient=patient)
+                        if luminance<self.luminance_threshold:
+                            for k in fps_control_dicts[patient].keys():
+                                if (("5000100" in k) or ("5000101" in k)): 
+                                    fps_control_dicts[patient][k]=False
 
             # 動作（FPSが上限を上回らない見込みのため割愛）
             # 位置（FPSが上限を上回らない見込みのため割愛）
@@ -216,7 +223,7 @@ class RealtimeEvaluator(Manager,GraphManager):
         # スタッフがいるかどうかを判定
         staff=[patient for patient in self.patients if data_dicts[patient]["50000000"]=="no"]
         if len(staff)>0:
-            print(staff)
+            # print(staff)
             # いる
             for patient in self.patients:
                 distances=[get_relative_distance(data_dicts,patient,s) for s in staff]
@@ -265,8 +272,6 @@ class RealtimeEvaluator(Manager,GraphManager):
                     try:
                         additional_data_dicts["static_factor"]["significance"][patient][k]=data_dicts[focus_patient][k]-data_dicts[patient][k]
                     except TypeError:
-                        self.logger.warning(data_dicts[focus_patient][k])
-                        self.logger.warning(data_dicts[patient][k])
                         if ((type(data_dicts[patient][k])==float) or (type(data_dicts[focus_patient][k])==float)):
                             additional_data_dicts["static_factor"]["significance"][patient][k]=np.nan
                         else:
@@ -332,7 +337,8 @@ class RealtimeEvaluator(Manager,GraphManager):
             patients=list(data_dicts.keys())
             total_risks=[]
             for patient in patients:
-                total_risks.append(data_dicts[patient]["10000000"])
+                # total_risks.append(data_dicts[patient]["10000000"])
+                total_risks.append(self.df_eval[patient+"_10000000"].tail(5).mean())
             patients_rank=(-np.array(total_risks)).argsort()
 
             most_risky_patient=patients[np.array(total_risks).argmax()]
@@ -387,13 +393,104 @@ class RealtimeEvaluator(Manager,GraphManager):
             thickness=2,
             )
         return elp_img
+    
+    def draw_rank(self,img,data_dicts,additional_data_dicts,patients):
+        def get_bbox_info(rank):
+            x_width=125
+            y_interval=50
+            y_width=40
+            bbox_info=[
+                (0,int(100+rank*y_interval)),
+                (x_width,int(100+rank*y_interval+y_width))
+                ]
+            return bbox_info
         
-    def draw_export_img(self,elp_img_path,elp_img,json_latest_data,patients):
+        # 背景色の白
+        cv2.rectangle(img,(0,40),(250,50*(len(patients)+3)),color=(255,255,255),thickness=cv2.FILLED)
+        cv2.putText(
+                img=img,
+                # text=f"No.{int(rank)+1}: "+"ID_"+patient,
+                text=f"Priority Order",
+                fontFace=cv2.FONT_HERSHEY_DUPLEX,
+                fontScale=1,
+                org=(0,100-20),
+                color=(0,0,0),
+                thickness=2,
+        )
+
+        for patient in patients:
+            # patient_str=self.patient_dict[patient]
+            patient_str=patient
+            rank=additional_data_dicts["rank"][patient]["10000000"]
+            if np.isnan(rank):
+                continue
+            bbox_info=get_bbox_info(rank)
+            # 患者カラーの帯
+            cv2.rectangle(img,(bbox_info[0][0]+90,bbox_info[0][1]),bbox_info[1],color=colors[int(patient)],thickness=cv2.FILLED)
+            cv2.putText(
+                img=img,
+                # text=f"No.{int(rank)+1}: "+"ID_"+patient,
+                text=f"No.{int(rank)+1}: "+patient_str,
+                fontFace=cv2.FONT_HERSHEY_DUPLEX,
+                fontScale=1,
+                org=(bbox_info[0][0],bbox_info[1][1]-10),
+                color=(0,0,0),
+                thickness=2,
+                )            
+        #     # 通知中か判定
+        #     notify_for_the_patient_data=self.notification_data[self.notification_data.fillna(99999)["patient"]==patient_str]
+        #     for j,_ in notify_for_the_patient_data.iterrows():
+        #         if (notify_for_the_patient_data.loc[j,"timestamp"]<self.rank_data.loc[i,"timestamp"]) and (self.rank_data.loc[i,"timestamp"]<=notify_for_the_patient_data.loc[j,"timestamp"]+8):
+        #             img[bbox_info[0][1]:bbox_info[0][1]+self.speaker_red_img.shape[0],bbox_info[1][0]:bbox_info[1][0]+self.speaker_red_img.shape[1]]=self.speaker_red_img
+        #     # raise NotImplementedError
+        # # 応援要請の状況
+        # notify_help_data=self.notification_data[self.notification_data["type"]=="help"]
+        # bbox_info=get_bbox_info(len(patients))
+        # for j,_ in notify_help_data.iterrows():
+        #     if (notify_help_data.loc[j,"timestamp"]<self.rank_data.loc[i,"timestamp"]) and (self.rank_data.loc[i,"timestamp"]<=notify_help_data.loc[j,"timestamp"]+7):
+        #         cv2.putText(
+        #                 img=img,
+        #                 text="Help:",
+        #                 fontFace=cv2.FONT_HERSHEY_DUPLEX,
+        #                 fontScale=1,
+        #                 org=(bbox_info[0][0],bbox_info[1][1]),
+        #                 color=(255,0,0),
+        #                 thickness=2,
+        #                 )
+        #         img[bbox_info[0][1]:bbox_info[0][1]+self.speaker_blue_img.shape[0],bbox_info[1][0]:bbox_info[1][0]+self.speaker_blue_img.shape[1]]=self.speaker_blue_img
+        #         break
+        #     else:
+        #         cv2.putText(
+        #                 img=img,
+        #                 text="Help:",
+        #                 fontFace=cv2.FONT_HERSHEY_DUPLEX,
+        #                 fontScale=1,
+        #                 org=(bbox_info[0][0],bbox_info[1][1]),
+        #                 color=(200,200,200),
+        #                 thickness=2,
+        #                 )
+
+        #     # 通知中なら，スピーカーアイコンを描く
+
+        return img
+    
+    def draw_pos(self,data_dicts,patients):
+        map_ax=copy.deepcopy(self.map_ax)
+        for patient in patients:
+            map_ax.scatter(data_dicts[patient]["60010000"],data_dicts[patient]["60010001"],s=100,marker="o",c=[colors_01[int(patient)]],label=patient)
+        plt.legend()
+        plt.title(self.timestamp)
+        plt.savefig(self.data_dir_dict["mobilesensing_dir_path"]+f"/jpg/map/{os.path.basename(self.elp_img_path)}")
+        
+        
+    def draw_export_img(self,elp_img_path,elp_img,json_latest_data,data_dicts,additional_data_dicts,patients):
         # ELP画像
         # bbox情報を用意（rank連携要検討）
         # 描画
         elp_img=self.draw_bbox(elp_img=elp_img,json_latest_data=json_latest_data,patients=patients)
         elp_img=self.draw_timestamp(elp_img=elp_img,json_latest_data=json_latest_data)
+        # rankの追記
+        elp_img=self.draw_rank(img=elp_img,data_dicts=data_dicts,additional_data_dicts=additional_data_dicts,patients=patients)
         # 保存
         cv2.imwrite(self.data_dir_dict["mobilesensing_dir_path"]+"/jpg/bbox/"+os.path.basename(elp_img_path),elp_img)
         pass
@@ -424,7 +521,7 @@ class RealtimeEvaluator(Manager,GraphManager):
                 data_dicts_flatten["timestamp"]=json_latest_data[f"{list(data_dicts.keys())[0]}_timestamp"]
             self.df_eval=pd.concat([self.df_eval,pd.DataFrame(data_dicts_flatten,index=[0])],axis=0)
             self.df_eval.reset_index(inplace=True,drop=True)
-            
+            # 順位付け・通知文生成
             self.logger.info(f"Analyzing results...Time: {np.round(time.time()-self.start,4)}")
             patients=list(data_dicts.keys())
             if len(patients)>0:
@@ -433,11 +530,17 @@ class RealtimeEvaluator(Manager,GraphManager):
                 additional_data_dicts=self.get_rank_and_text(data_dicts,additional_data_dicts)
                 additional_data_dicts_flatten=self.flatten_dict(additional_data_dicts)
                 self.df_post=pd.concat([self.df_post,pd.DataFrame(additional_data_dicts_flatten,index=[0])],axis=0)
-                self.df_post.reset_index(inplace=True,drop=True)
-            
-            self.logger.info(f"Drawing bbox image...Time: {np.round(time.time()-self.start,4)}")
-            patients=list(data_dicts.keys())
-            self.draw_export_img(self.elp_img_path,self.elp_img,json_latest_data,patients)
+                self.df_post.reset_index(inplace=True,drop=True)            
+            Manager().write_json(additional_data_dicts,json_path=os.path.split(json_latest_path)[0]+"/additional_data_dicts.json")
+            # 可視化
+            if draw_bbox:
+                self.logger.info(f"Drawing bbox image...Time: {np.round(time.time()-self.start,4)}")
+                patients=list(data_dicts.keys())
+                self.draw_export_img(self.elp_img_path,self.elp_img,json_latest_data,data_dicts,additional_data_dicts,patients)
+            if draw_map:
+                self.logger.info(f"Drawing map image...Time: {np.round(time.time()-self.start,4)}")
+                self.draw_pos(data_dicts=data_dicts,patients=patients)
+            self.logger.info(f"All process finished...Time: {np.round(time.time()-self.start,4)}")
         except Exception as e:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             self.logger.error(f"line {exc_tb.tb_lineno}: {e}")
@@ -447,13 +550,13 @@ class RealtimeEvaluator(Manager,GraphManager):
         
     def save(self):
         self.df_eval.sort_index(axis=1,inplace=True)
-        self.df_eval.to_csv(self.data_dir_dict["trial_dir_path"]+"/df_eval.csv",index=False)
+        self.df_eval.to_csv(self.data_dir_dict["mobilesensing_dir_path"]+"/csv/df_eval.csv",index=False)
         self.df_post.sort_index(axis=1,inplace=True)
-        self.df_post.to_csv(self.data_dir_dict["trial_dir_path"]+"/df_post.csv",index=False)
+        self.df_post.to_csv(self.data_dir_dict["mobilesensing_dir_path"]+"/csv/df_post.csv",index=False)
     
 
 if __name__=="__main__":
-    trial_name="20250219Object"
+    trial_name="20250220StopStandingObaachanSoTA"
     strage="local"
     json_dir_path="/catkin_ws/src/database"+"/"+trial_name+"/json"
 

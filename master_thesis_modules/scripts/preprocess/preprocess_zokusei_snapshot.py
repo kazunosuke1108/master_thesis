@@ -2,10 +2,9 @@ import os
 import sys
 import copy
 
-import pandas as pd
-import numpy as np
 import cv2
 import numpy as np
+import pandas as pd
 
 sys.path.append(".")
 sys.path.append("..")
@@ -32,31 +31,62 @@ class PreprocessZokusei(Manager):#,blipTools):
         }
 
     def get_center_median_rgb(self,image):
-        h, w, _ = image.shape
-        size = min(10, h, w)  # 画像が10x10未満でも処理可能に
+        """
+        画像全体から「赤・黒・薄ピンク」に最も近いピクセルのRGB値を取得する。
+
+        :param image: OpenCVで読み込んだBGR画像
+        :return: (B, G, R) のタプル
+        """
+        # 画像をHSVに変換
+        hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+        h, s, v = cv2.split(hsv)
+
+        # 赤の条件（Hue ≈ 0° or 170°）
+        red_distance = np.minimum(np.abs(h - 0), np.abs(h - 170))
+        red_score = (1 - red_distance / 20) * (s / 255) * (v / 255)
+
+        # 黒の条件（低明度・低彩度）
+        # black_score = (1 - v / 100) * (1 - s / 100)
+
+        # 薄ピンクの条件（Hue 160~180°, 低彩度, 高明度）
+        pink_mask = (160 <= h) & (h <= 180)
+        pink_distance = np.abs(h - 170)
+        pink_score = np.where(pink_mask, (1 - pink_distance / 10) * (1 - s / 180) * (v / 255), 0)
+
+        # 赤・黒・ピンクの最大スコアを持つピクセルの座標を取得
+        # combined_score = np.maximum(np.maximum(red_score, black_score), pink_score)
+        combined_score = np.maximum(red_score, pink_score)
+        max_idx = np.unravel_index(np.argmax(combined_score), combined_score.shape)
+
+        # 対応するBGRの値を取得
+        best_pixel_bgr = image[max_idx[0], max_idx[1]]
+
+        return tuple(best_pixel_bgr)  # (B, G, R) の順で返す
+        # h, w, _ = image.shape
+        # size = min(10, h, w)  # 画像が10x10未満でも処理可能に
         
-        # 中央座標
-        cx, cy = w // 2, h // 2
+        # # 中央座標
+        # cx, cy = w // 2, h // 2
         
-        # 切り出し範囲を決定
-        x1, x2 = cx - size // 2, cx + size // 2
-        y1, y2 = cy - size // 2, cy + size // 2
+        # # 切り出し範囲を決定
+        # x1, x2 = cx - size // 2, cx + size // 2
+        # y1, y2 = cy - size // 2, cy + size // 2
         
-        # 画像の範囲内に収まるように調整
-        x1, x2 = max(0, x1), min(w, x2)
-        y1, y2 = max(0, y1), min(h, y2)
+        # # 画像の範囲内に収まるように調整
+        # x1, x2 = max(0, x1), min(w, x2)
+        # y1, y2 = max(0, y1), min(h, y2)
         
-        # 指定範囲のピクセルを取得
-        center_region = image[y1:y2, x1:x2]
+        # # 指定範囲のピクセルを取得
+        # center_region = image[y1:y2, x1:x2]
         
-        # RGBごとの中央値を計算
-        median_rgb = np.median(center_region, axis=(0, 1)).astype(np.uint8)
+        # # RGBごとの中央値を計算
+        # median_rgb = np.median(center_region, axis=(0, 1)).astype(np.uint8)
         
-        return tuple(median_rgb)  # (B, G, R) の順で返す
+        # return tuple(median_rgb)  # (B, G, R) の順で返す
     
     def is_nurse_color(self,rgb):
         """
-        中央のRGB値が「赤っぽい」または「黒っぽい」かを判定し、信頼度も返す。
+        中央のRGB値が「看護師（赤・黒）」または「介護福祉士（薄ピンク）」の可能性があるかを判定し、信頼度も返す。
 
         :param rgb: (B, G, R) のタプル
         :return: (True / False, confidence (0.0~1.0))
@@ -70,18 +100,26 @@ class PreprocessZokusei(Manager):#,blipTools):
 
         # 赤っぽいスコア
         red_distance = min(abs(h - 0), abs(h - 170))  # 0° or 170° に近いほどスコアが高い
-        red_conf = max(1 - red_distance / 20, 0) * (s / 255) * (v / 255)  # 彩度・明度が高いほど信頼度UP
+        red_conf = max(1 - red_distance / 20, 0) * (s / 255) * (v / 255)
 
         # 黒っぽいスコア
-        black_conf = (1 - v / 100) * (1 - s / 100)  # 明度と彩度が低いほど黒っぽい
+        # black_conf = (1 - v / 100) * (1 - s / 100)  # 明度と彩度が低いほど黒っぽい
+
+        # 薄ピンクっぽいスコア
+        if 160 <= h <= 180:  # Hueが160°〜180°の範囲
+            pink_conf = (1 - (abs(h - 170) / 10)) * (1 - s / 180) * (v / 255)
+        else:
+            pink_conf = 0
 
         # 信頼度の最大値を採用
-        confidence = max(red_conf, black_conf)
+        # confidence = max(red_conf, black_conf, pink_conf)
+        confidence = max(red_conf, pink_conf)
 
-        # 「看護師の可能性あり」と判定する基準
-        is_nurse = confidence > 0.5  # 50%以上なら看護師とみなす
+        # 「看護師または介護福祉士の可能性あり」と判定する基準
+        is_nurse_or_caregiver = confidence > 0.25  # 50%以上なら該当
 
-        return is_nurse, confidence
+        return is_nurse_or_caregiver, confidence
+
     
     def zokusei_snapshot(self,data_dict,rgb_img,t,b,l,r,):
         # 患者判別
@@ -93,9 +131,9 @@ class PreprocessZokusei(Manager):#,blipTools):
         # 赤っぽい（または黒っぽい）ことを判別
         nurse,conf=self.is_nurse_color(median_rgb)
         if nurse:
-            data_dict["50000000"]="yes"
+            data_dict["50000000"]="no"# =NS,Cwである
         else:
-            data_dict["50000000"]="no"
+            data_dict["50000000"]="yes"# =患者である
         data_dict["50000001"]=conf
 
         # 年齢
