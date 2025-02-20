@@ -54,6 +54,7 @@ ss_structure_dict={"pos":[6,-7.5],"direction":[0,0.1]} # 11月
 colors_01 = plt.get_cmap("tab10").colors
 colors = [(int(b*255), int(g*255), int(r*255)) for r, g, b in colors_01]
 
+w=5
 
 # switch
 draw_map=False
@@ -76,8 +77,30 @@ class RealtimeEvaluator(Manager,GraphManager):
         self.default_graph=self.get_default_graph()
         self.df_eval=pd.DataFrame()
         self.df_post=pd.DataFrame()
+        self.notify_history=pd.DataFrame(columns=["notificationId","timestamp","relativeTimestamp","patient","sentence","type","10000000"])
+
         self.logger=self.prepare_log(self.data_dir_dict["mobilesensing_dir_path"]+"/log")
         self.map_fig,self.map_ax=self.plot_map_matplotlib()
+
+        self.notify_interval_dict={"notice":5,"help":10,"notice2help":5}
+        self.notify_threshold_by_dinamic_factor={
+            "40000000":0.3,
+            "40000001":0.4,
+            "40000010":0.2,
+            "40000011":0.33,
+            "40000012":0.4,
+            "40000013":0.6,
+            "40000014":0.6,
+            "40000015":0.5,
+            "40000016":0.5,
+            "40000100":0.6,
+            "40000101":0.6,
+            "40000102":0.6,
+            "40000110":0.5,
+            "40000111":0.5,
+        }
+        self.notification_id=0
+        self.previous_risky_patient=""
 
         self.luminance_threshold=0.5
         self.logger.info(f"RealtimeEvaluator has woken up")
@@ -245,46 +268,89 @@ class RealtimeEvaluator(Manager,GraphManager):
     
     def get_rank_and_text(self,data_dicts,additional_data_dicts):
         def guess_static_factor(data_dicts,focus_patient,additional_data_dicts):
-            additional_data_dicts["static_factor"]={}
-            focus_keys=[]
-            # 4000番台だけを採用
-            for k in data_dicts[list(data_dicts.keys())[0]].keys():
-                if k=="timestamp":
-                    continue
-                elif (int(k[0])>=5) or (int(k[0])<=3):
-                    continue
-                else:
-                    focus_keys.append(k)
-            focus_keys_static=[]
-            for k in focus_keys:
-                if int(k[-2])==0: # static node
-                    focus_keys_static.append(k)
+            try:
+                additional_data_dicts["static_factor"]={}
+                focus_keys=[]
+                # 4000番台だけを採用
+                for k in data_dicts[list(data_dicts.keys())[0]].keys():
+                    if k=="timestamp":
+                        continue
+                    elif (int(k[0])>=5) or (int(k[0])<=3):
+                        continue
+                    else:
+                        focus_keys.append(k)
+                focus_keys_static=[]
+                for k in focus_keys:
+                    if int(k[-2])==0: # static node
+                        focus_keys_static.append(k)
 
-            additional_data_dicts["static_factor"]["significance"]={}
-            # 顕著なノードの検出
-            patients=list(data_dicts.keys())
-            
-            for patient in patients:
-                # if patient==focus_patient:
-                #     continue
-                additional_data_dicts["static_factor"]["significance"][patient]={}
-                for k in focus_keys_static:
-                    try:
-                        additional_data_dicts["static_factor"]["significance"][patient][k]=data_dicts[focus_patient][k]-data_dicts[patient][k]
-                    except TypeError:
-                        if ((type(data_dicts[patient][k])==float) or (type(data_dicts[focus_patient][k])==float)):
-                            additional_data_dicts["static_factor"]["significance"][patient][k]=np.nan
+                additional_data_dicts["static_factor"]["significance"]={}
+                # 顕著なノードの検出
+                patients=list(data_dicts.keys())
+                
+                for patient in patients:
+                    # if patient==focus_patient:
+                    #     continue
+                    additional_data_dicts["static_factor"]["significance"][patient]={}
+                    for k in focus_keys_static:
+                        if k in ["40000000","40000001"]: # TFNが格納されている場合
+                            val_focus_patient=np.array([eval(v)[1] for v in self.df_eval[focus_patient+f"_{k}"].dropna().tail(5)]).mean()
+                            val_patient=np.array([eval(v)[1] for v in self.df_eval[patient+f"_{k}"].dropna().tail(5)]).mean()
+                            additional_data_dicts["static_factor"]["significance"][patient][k]=val_focus_patient-val_patient
                         else:
-                            additional_data_dicts["static_factor"]["significance"][patient][k]=data_dicts[focus_patient][k][1]-data_dicts[patient][k][1]
-            
-            additional_data_dicts["static_factor"]["significance"]["max"]={}
-            for k in focus_keys_static:
-                additional_data_dicts["static_factor"]["significance"]["max"][k]=np.array([additional_data_dicts["static_factor"]["significance"][p][k] for p in patients]).max()
-            most_significant_node=focus_keys_static[np.array([additional_data_dicts["static_factor"]["significance"]["max"][k] for k in focus_keys_static]).argmax()]
-            additional_data_dicts["static_factor"]["most_significant_node"]=most_significant_node
-            return additional_data_dicts
+                            additional_data_dicts["static_factor"]["significance"][patient][k]=self.df_eval[focus_patient+f"_{k}"].tail(5).mean()-self.df_eval[patient+f"_{k}"].tail(5).mean()
+                        # except TypeError:
+                        #     if k in ["4000"]:
+                        #         additional_data_dicts["static_factor"]["significance"][patient][k]=np.nan
+                        #     else:
+                        #         additional_data_dicts["static_factor"]["significance"][patient][k]=self.df_eval[focus_patient+f"_{k}"].tail(5).mean()[1]-self.df_eval[patient+f"_{k}"].tail(5).mean()[1]
+                
+                additional_data_dicts["static_factor"]["significance"]["max"]={}
+                for k in focus_keys_static:
+                    additional_data_dicts["static_factor"]["significance"]["max"][k]=np.array([additional_data_dicts["static_factor"]["significance"][p][k] for p in patients]).max()
+                most_significant_node=focus_keys_static[np.array([additional_data_dicts["static_factor"]["significance"]["max"][k] for k in focus_keys_static]).argmax()]
+                additional_data_dicts["static_factor"]["most_significant_node"]=most_significant_node
+            except Exception as e:
+                exc_type, exc_obj, exc_tb = sys.exc_info()
+                self.logger.error(f"line {exc_tb.tb_lineno}: {e}")
+                
+            return additional_data_dicts,most_significant_node
 
         def guess_dynamic_factor(data_dicts,focus_patient,additional_data_dicts):
+            try:
+
+                additional_data_dicts["dynamic_factor"]={}
+                focus_keys=[]
+                # 4000番台だけを採用
+                for k in data_dicts[list(data_dicts.keys())[0]].keys():
+                    if k=="timestamp":
+                        continue
+                    elif (int(k[0])>=5) or (int(k[0])<=3):
+                        continue
+                    else:
+                        focus_keys.append(k)
+                focus_keys_dynamic=[]
+                for k in focus_keys:
+                    if int(k[-2])==1: # dynamic node
+                        focus_keys_dynamic.append(k)
+                
+                data=self.df_eval[[focus_patient+f"_{k}" for k in ["10000000"]+focus_keys_dynamic]].tail(20).rolling(w).mean()
+                data_corr=data.corr()[focus_patient+"_10000000"]
+                # 一番相関が高い4000番台の因子を抜き出す
+                data_corr_4000=data_corr[[focus_patient+"_"+k for k in focus_keys_dynamic]]
+                most_corr_key=list(data_corr_4000.keys())[data_corr_4000.argmax()]
+                most_corr_node=most_corr_key.replace(focus_patient+"_","")
+                additional_data_dicts["dynamic_factor"]["most_significant_node"]=most_corr_node
+            except Exception as e:
+                exc_type, exc_obj, exc_tb = sys.exc_info()
+                self.logger.error(f"line {exc_tb.tb_lineno}: {e}")
+
+            return additional_data_dicts,most_corr_node
+
+            
+            pass
+
+        def guess_dynamic_factor_depreciated(data_dicts,focus_patient,additional_data_dicts):
             print("!!!!!!!!!!!! dynamic factorの算出方法は仮 !!!!!!!!!!!!")
             additional_data_dicts["dynamic_factor"]={}
             focus_keys=[]
@@ -322,6 +388,87 @@ class RealtimeEvaluator(Manager,GraphManager):
             additional_data_dicts["dynamic_factor"]["most_significant_node"]=most_significant_node
             return additional_data_dicts
         
+        def judge_notification_necessity(data_dicts,most_risky_patient,dynamic_factor_node):
+            def judge_time_interval(notify_history,data_dicts,alert_type):
+                df=notify_history[notify_history["type"]==alert_type].reset_index()
+                self.logger.info(f"\n{self.notify_history}\n{notify_history}")
+                if len(df)==0:
+                    if len(notify_history)==0:
+                        self.logger.info("時間間隔制約：充足【初回】")
+                        return True
+                    if alert_type=="help":
+                        df=notify_history[notify_history["type"]=="notice"].reset_index()
+                        if self.timestamp-df.loc[len(df)-1,"timestamp"]>self.notify_interval_dict["notice2help"]:
+                            return True
+                        else:
+                            return False
+                    else:
+                        self.logger.info("時間間隔制約：充足【よくわからん】")
+                        return True
+
+                if self.timestamp-df.loc[len(df)-1,"timestamp"]>self.notify_interval_dict[alert_type]:
+                    if alert_type=="help":
+                        df=notify_history[notify_history["type"]=="notice"].reset_index()
+                        if self.timestamp-df.loc[len(df)-1,"timestamp"]>self.notify_interval_dict["notice2help"]:
+                            return True
+                        else:
+                            return False
+                    else:
+                        self.logger.info(f"時間間隔制約：充足 ({self.timestamp-df.loc[len(df)-1,'timestamp']})")
+                        return True
+                else:
+                    self.logger.info(f"時間間隔制約：非充足 ({self.timestamp-df.loc[len(df)-1,'timestamp']})")
+                    return False
+            def judge_rank_change(most_risky_patient):
+                if len(self.notify_history)>0:
+                    rank_change=most_risky_patient!=self.previous_risky_patient
+                elif len(self.notify_history)==0:
+                    rank_change=True
+                    self.previous_risky_patient=most_risky_patient
+                return rank_change
+            def judge_above_dynamic_thre(most_risky_patient,dynamic_factor_node):
+                
+                node_val=self.df_eval.loc[len(self.df_eval)-1,most_risky_patient+"_"+dynamic_factor_node]
+                if node_val>self.notify_threshold_by_dinamic_factor[dynamic_factor_node]:
+                    return True
+                else:
+                    return False
+                
+            try:
+                # 通知の必要性判断
+                need_notify=False
+                need_help=False
+                ## A 前回通知からの時間経過
+                tf_interval_notify=judge_time_interval(self.notify_history,data_dicts,"notice")
+                # tf_interval_help=judge_time_interval(self.notify_history,data_dicts,"help")
+                ## B 順位入れ替えの発生
+                tf_rank_change=judge_rank_change(most_risky_patient)
+                ## C dynamic_factor_node毎の通知基準値を超越しているか
+                tf_dynamic_node=judge_above_dynamic_thre(most_risky_patient,dynamic_factor_node)
+
+                if tf_interval_notify and tf_rank_change and tf_dynamic_node:
+                    self.logger.warning(f"経過時間：{tf_interval_notify}　順位変更：{tf_rank_change}　ノード閾値以上：{tf_dynamic_node}　➡　通知実行")
+                    return True
+                else:
+                    self.logger.warning(f"経過時間：{tf_interval_notify}　順位変更：{tf_rank_change}　ノード閾値以上：{tf_dynamic_node}　➡　通知見送り")
+                    return False
+                # elif (not tf_interval_notify) and tf_rank_change:
+                #     self.logger.warning("経過時間：×　順位変更：有　➡　通知見送り")
+                #     return False
+                # elif tf_interval_notify and (not tf_rank_change):
+                #     self.logger.warning("経過時間：〇　順位変更：×　➡　通知見送り")
+                #     return False
+                # elif (not tf_interval_notify) and (not tf_rank_change):
+                #     self.logger.warning("経過時間：×　順位変更：×　➡　通知見送り")
+                #     return False
+            except Exception as e:
+                exc_type, exc_obj, exc_tb = sys.exc_info()
+                self.logger.error(f"line {exc_tb.tb_lineno}: {e}")
+                
+                
+            
+            pass
+
         def get_alert_sentence(most_risky_patient,static_factor_node,dynamic_factor_node):
             if static_factor_node=="":
                 text_dynamic=self.default_graph["node_dict"][dynamic_factor_node]["description_ja"]
@@ -333,6 +480,7 @@ class RealtimeEvaluator(Manager,GraphManager):
             return alert_text
 
         try:
+            # 順位の算出
             additional_data_dicts["rank"]={}
             patients=list(data_dicts.keys())
             total_risks=[]
@@ -341,15 +489,25 @@ class RealtimeEvaluator(Manager,GraphManager):
                 total_risks.append(self.df_eval[patient+"_10000000"].tail(5).mean())
             patients_rank=(-np.array(total_risks)).argsort()
 
+            # 最も高リスクな患者の決定
             most_risky_patient=patients[np.array(total_risks).argmax()]
 
-            additional_data_dicts=guess_static_factor(data_dicts,most_risky_patient,additional_data_dicts)
-            additional_data_dicts=guess_dynamic_factor(data_dicts,most_risky_patient,additional_data_dicts)
+            # 静的・動的要因の算出
+            additional_data_dicts,static_factor_node=guess_static_factor(data_dicts,most_risky_patient,additional_data_dicts)
+            # additional_data_dicts=guess_dynamic_factor(data_dicts,most_risky_patient,additional_data_dicts)
+            additional_data_dicts,dynamic_factor_node=guess_dynamic_factor(data_dicts,most_risky_patient,additional_data_dicts)
+            
+            # 通知の必要性を判断
+            notice_necessary=judge_notification_necessity(data_dicts=data_dicts,most_risky_patient=most_risky_patient,dynamic_factor_node=dynamic_factor_node)
             text=get_alert_sentence(most_risky_patient,
                                     static_factor_node=additional_data_dicts["static_factor"]["most_significant_node"],
                                     dynamic_factor_node=additional_data_dicts["dynamic_factor"]["most_significant_node"],
                                     )
-            print(text)
+            if notice_necessary:
+                # ["notificationId","timestamp","relativeTimestamp","patient","sentence","type","10000000"]
+                self.notify_history.loc[len(self.notify_history),:]=[self.notification_id,self.timestamp,self.timestamp,most_risky_patient,text,"notice",data_dicts[most_risky_patient]["10000000"]]
+                self.notification_id+=1
+            
             additional_data_dicts["alert"]=text
 
             for patient,rank in zip(patients,patients_rank):
@@ -501,12 +659,15 @@ class RealtimeEvaluator(Manager,GraphManager):
         try:
             self.start=time.time()
             self.logger.info(f"RealtimeEvaluator called. Time: {np.round(time.time()-self.start,4)}")
+
             # 情報の読込
             self.logger.info(f"Loading info...")
             json_latest_path,json_latest_data=self.load_data()
+
             # 特徴量の算出
             self.logger.info(f"Calculating feature values...Time: {np.round(time.time()-self.start,4)}")
             data_dicts=self.get_features()
+
             # 危険性評価
             self.logger.info(f"Evaluating risk...Time: {np.round(time.time()-self.start,4)}")
             cls_master=Master(data_dicts,strage=self.strage)
@@ -521,6 +682,7 @@ class RealtimeEvaluator(Manager,GraphManager):
                 data_dicts_flatten["timestamp"]=json_latest_data[f"{list(data_dicts.keys())[0]}_timestamp"]
             self.df_eval=pd.concat([self.df_eval,pd.DataFrame(data_dicts_flatten,index=[0])],axis=0)
             self.df_eval.reset_index(inplace=True,drop=True)
+
             # 順位付け・通知文生成
             self.logger.info(f"Analyzing results...Time: {np.round(time.time()-self.start,4)}")
             patients=list(data_dicts.keys())
@@ -532,6 +694,7 @@ class RealtimeEvaluator(Manager,GraphManager):
                 self.df_post=pd.concat([self.df_post,pd.DataFrame(additional_data_dicts_flatten,index=[0])],axis=0)
                 self.df_post.reset_index(inplace=True,drop=True)            
             Manager().write_json(additional_data_dicts,json_path=os.path.split(json_latest_path)[0]+"/additional_data_dicts.json")
+
             # 可視化
             if draw_bbox:
                 self.logger.info(f"Drawing bbox image...Time: {np.round(time.time()-self.start,4)}")
@@ -554,9 +717,11 @@ class RealtimeEvaluator(Manager,GraphManager):
         self.df_post.sort_index(axis=1,inplace=True)
         self.df_post.to_csv(self.data_dir_dict["mobilesensing_dir_path"]+"/csv/df_post.csv",index=False)
     
+        self.notify_history.sort_index(axis=1,inplace=True)
+        self.notify_history.to_csv(self.data_dir_dict["mobilesensing_dir_path"]+"/csv/notify_history.csv",index=False)
 
 if __name__=="__main__":
-    trial_name="20250220StopStandingObaachanSoTA"
+    trial_name="20250220MinimumNotification"
     strage="local"
     json_dir_path="/catkin_ws/src/database"+"/"+trial_name+"/json"
 
