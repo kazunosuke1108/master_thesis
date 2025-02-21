@@ -162,12 +162,9 @@ class PreprocessYolo(Manager,blipTools):
         ankle_ratio=np.clip(ankle_ratio,0,1)
         return ankle_ratio
 
-    def yolo_snapshot(self,data_dict,rgb_img,t,b,l,r):
+    def yolo_snapshot(self,data_dict,rgb_img,t,b,l,r,yolo_debug,debug_dir_path,patient,timestamp):
         t,b,l,r=int(t),int(b),int(l),int(r)
-        bbox_rgb_img=rgb_img[t:b,l:r]
-        # cv2.imshow("bbox",bbox_rgb_img)
-        # print(bbox_rgb_img.shape)
-        # cv2.waitKey(1)
+        # bbox_rgb_img=rgb_img[t:b,l:r]
         # 拡張bounding boxの切り出し
         extend_ratio=0.025
         t_e,b_e,l_e,r_e,=np.max([t-extend_ratio*rgb_img.shape[0],0]),np.min([b+extend_ratio*rgb_img.shape[0],rgb_img.shape[0]]),np.max([l-extend_ratio*rgb_img.shape[1],0]),np.min([r+extend_ratio*rgb_img.shape[1],rgb_img.shape[0]])
@@ -177,14 +174,18 @@ class PreprocessYolo(Manager,blipTools):
         # 姿勢推定
         try:
             results=self.model(extended_bbox_rgb_img)
+            if yolo_debug:
+                plotted_image=results[0].plot()
+                cv2.imwrite(debug_dir_path+f"/{patient}_{timestamp}.jpg",plotted_image)
+
         except ZeroDivisionError:
-            return data_dict,False
+            return data_dict,False,"姿勢推定自体が失敗"
         kp=results[0].keypoints
         try:
             kp_xy=np.array(kp.xy[0].tolist())
             kp_conf=np.array(kp.conf[0].tolist())
         except TypeError:
-            return data_dict,False
+            return data_dict,False,"kpの取り出しに失敗"
         kp_dict={}
         for j,k in enumerate(self.KEYPOINTS_NAMES):
             kp_dict[k]={
@@ -206,7 +207,7 @@ class PreprocessYolo(Manager,blipTools):
         data_dict["50000102"]=features[2]
         data_dict["50000103"]=features[3]
 
-        return data_dict,True
+        return data_dict,True,"成功"
 
 if __name__=="__main__":
     trial_name="20250115PullWheelchairObaachan2"

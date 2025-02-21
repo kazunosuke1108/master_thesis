@@ -102,6 +102,7 @@ class RealtimeEvaluator(Manager,GraphManager):
 
         # switch
         self.left_right="left"
+        self.yolo_debug=True
         self.tf_draw_map=False
         self.tf_draw_bbox=True
         self.tf_throttling=False
@@ -214,13 +215,13 @@ class RealtimeEvaluator(Manager,GraphManager):
 
             # feature (5)
             ## BLIP系 属性・物体(手すり以外)
-            self.logger.info(f"BLIP開始 Time: {np.round(time.time()-self.start,4)}")
+            self.logger.info(f"属性推論開始 Time: {np.round(time.time()-self.start,4)}")
             data_dicts[patient]=cls_zokusei.zokusei_snapshot(data_dict=data_dicts[patient],rgb_img=self.elp_img,t=t,b=b,l=l,r=r,)#(data_dicts[patient],self.elp_img,t,b,l,r,self.fps_control_dicts[patient])
             ## 動作
             self.logger.info(f"YOLO開始 Time: {np.round(time.time()-self.start,4)}")
-            data_dicts[patient],success_flag=cls_yolo.yolo_snapshot(data_dicts[patient],self.elp_img,t,b,l,r,)
+            data_dicts[patient],success_flag,description=cls_yolo.yolo_snapshot(data_dicts[patient],self.elp_img,t,b,l,r,self.yolo_debug,debug_dir_path=self.data_dir_dict["mobilesensing_dir_path"]+"/jpg/yolo",patient=patient,timestamp=self.timestamp)
             if not success_flag:
-                self.logger.info(f"姿勢推定が不正のため削除 {patient}")
+                self.logger.info(f"姿勢推定が不正のため削除 {patient}（{description}）")
                 # self.patients.remove(patient)
                 del data_dicts[patient]
                 continue
@@ -233,22 +234,12 @@ class RealtimeEvaluator(Manager,GraphManager):
                 if self.fps_control_dicts[patient][k]==False:
                     data_dicts[patient][k]=self.df_eval.loc[self.df_eval.index[-1], f"{patient}_{k}"]
 
-
-
-        self.patients=list(data_dicts.keys())
-
         ## 見守り状況
-        # ========= debug用のデータ =========
-        # data_dicts["00000"]["50000000"]="no"
-        # # data_dicts["00001"]["50000000"]="yes"
-        # data_dicts["00003"]["50000000"]="yes"
-        # data_dicts["00006"]["50000000"]="yes"
-        # data_dicts["00007"]["50000000"]="yes"
-        # # data_dicts["00009"]["50000000"]="yes"
-
         def get_relative_distance(data_dicts,p,s,):
             d=np.linalg.norm(np.array([data_dicts[p]["60010000"],data_dicts[p]["60010001"]])-np.array([data_dicts[s]["60010000"],data_dicts[s]["60010001"]]))
             return d
+
+        self.patients=list(data_dicts.keys())
 
         self.logger.info(f"見守り関連開始 Time: {np.round(time.time()-self.start,4)}")
         # スタッフがいるかどうかを判定
