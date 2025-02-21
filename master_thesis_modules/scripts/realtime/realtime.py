@@ -56,7 +56,7 @@ class RealtimeEvaluator(Manager,GraphManager):
         self.logger=self.prepare_log(self.data_dir_dict["mobilesensing_dir_path"]+"/log")
         self.map_fig,self.map_ax=self.plot_map_matplotlib()
 
-        self.notify_interval_dict={"notice":5,"help":10,"notice2help":5}
+        self.notify_interval_dict={"general":5,"notice":5,"help":10,"notice2help":5}
         self.notify_threshold_by_dinamic_factor={
             "40000000":0.3,
             "40000001":0.4,
@@ -358,84 +358,73 @@ class RealtimeEvaluator(Manager,GraphManager):
             
             pass
 
-        def guess_dynamic_factor_depreciated(data_dicts,focus_patient,additional_data_dicts):
-            print("!!!!!!!!!!!! dynamic factorの算出方法は仮 !!!!!!!!!!!!")
-            additional_data_dicts["dynamic_factor"]={}
-            focus_keys=[]
-            # 4000番台だけを採用
-            for k in data_dicts[list(data_dicts.keys())[0]].keys():
-                if k=="timestamp":
-                    continue
-                elif (int(k[0])>=5) or (int(k[0])<=3):
-                    continue
-                else:
-                    focus_keys.append(k)
-            focus_keys_dynamic=[]
-            for k in focus_keys:
-                if int(k[-2])==1: # dynamic node 【ここが仮】
-                    focus_keys_dynamic.append(k)
-
-            additional_data_dicts["dynamic_factor"]["significance"]={}
-            # 顕著なノードの検出
-            patients=list(data_dicts.keys())
-            
-            for patient in patients:
-                # if patient==focus_patient:
-                #     continue
-                additional_data_dicts["dynamic_factor"]["significance"][patient]={}
-                for k in focus_keys_dynamic:
-                    try:
-                        additional_data_dicts["dynamic_factor"]["significance"][patient][k]=data_dicts[focus_patient][k]-data_dicts[patient][k]
-                    except TypeError:
-                        additional_data_dicts["dynamic_factor"]["significance"][patient][k]=data_dicts[focus_patient][k][1]-data_dicts[patient][k][1]
-            
-            additional_data_dicts["dynamic_factor"]["significance"]["max"]={}
-            for k in focus_keys_dynamic:
-                additional_data_dicts["dynamic_factor"]["significance"]["max"][k]=np.array([additional_data_dicts["dynamic_factor"]["significance"][p][k] for p in patients]).max()
-            most_significant_node=focus_keys_dynamic[np.array([additional_data_dicts["dynamic_factor"]["significance"]["max"][k] for k in focus_keys_dynamic]).argmax()]
-            additional_data_dicts["dynamic_factor"]["most_significant_node"]=most_significant_node
-            return additional_data_dicts
-        
         def judge_notification_necessity(data_dicts,most_risky_patient,dynamic_factor_node):
             def judge_time_interval(notify_history,data_dicts,alert_type):
-                df=notify_history[notify_history["type"]==alert_type].reset_index()
-                self.logger.info(f"\n{self.notify_history}\n{notify_history}")
-                if len(df)==0:
-                    if len(notify_history)==0:
-                        self.logger.info("時間間隔制約：充足【初回】")
-                        return True
-                    if alert_type=="help":
-                        df=notify_history[notify_history["type"]=="notice"].reset_index()
-                        if self.timestamp-df.loc[len(df)-1,"timestamp"]>self.notify_interval_dict["notice2help"]:
-                            return True
-                        else:
-                            return False
-                    else:
-                        self.logger.info("時間間隔制約：充足【よくわからん】")
-                        return True
-
-                if self.timestamp-df.loc[len(df)-1,"timestamp"]>self.notify_interval_dict[alert_type]:
-                    if alert_type=="help":
-                        df=notify_history[notify_history["type"]=="notice"].reset_index()
-                        if self.timestamp-df.loc[len(df)-1,"timestamp"]>self.notify_interval_dict["notice2help"]:
-                            return True
-                        else:
-                            return False
-                    else:
-                        self.logger.info(f"時間間隔制約：充足 ({self.timestamp-df.loc[len(df)-1,'timestamp']})")
-                        return True
+                """
+                - 直前の通知との時間差
+                - 同じ種類の通知との時間差
+                """
+                if len(notify_history)==0: # 通知自体が初回の場合
+                    self.logger.info("時間間隔制約：充足【初回】")
+                    return True
                 else:
-                    self.logger.info(f"時間間隔制約：非充足 ({self.timestamp-df.loc[len(df)-1,'timestamp']})")
-                    return False
+                    last_notice_timestamp=notify_history.loc[len(notify_history)-1,"timestamp"]
+                    if self.timestamp-last_notice_timestamp>self.notify_interval_dict["general"]:
+                        self.logger.info(f"時間間隔制約：充足【経過時間: {np.round(self.timestamp-last_notice_timestamp,1)} sec.】")
+                        return True
+                    else:
+                        self.logger.info(f"時間間隔制約：非充足【経過時間: {np.round(self.timestamp-last_notice_timestamp,1)} sec.】")
+                        return False
+
+                # # 同じ種類の通知（通知・応援要請）を抜き出す
+                # df=notify_history[notify_history["type"]==alert_type].reset_index()
+                
+                # if len(df)==0: # 同じ種類の通知の、前例がない場合
+                #     if len(notify_history)==0:
+                #         self.logger.info("時間間隔制約：充足【初回】")
+                #         return True
+                #     if alert_type=="help":
+                #         df=notify_history[notify_history["type"]=="notice"].reset_index()
+                #         if self.timestamp-df.loc[len(df)-1,"timestamp"]>self.notify_interval_dict["notice2help"]:
+                #             return True
+                #         else:
+                #             return False
+                #     else:
+                #         self.logger.info("時間間隔制約：充足【よくわからん】")
+                #         return True
+
+                # if self.timestamp-df.loc[len(df)-1,"timestamp"]>self.notify_interval_dict[alert_type]:
+                #     if alert_type=="help":
+                #         df=notify_history[notify_history["type"]=="notice"].reset_index()
+                #         if self.timestamp-df.loc[len(df)-1,"timestamp"]>self.notify_interval_dict["notice2help"]:
+                #             return True
+                #         else:
+                #             return False
+                #     else:
+                #         self.logger.info(f"時間間隔制約：充足 ({self.timestamp-df.loc[len(df)-1,'timestamp']})")
+                #         return True
+                # else:
+                #     self.logger.info(f"時間間隔制約：非充足 ({self.timestamp-df.loc[len(df)-1,'timestamp']})")
+                #     return False
+
             def judge_rank_change(most_risky_patient):
                 if len(self.notify_history)>0:
                     rank_change=most_risky_patient!=self.previous_risky_patient
                 elif len(self.notify_history)==0:
                     rank_change=True
-                    self.previous_risky_patient=most_risky_patient
+                self.logger.info(f"順位入れ替わり検知：{rank_change}【今回：{most_risky_patient} 前イテレーション：{self.previous_risky_patient}】")
                 return rank_change
+
+            def judge_rank_change2(most_risky_patient):
+                if len(self.notify_history)>0:
+                    rank_change=most_risky_patient!=self.notify_history.loc[len(self.notify_history)-1,"patient"]
+                    self.logger.info(f"前回通知人物と違う人物が最上位と検知：{rank_change}【今回：{most_risky_patient} 前回通知：{self.notify_history.loc[len(self.notify_history)-1,'patient']}】")
+                elif len(self.notify_history)==0:
+                    self.logger.info(f"初回のため、通知人物と最上位人物の比較はなし")
+                    rank_change=True
+                return rank_change
+            
             def judge_above_dynamic_thre(most_risky_patient,dynamic_factor_node):
-                
                 node_val=self.df_eval.loc[len(self.df_eval)-1,most_risky_patient+"_"+dynamic_factor_node]
                 if node_val>self.notify_threshold_by_dinamic_factor[dynamic_factor_node]:
                     return True
@@ -443,32 +432,27 @@ class RealtimeEvaluator(Manager,GraphManager):
                     return False
                 
             try:
-                # 通知の必要性判断
-                need_notify=False
-                need_help=False
                 ## A 前回通知からの時間経過
                 tf_interval_notify=judge_time_interval(self.notify_history,data_dicts,"notice")
                 # tf_interval_help=judge_time_interval(self.notify_history,data_dicts,"help")
+
                 ## B 順位入れ替えの発生
-                tf_rank_change=judge_rank_change(most_risky_patient)
+                # tf_rank_change=judge_rank_change(most_risky_patient)
+
+                ## B2 以前通知した人物と違う人物が最上位にいる
+                tf_rank_change=judge_rank_change2(most_risky_patient)
+
                 ## C dynamic_factor_node毎の通知基準値を超越しているか
                 tf_dynamic_node=judge_above_dynamic_thre(most_risky_patient,dynamic_factor_node)
 
-                if tf_interval_notify and tf_rank_change and tf_dynamic_node:
+                
+                if tf_interval_notify and tf_rank_change and tf_dynamic_node: # すべての条件を充足したら通知を実行
                     self.logger.warning(f"経過時間：{tf_interval_notify}　順位変更：{tf_rank_change}　ノード閾値以上：{tf_dynamic_node}　➡　通知実行")
                     return True
                 else:
                     self.logger.warning(f"経過時間：{tf_interval_notify}　順位変更：{tf_rank_change}　ノード閾値以上：{tf_dynamic_node}　➡　通知見送り")
                     return False
-                # elif (not tf_interval_notify) and tf_rank_change:
-                #     self.logger.warning("経過時間：×　順位変更：有　➡　通知見送り")
-                #     return False
-                # elif tf_interval_notify and (not tf_rank_change):
-                #     self.logger.warning("経過時間：〇　順位変更：×　➡　通知見送り")
-                #     return False
-                # elif (not tf_interval_notify) and (not tf_rank_change):
-                #     self.logger.warning("経過時間：×　順位変更：×　➡　通知見送り")
-                #     return False
+
             except Exception as e:
                 exc_type, exc_obj, exc_tb = sys.exc_info()
                 self.logger.error(f"line {exc_tb.tb_lineno}: {e}")
@@ -517,6 +501,9 @@ class RealtimeEvaluator(Manager,GraphManager):
                 self.notification_id+=1
             
             additional_data_dicts["alert"]=text
+
+            # 今回の危険患者をメモ
+            self.previous_risky_patient=most_risky_patient
 
             for patient,rank in zip(patients,patients_rank):
                 additional_data_dicts["rank"][patient]={}
@@ -648,7 +635,6 @@ class RealtimeEvaluator(Manager,GraphManager):
         plt.title(self.timestamp)
         plt.savefig(self.data_dir_dict["mobilesensing_dir_path"]+f"/jpg/map/{os.path.basename(self.elp_img_path)}")
         
-        
     def draw_export_img(self,elp_img_path,elp_img,json_latest_data,data_dicts,additional_data_dicts,patients):
         # ELP画像
         # bbox情報を用意（rank連携要検討）
@@ -714,9 +700,6 @@ class RealtimeEvaluator(Manager,GraphManager):
             exc_type, exc_obj, exc_tb = sys.exc_info()
             self.logger.error(f"line {exc_tb.tb_lineno}: {e}")
 
-        
-
-        
     def save(self):
         self.df_eval.sort_index(axis=1,inplace=True)
         self.df_eval.to_csv(self.data_dir_dict["mobilesensing_dir_path"]+"/csv/df_eval.csv",index=False)
