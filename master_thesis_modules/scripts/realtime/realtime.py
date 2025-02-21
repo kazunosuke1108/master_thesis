@@ -33,32 +33,6 @@ from scripts.preprocess.preprocess_objects_snapshot import PreprocessObject
 
 # 定数
 WATCHED_FILES = ["dict_after_reid.json","dict_after_reid_old.json"]
-dayroom_structure_dict={"xrange":[6,15],"yrange":[-11,-4]} # 11月
-# dayroom_structure_dict={"xrange":[-4,6],"yrange":[5,10]} # 08月
-structure_dict={
-    "ivPole":[
-        np.array([-4,5]), # muに相当
-        np.array([6,5]),
-        ],
-    "wheelchair":[
-        np.array([0,6]),
-        np.array([0,8]),
-        ],
-    "handrail":{
-        "xrange":[6,15],
-        "yrange":[-11,-4]
-        }
-}
-ss_structure_dict={"pos":[6,-7.5],"direction":[0,0.1]} # 11月
-# ss_structure_dict={"pos":[-4,7.5],"direction":[0.1,0]} # 08月
-colors_01 = plt.get_cmap("tab10").colors
-colors = [(int(b*255), int(g*255), int(r*255)) for r, g, b in colors_01]
-
-w=5
-
-# switch
-draw_map=False
-draw_bbox=True
 
 class JSONFileChangeHandler(FileSystemEventHandler):
     def on_modified(self, event):
@@ -103,6 +77,35 @@ class RealtimeEvaluator(Manager,GraphManager):
         self.previous_risky_patient=""
 
         self.luminance_threshold=0.5
+        self.smoothing_w=5
+
+        self.structure_dict={
+            "ivPole":[
+                np.array([-4,5]), # muに相当
+                np.array([6,5]),
+                ],
+            "wheelchair":[
+                np.array([0,6]),
+                np.array([0,8]),
+                ],
+            "handrail":{
+                "xrange":[6,15],
+                "yrange":[-11,-4]
+                },
+            "staff_station":{
+                "pos":[6,-7.5],
+                "direction":[0,0.1]
+                }
+        }
+        self.colors_01 = plt.get_cmap("tab10").colors
+        self.colors = [(int(b*255), int(g*255), int(r*255)) for r, g, b in self.colors_01]
+
+        # switch
+        self.left_right="left"
+        self.tf_draw_map=False
+        self.tf_draw_bbox=True
+        self.tf_throttling=False
+
         self.logger.info(f"RealtimeEvaluator has woken up")
 
     def load_data(self):
@@ -121,16 +124,17 @@ class RealtimeEvaluator(Manager,GraphManager):
                 self.timestamp=self.json_latest_data[self.patients[0]+"_timestamp"]
                 self.logger.info(f"解析時刻: {self.timestamp}")
                 # ELP
-                elp_img_paths=sorted(glob(f"/catkin_ws/src/database/{self.trial_name}/jpg/elp/left/*.jpg"))
+                elp_img_paths=sorted(glob(f"/catkin_ws/src/database/{self.trial_name}/jpg/elp/{self.left_right}/*.jpg"))
                 self.elp_img_path=elp_img_paths[abs(np.array([float(os.path.basename(p).split("_")[1][:-len(".jpg")])-self.timestamp for p in elp_img_paths])).argmin()]
                 self.logger.info(f"解析ELP: {self.elp_img_path}")
                 self.elp_img=cv2.imread(self.elp_img_path)
                 # self.elp_img=cv2.cvtColor(self.elp_img, cv2.COLOR_BGR2RGB)
                 # 背景差分画像
-                diff_img_paths=sorted(glob(f"/catkin_ws/src/database/{self.trial_name}/jpg/diff/left/*.jpg"))
-                self.diff_img_path=diff_img_paths[abs(np.array([float(os.path.basename(p).split("_")[1][:-len(".jpg")])-self.timestamp for p in diff_img_paths])).argmin()]
-                self.logger.info(f"解析diff: {self.diff_img_path}")
-                self.diff_img=cv2.imread(self.diff_img_path)
+                if self.tf_throttling:
+                    diff_img_paths=sorted(glob(f"/catkin_ws/src/database/{self.trial_name}/jpg/diff/{self.left_right}/*.jpg"))
+                    self.diff_img_path=diff_img_paths[abs(np.array([float(os.path.basename(p).split("_")[1][:-len(".jpg")])-self.timestamp for p in diff_img_paths])).argmin()]
+                    self.logger.info(f"解析diff: {self.diff_img_path}")
+                    self.diff_img=cv2.imread(self.diff_img_path)
                 all_files_found=True
             except FileNotFoundError:
                 print(self.get_timestamp(),"json not found")
@@ -140,6 +144,10 @@ class RealtimeEvaluator(Manager,GraphManager):
                 print(self.get_timestamp(),"ELP not found")
                 time.sleep(0.1)
                 continue
+            except Exception as e:
+                exc_type, exc_obj, exc_tb = sys.exc_info()
+                self.logger.error(f"line {exc_tb.tb_lineno}: {e}")
+
         return json_latest_path,self.json_latest_data
 
     def get_features(self):
@@ -182,8 +190,8 @@ class RealtimeEvaluator(Manager,GraphManager):
 
             return fps_control_dicts
         # FPS制御
-        self.fps_control_dicts=fps_judger()
-        self.logger.info(f"fps_control_dicts:{self.fps_control_dicts}")
+        self.fps_control_dicts=fps_judger(active=self.tf_throttling)
+        # self.logger.info(f"fps_control_dicts:{self.fps_control_dicts}")
         self.logger.info(f"評価開始前のpatients: {self.patients}")
         # 1人ずつ評価
         for patient in self.patients:
@@ -218,7 +226,7 @@ class RealtimeEvaluator(Manager,GraphManager):
                 continue
             self.logger.info(f"手すり開始 Time: {np.round(time.time()-self.start,4)}")
             ## 物体(手すり)
-            data_dicts[patient]=cls_object.object_snapshot(data_dicts[patient],structure_dict)
+            data_dicts[patient]=cls_object.object_snapshot(data_dicts[patient],self.structure_dict)
             
             # FPS制御で省略されたデータを補う
             for k in self.fps_control_dicts[patient].keys():
@@ -259,10 +267,10 @@ class RealtimeEvaluator(Manager,GraphManager):
         else:
             # いない
             for patient in self.patients:
-                data_dicts[patient]["50001100"]=ss_structure_dict["pos"][0]
-                data_dicts[patient]["50001101"]=ss_structure_dict["pos"][1]
-                data_dicts[patient]["50001110"]=ss_structure_dict["direction"][0]
-                data_dicts[patient]["50001111"]=ss_structure_dict["direction"][1]
+                data_dicts[patient]["50001100"]=self.structure_dict["staff_station"]["pos"][0]
+                data_dicts[patient]["50001101"]=self.structure_dict["staff_station"]["pos"][1]
+                data_dicts[patient]["50001110"]=self.structure_dict["staff_station"]["direction"][0]
+                data_dicts[patient]["50001111"]=self.structure_dict["staff_station"]["direction"][1]
         
         return data_dicts
     
@@ -294,11 +302,11 @@ class RealtimeEvaluator(Manager,GraphManager):
                     additional_data_dicts["static_factor"]["significance"][patient]={}
                     for k in focus_keys_static:
                         if k in ["40000000","40000001"]: # TFNが格納されている場合
-                            val_focus_patient=np.array([eval(v)[1] for v in self.df_eval[focus_patient+f"_{k}"].dropna().tail(5)]).mean()
-                            val_patient=np.array([eval(v)[1] for v in self.df_eval[patient+f"_{k}"].dropna().tail(5)]).mean()
+                            val_focus_patient=np.array([eval(v)[1] for v in self.df_eval[focus_patient+f"_{k}"].dropna().tail(self.smoothing_w)]).mean()
+                            val_patient=np.array([eval(v)[1] for v in self.df_eval[patient+f"_{k}"].dropna().tail(self.smoothing_w)]).mean()
                             additional_data_dicts["static_factor"]["significance"][patient][k]=val_focus_patient-val_patient
                         else:
-                            additional_data_dicts["static_factor"]["significance"][patient][k]=self.df_eval[focus_patient+f"_{k}"].tail(5).mean()-self.df_eval[patient+f"_{k}"].tail(5).mean()
+                            additional_data_dicts["static_factor"]["significance"][patient][k]=self.df_eval[focus_patient+f"_{k}"].tail(self.smoothing_w).mean()-self.df_eval[patient+f"_{k}"].tail(self.smoothing_w).mean()
                         # except TypeError:
                         #     if k in ["4000"]:
                         #         additional_data_dicts["static_factor"]["significance"][patient][k]=np.nan
@@ -334,7 +342,7 @@ class RealtimeEvaluator(Manager,GraphManager):
                     if int(k[-2])==1: # dynamic node
                         focus_keys_dynamic.append(k)
                 
-                data=self.df_eval[[focus_patient+f"_{k}" for k in ["10000000"]+focus_keys_dynamic]].tail(20).rolling(w).mean()
+                data=self.df_eval[[focus_patient+f"_{k}" for k in ["10000000"]+focus_keys_dynamic]].tail(20).rolling(self.smoothing_w).mean()
                 data_corr=data.corr()[focus_patient+"_10000000"]
                 # 一番相関が高い4000番台の因子を抜き出す
                 data_corr_4000=data_corr[[focus_patient+"_"+k for k in focus_keys_dynamic]]
@@ -486,7 +494,7 @@ class RealtimeEvaluator(Manager,GraphManager):
             total_risks=[]
             for patient in patients:
                 # total_risks.append(data_dicts[patient]["10000000"])
-                total_risks.append(self.df_eval[patient+"_10000000"].tail(5).mean())
+                total_risks.append(self.df_eval[patient+"_10000000"].tail(self.smoothing_w).mean())
             patients_rank=(-np.array(total_risks)).argsort()
 
             # 最も高リスクな患者の決定
@@ -532,7 +540,7 @@ class RealtimeEvaluator(Manager,GraphManager):
             #     thickness=len(self.patients)-int(self.rank_data.loc[i,patient+"_rank"])
             # else:
             thickness=4
-            cv2.rectangle(elp_img,bbox_info[0],bbox_info[1],colors[int(patient)], thickness=thickness)
+            cv2.rectangle(elp_img,bbox_info[0],bbox_info[1],self.colors[int(patient)], thickness=thickness)
         return elp_img
         
     def draw_timestamp(self,elp_img,json_latest_data):
@@ -584,7 +592,7 @@ class RealtimeEvaluator(Manager,GraphManager):
                 continue
             bbox_info=get_bbox_info(rank)
             # 患者カラーの帯
-            cv2.rectangle(img,(bbox_info[0][0]+90,bbox_info[0][1]),bbox_info[1],color=colors[int(patient)],thickness=cv2.FILLED)
+            cv2.rectangle(img,(bbox_info[0][0]+90,bbox_info[0][1]),bbox_info[1],color=self.colors[int(patient)],thickness=cv2.FILLED)
             cv2.putText(
                 img=img,
                 # text=f"No.{int(rank)+1}: "+"ID_"+patient,
@@ -635,7 +643,7 @@ class RealtimeEvaluator(Manager,GraphManager):
     def draw_pos(self,data_dicts,patients):
         map_ax=copy.deepcopy(self.map_ax)
         for patient in patients:
-            map_ax.scatter(data_dicts[patient]["60010000"],data_dicts[patient]["60010001"],s=100,marker="o",c=[colors_01[int(patient)]],label=patient)
+            map_ax.scatter(data_dicts[patient]["60010000"],data_dicts[patient]["60010001"],s=100,marker="o",c=[self.colors_01[int(patient)]],label=patient)
         plt.legend()
         plt.title(self.timestamp)
         plt.savefig(self.data_dir_dict["mobilesensing_dir_path"]+f"/jpg/map/{os.path.basename(self.elp_img_path)}")
@@ -653,8 +661,6 @@ class RealtimeEvaluator(Manager,GraphManager):
         cv2.imwrite(self.data_dir_dict["mobilesensing_dir_path"]+"/jpg/bbox/"+os.path.basename(elp_img_path),elp_img)
         pass
 
-
-    
     def evaluate_main(self):
         try:
             self.start=time.time()
@@ -686,21 +692,21 @@ class RealtimeEvaluator(Manager,GraphManager):
             # 順位付け・通知文生成
             self.logger.info(f"Analyzing results...Time: {np.round(time.time()-self.start,4)}")
             patients=list(data_dicts.keys())
+            additional_data_dicts={}
             if len(patients)>0:
-                additional_data_dicts={}
                 # リスク優先順位付け
                 additional_data_dicts=self.get_rank_and_text(data_dicts,additional_data_dicts)
                 additional_data_dicts_flatten=self.flatten_dict(additional_data_dicts)
                 self.df_post=pd.concat([self.df_post,pd.DataFrame(additional_data_dicts_flatten,index=[0])],axis=0)
                 self.df_post.reset_index(inplace=True,drop=True)            
-            Manager().write_json(additional_data_dicts,json_path=os.path.split(json_latest_path)[0]+"/additional_data_dicts.json")
+                Manager().write_json(additional_data_dicts,json_path=os.path.split(json_latest_path)[0]+"/additional_data_dicts.json")
 
             # 可視化
-            if draw_bbox:
+            if self.tf_draw_bbox:
                 self.logger.info(f"Drawing bbox image...Time: {np.round(time.time()-self.start,4)}")
                 patients=list(data_dicts.keys())
                 self.draw_export_img(self.elp_img_path,self.elp_img,json_latest_data,data_dicts,additional_data_dicts,patients)
-            if draw_map:
+            if self.tf_draw_map:
                 self.logger.info(f"Drawing map image...Time: {np.round(time.time()-self.start,4)}")
                 self.draw_pos(data_dicts=data_dicts,patients=patients)
             self.logger.info(f"All process finished...Time: {np.round(time.time()-self.start,4)}")
@@ -721,7 +727,7 @@ class RealtimeEvaluator(Manager,GraphManager):
         self.notify_history.to_csv(self.data_dir_dict["mobilesensing_dir_path"]+"/csv/notify_history.csv",index=False)
 
 if __name__=="__main__":
-    trial_name="20250220MinimumNotification"
+    trial_name="20250221Refactor"
     strage="local"
     json_dir_path="/catkin_ws/src/database"+"/"+trial_name+"/json"
 
