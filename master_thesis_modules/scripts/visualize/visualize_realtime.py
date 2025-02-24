@@ -6,7 +6,6 @@ from glob import glob
 import json
 import cv2
 import atexit
-from icecream import ic
 from pprint import pprint
 import numpy as np
 import pandas as pd
@@ -14,8 +13,6 @@ import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec
 
 # pip install watchdog
-from watchdog.observers import Observer
-from watchdog.events import FileSystemEventHandler
 
 sys.path.append(".")
 sys.path.append("..")
@@ -117,7 +114,7 @@ class Visualizer(Manager):
         pass
 
 if __name__=="__main__":
-    trial_name="20250220StopStandingObaachanSoTA"
+    trial_name="20250224NameDict"
     strage="local"
     cls=Visualizer(trial_name,strage)
     cls.export_movies(map=False,bbox=True)

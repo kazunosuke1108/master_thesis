@@ -49,13 +49,22 @@ class RealtimeEvaluator(Manager,GraphManager):
         self.strage=strage
         self.data_dir_dict=self.get_database_dir(trial_name=self.trial_name,strage=self.strage)
         self.default_graph=self.get_default_graph()
+
+        # path
+        self.name_dict_path=self.data_dir_dict["mobilesensing_dir_path"]+"/json/name_dict.json"
+
+        # df
         self.df_eval=pd.DataFrame()
         self.df_post=pd.DataFrame()
         self.notify_history=pd.DataFrame(columns=["notificationId","timestamp","relativeTimestamp","patient","sentence","type","10000000"])
 
+        # logger
         self.logger=self.prepare_log(self.data_dir_dict["mobilesensing_dir_path"]+"/log")
+
+        # map
         self.map_fig,self.map_ax=self.plot_map_matplotlib()
 
+        # notification params
         self.notify_interval_dict={"general":5,"notice":5,"help":10,"notice2help":5}
         self.notify_threshold_by_dinamic_factor={
             "40000000":0.3,
@@ -76,9 +85,11 @@ class RealtimeEvaluator(Manager,GraphManager):
         self.notification_id=0
         self.previous_risky_patient=""
 
+        # parameters
         self.luminance_threshold=0.5
         self.smoothing_w=5
 
+        # visualize関連
         self.structure_dict={
             "ivPole":[
                 np.array([-4,5]), # muに相当
@@ -108,6 +119,27 @@ class RealtimeEvaluator(Manager,GraphManager):
         self.tf_throttling=False
 
         self.logger.info(f"RealtimeEvaluator has woken up")
+    
+    def renew_name_dict(self,patients=[]):
+        # name_dictを作成または読み込む
+        # 新しい患者が確認された場合に、keyを作成する
+        try:
+            name_dict=self.load_json(self.name_dict_path)
+        except FileNotFoundError:
+            name_dict={}
+
+        for patient in patients:
+            if patient not in list(name_dict.keys()):
+                name_dict[patient]=patient
+        self.write_json(name_dict,self.name_dict_path)
+        return name_dict
+
+    def get_patient_name(self,patient_id):
+        try:
+            patient_name=self.name_dict[patient_id]
+        except KeyError:
+            patient_name=patient_id
+        return patient_name
 
     def load_data(self):
         all_files_found=False
@@ -459,7 +491,7 @@ class RealtimeEvaluator(Manager,GraphManager):
             else:
                 text_static=self.default_graph["node_dict"][static_factor_node]["description_ja"]
                 text_dynamic=self.default_graph["node_dict"][dynamic_factor_node]["description_ja"]
-                alert_text=f"{most_risky_patient}さんが，元々{text_static}のに，{text_dynamic}ので，危険です．"
+                alert_text=f"{self.get_patient_name(patient_id=most_risky_patient)}さんが，元々{text_static}のに，{text_dynamic}ので，危険です．"
             return alert_text
 
         try:
@@ -531,6 +563,9 @@ class RealtimeEvaluator(Manager,GraphManager):
             # else:
             thickness=4
             cv2.rectangle(elp_img,bbox_info[0],bbox_info[1],self.colors[int(patient)], thickness=thickness)
+            elp_img=self.draw_japanese_text(img=elp_img,text=self.get_patient_name(patient),position=bbox_info[0],bg_color=self.color_converter(self.colors[int(patient)]),font_size=15)
+
+            # 氏名・順位を書き足したい
         return elp_img
         
     def draw_timestamp(self,elp_img,json_latest_data):
@@ -576,7 +611,7 @@ class RealtimeEvaluator(Manager,GraphManager):
 
         for patient in patients:
             # patient_str=self.patient_dict[patient]
-            patient_str=patient
+            patient_str=self.get_patient_name(patient_id=patient)
             rank=additional_data_dicts["rank"][patient]["10000000"]
             if np.isnan(rank):
                 continue
@@ -586,13 +621,14 @@ class RealtimeEvaluator(Manager,GraphManager):
             cv2.putText(
                 img=img,
                 # text=f"No.{int(rank)+1}: "+"ID_"+patient,
-                text=f"No.{int(rank)+1}: "+patient_str,
+                text=f"No.{int(rank)+1}: ",#+patient_str,
                 fontFace=cv2.FONT_HERSHEY_DUPLEX,
                 fontScale=1,
                 org=(bbox_info[0][0],bbox_info[1][1]-10),
                 color=(0,0,0),
                 thickness=2,
                 )            
+            img=self.draw_japanese_text(img=img,text=patient_str,position=(bbox_info[0][0]+90,bbox_info[0][1]-20),bg_color=self.color_converter(self.colors[int(patient)]),font_size=50)
         #     # 通知中か判定
         #     notify_for_the_patient_data=self.notification_data[self.notification_data.fillna(99999)["patient"]==patient_str]
         #     for j,_ in notify_for_the_patient_data.iterrows():
@@ -665,6 +701,9 @@ class RealtimeEvaluator(Manager,GraphManager):
             self.start=time.time()
             self.logger.info(f"RealtimeEvaluator called. Time: {np.round(time.time()-self.start,4)}")
 
+            # 患者の氏名情報の読み込み
+            self.name_dict=self.renew_name_dict()
+
             # 情報の読込
             self.logger.info(f"Loading info...")
             json_latest_path,json_latest_data=self.load_data()
@@ -710,6 +749,10 @@ class RealtimeEvaluator(Manager,GraphManager):
             if self.tf_draw_map:
                 self.logger.info(f"Drawing map image...Time: {np.round(time.time()-self.start,4)}")
                 self.draw_pos(data_dicts=data_dicts,patients=patients)
+            
+            # 患者氏名情報の追記
+            self.name_dict=self.renew_name_dict(patients=list(data_dicts.keys()))
+
             self.logger.info(f"All process finished...Time: {np.round(time.time()-self.start,4)}")
         except Exception as e:
             exc_type, exc_obj, exc_tb = sys.exc_info()
@@ -725,7 +768,7 @@ class RealtimeEvaluator(Manager,GraphManager):
         self.notify_history.to_csv(self.data_dir_dict["mobilesensing_dir_path"]+"/csv/notify_history.csv",index=False)
 
 if __name__=="__main__":
-    trial_name="20250224ShowText"
+    trial_name="20250224NameOnBbox"
     strage="local"
     json_dir_path="/catkin_ws/src/database"+"/"+trial_name+"/json"
 
