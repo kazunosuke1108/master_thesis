@@ -173,6 +173,7 @@ RUN pip install watchdog
 #######################################################################
 RUN pip install pydub
 RUN pip install playsound
+RUN sudo apt install fonts-noto-cjk
 
 #######################################################################
 ##                            delete cash                            ##

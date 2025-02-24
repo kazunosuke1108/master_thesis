@@ -57,7 +57,7 @@ class NotificationPlayer(Manager):
 
 
 if __name__=="__main__":
-    trial_name="20250224PlayChime"
+    trial_name="20250224ShowText"
     strage="local"
     json_dir_path="/catkin_ws/src/database"+"/"+trial_name+"/json"
     cls=NotificationPlayer(trial_name,strage)

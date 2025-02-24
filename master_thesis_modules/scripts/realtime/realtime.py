@@ -489,6 +489,7 @@ class RealtimeEvaluator(Manager,GraphManager):
             
             
             additional_data_dicts["alert"]=text
+            additional_data_dicts["most_risky_patient"]=most_risky_patient
 
             if notice_necessary:
                 notify_dict={
@@ -629,6 +630,13 @@ class RealtimeEvaluator(Manager,GraphManager):
 
         return img
     
+    def draw_notification(self,img,additional_data_dicts):
+        text=additional_data_dicts["alert"]
+        most_risky_patient=additional_data_dicts["most_risky_patient"]
+        anchor=(50,600)
+        img=self.draw_japanese_text(img=img,text=text,position=anchor,text_color=(255,255,255),bg_color=self.color_converter(self.colors[int(most_risky_patient)]),)
+        return img
+
     def draw_pos(self,data_dicts,patients):
         map_ax=copy.deepcopy(self.map_ax)
         for patient in patients:
@@ -645,8 +653,11 @@ class RealtimeEvaluator(Manager,GraphManager):
         elp_img=self.draw_timestamp(elp_img=elp_img,json_latest_data=json_latest_data)
         # rankの追記
         elp_img=self.draw_rank(img=elp_img,data_dicts=data_dicts,additional_data_dicts=additional_data_dicts,patients=patients)
+        # draw notification text
+        elp_img=self.draw_notification(img=elp_img,additional_data_dicts=additional_data_dicts)
         # 保存
         cv2.imwrite(self.data_dir_dict["mobilesensing_dir_path"]+"/jpg/bbox/"+os.path.basename(elp_img_path),elp_img)
+        cv2.imwrite(self.data_dir_dict["mobilesensing_dir_path"]+"/jpg/console/bbox.jpg",elp_img)
         pass
 
     def evaluate_main(self):
@@ -714,7 +725,7 @@ class RealtimeEvaluator(Manager,GraphManager):
         self.notify_history.to_csv(self.data_dir_dict["mobilesensing_dir_path"]+"/csv/notify_history.csv",index=False)
 
 if __name__=="__main__":
-    trial_name="20250224PlayChime"
+    trial_name="20250224ShowText"
     strage="local"
     json_dir_path="/catkin_ws/src/database"+"/"+trial_name+"/json"
 

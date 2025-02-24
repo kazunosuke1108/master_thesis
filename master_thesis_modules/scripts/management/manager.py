@@ -9,6 +9,9 @@ import numpy as np
 import pandas as pd
 
 import matplotlib.pyplot as plt
+import cv2
+import numpy as np
+from PIL import Image, ImageDraw, ImageFont
 
 class Manager():
     def __init__(self):
@@ -199,23 +202,21 @@ class Manager():
             print(f"now processing: {os.path.basename(image)} {idx}/{len(image_paths)}")
         video.release()
 
-    def putText_japanese(img, text, point, size, color):
-        from PIL import ImageFont, ImageDraw, Image
+    # def putText_japanese(img, text, point, size, color):
+    #     #Notoフォントとする
+    #     font = ImageFont.truetype('/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc', size)
 
-        #Notoフォントとする
-        font = ImageFont.truetype('/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc', size)
+    #     #imgをndarrayからPILに変換
+    #     img_pil = Image.fromarray(img)
 
-        #imgをndarrayからPILに変換
-        img_pil = Image.fromarray(img)
+    #     #drawインスタンス生成
+    #     draw = ImageDraw.Draw(img_pil)
 
-        #drawインスタンス生成
-        draw = ImageDraw.Draw(img_pil)
+    #     #テキスト描画
+    #     draw.text(point, text, fill=color, font=font)
 
-        #テキスト描画
-        draw.text(point, text, fill=color, font=font)
-
-        #PILからndarrayに変換して返す
-        return np.array(img_pil)
+    #     #PILからndarrayに変換して返す
+    #     return np.array(img_pil)
     
     # def flattern_dict(self,d):
     #     d_flatten={}
@@ -402,6 +403,44 @@ class Manager():
                 )
             )
         return fig
+    
+    def draw_japanese_text(self,img, text, position, text_color=(255, 255, 255), bg_color=None, font_path="NotoSansCJK-Regular.ttc", font_size=30):
+        """
+        OpenCVの画像に日本語テキストを描画する関数
+
+        Parameters:
+            img (numpy.ndarray): OpenCVで読み込んだ画像
+            text (str): 描画する日本語テキスト
+            position (tuple): テキストの左上座標 (x, y)
+            text_color (tuple): 文字色（BGR）
+            bg_color (tuple or None): 背景色（BGR）、Noneの場合は背景なし
+            font_path (str): 使用するフォントのパス（日本語対応フォント）
+            font_size (int): フォントサイズ
+
+        Returns:
+            numpy.ndarray: 日本語テキストを描画した画像
+        """
+        # OpenCVの画像をPillow形式に変換
+        img_pil = Image.fromarray(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
+        draw = ImageDraw.Draw(img_pil)
+
+        # フォントを設定
+        font = ImageFont.truetype(font_path, font_size)
+
+        # 背景色が指定されていれば背景を描画
+        if bg_color:
+            text_size = draw.textbbox(position, text, font=font)  # (left, top, right, bottom)
+            draw.rectangle(text_size, fill=bg_color)
+
+        # 日本語テキストを描画
+        draw.text(position, text, font=font, fill=text_color)
+
+        # Pillowの画像をOpenCV形式に変換して返す
+        return cv2.cvtColor(np.array(img_pil), cv2.COLOR_RGB2BGR)
+    
+    def color_converter(self,rgb_array):
+        bgr_array=(rgb_array[2],rgb_array[1],rgb_array[0])
+        return bgr_array
     
 if __name__=="__main__":
     cls=Manager()
