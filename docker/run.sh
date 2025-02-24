@@ -19,12 +19,15 @@ else
     echo "========================="
 
     docker run -it \
+    --device /dev/snd \
     --privileged \
     --gpus all \
+    -e PULSE_SERVER=unix:/run/user/$(id -u)/pulse/native \
     -e NVIDIA_VISIBLE_DEVICES=all \
     -e NVIDIA_DRIVER_CAPABILITIES=all \
     --env=DISPLAY=$DISPLAY \
     --volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" \
+    -v /run/user/$(id -u)/pulse:/run/user/$(id -u)/pulse \
     -v "/home/${USER}/.Xauthority:/home/${USER}/.Xauthority" \
     --env="QT_X11_NO_MITSHM=1" \
     --rm \

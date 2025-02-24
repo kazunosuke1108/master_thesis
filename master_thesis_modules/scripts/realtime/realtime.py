@@ -486,12 +486,24 @@ class RealtimeEvaluator(Manager,GraphManager):
                                     static_factor_node=additional_data_dicts["static_factor"]["most_significant_node"],
                                     dynamic_factor_node=additional_data_dicts["dynamic_factor"]["most_significant_node"],
                                     )
-            if notice_necessary:
-                # ["notificationId","timestamp","relativeTimestamp","patient","sentence","type","10000000"]
-                self.notify_history.loc[len(self.notify_history),:]=[self.notification_id,self.timestamp,self.timestamp,most_risky_patient,text,"notice",data_dicts[most_risky_patient]["10000000"]]
-                self.notification_id+=1
+            
             
             additional_data_dicts["alert"]=text
+
+            if notice_necessary:
+                notify_dict={
+                    "notificationId":self.notification_id,
+                    "timestamp":self.timestamp,
+                    "relativeTimestamp":self.timestamp,
+                    "patient":patient,
+                    "sentence":text,
+                    "type":"notice",
+                    "10000000":10000000
+                    }
+                self.notify_history.loc[len(self.notify_history),:]=[self.notification_id,self.timestamp,self.timestamp,most_risky_patient,text,"notice",data_dicts[most_risky_patient]["10000000"]]
+                self.notification_id+=1
+            else:
+                notify_dict={}
 
             # 今回の危険患者をメモ
             self.previous_risky_patient=most_risky_patient
@@ -499,11 +511,10 @@ class RealtimeEvaluator(Manager,GraphManager):
             for patient,rank in zip(patients,patients_rank):
                 additional_data_dicts["rank"][patient]={}
                 additional_data_dicts["rank"][patient]["10000000"]=rank
-            return additional_data_dicts
         except Exception as e:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             self.logger.error(f"line {exc_tb.tb_lineno}: {e}")
-            return additional_data_dicts
+        return additional_data_dicts,notify_dict
 
     def draw_bbox(self,elp_img,json_latest_data,patients):
         for patient in patients:
@@ -672,11 +683,13 @@ class RealtimeEvaluator(Manager,GraphManager):
             additional_data_dicts={}
             if len(patients)>0:
                 # リスク優先順位付け
-                additional_data_dicts=self.get_rank_and_text(data_dicts,additional_data_dicts)
+                additional_data_dicts,notify_dict=self.get_rank_and_text(data_dicts,additional_data_dicts)
                 additional_data_dicts_flatten=self.flatten_dict(additional_data_dicts)
                 self.df_post=pd.concat([self.df_post,pd.DataFrame(additional_data_dicts_flatten,index=[0])],axis=0)
                 self.df_post.reset_index(inplace=True,drop=True)            
-                Manager().write_json(additional_data_dicts,json_path=os.path.split(json_latest_path)[0]+"/additional_data_dicts.json")
+                self.write_json(additional_data_dicts,json_path=os.path.split(json_latest_path)[0]+"/additional_data_dicts.json")
+                if len(notify_dict)>0:
+                    self.write_json(notify_dict,json_path=os.path.split(json_latest_path)[0]+"/notify_dict.json")
 
             # 可視化
             if self.tf_draw_bbox:
@@ -701,7 +714,7 @@ class RealtimeEvaluator(Manager,GraphManager):
         self.notify_history.to_csv(self.data_dir_dict["mobilesensing_dir_path"]+"/csv/notify_history.csv",index=False)
 
 if __name__=="__main__":
-    trial_name="20250221Refactor"
+    trial_name="20250224PlayChime"
     strage="local"
     json_dir_path="/catkin_ws/src/database"+"/"+trial_name+"/json"
 
@@ -720,7 +733,14 @@ if __name__=="__main__":
     event_handler = JSONFileChangeHandler()
     observer = Observer()
     observer.schedule(event_handler, json_dir_path, recursive=False)
-    observer.start()    
+    while True:
+        try:
+            observer.start()
+            break
+        except FileNotFoundError:
+            print("dict_after_reid.json nor dict_after_reid_old.json not found")
+            time.sleep(0.1)
+            continue        
     print("Observation started")
 
     try:

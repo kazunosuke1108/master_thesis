@@ -68,6 +68,11 @@ class Notification(Manager):
 
         pass
 
+    def play_only_chime(self,chime_type=1):
+        chime_mp3_path=self.data_dir_dict["common_dir_path"]+f"/alert{chime_type}.mp3"
+        import playsound
+        playsound.playsound(chime_mp3_path, False)
+
     def save_audio(self,audio_data):
         pass
 
@@ -94,10 +99,15 @@ class Notification(Manager):
         pass
 
 if __name__=="__main__":
-    trial_name="20250121VoiceDemo"
-    strage="NASK"
+    # trial_name="20250121VoiceDemo"
+    # strage="NASK"
+    # cls=Notification(trial_name,strage)
+    # cls.main_dev()
+
+    trial_name="20250224OnlyChime"
+    strage="local"
     cls=Notification(trial_name,strage)
-    cls.main_dev()
+    cls.play_only_chime()
 
 
 """

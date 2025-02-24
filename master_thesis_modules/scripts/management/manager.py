@@ -147,8 +147,8 @@ class Manager():
 
     def write_json(self,dict_data,json_path):
         dict_data=self.convert_np_types(dict_data)
-        with open(json_path,mode="w") as f:
-            json.dump(dict_data,f)
+        with open(json_path,mode="w",encoding="utf-8") as f:
+            json.dump(dict_data,f,ensure_ascii=False)
 
     def load_json(self,json_path):
         with open(json_path,encoding="utf-8") as f:
