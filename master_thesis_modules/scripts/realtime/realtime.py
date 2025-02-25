@@ -3,6 +3,9 @@ import sys
 import copy
 import time
 from glob import glob
+import random
+random.seed(42)  # 例えば 42 に固定
+
 import json
 import cv2
 import atexit
@@ -108,8 +111,19 @@ class RealtimeEvaluator(Manager,GraphManager):
                 "direction":[0,0.1]
                 }
         }
+
+        num_colors = 100  # 100通りの色を用意
+        cmap = plt.get_cmap("gist_ncar")  # カラーマップを選択
+
+        # self.colors_01 = [cmap(i / num_colors) for i in range(num_colors)]
+        # self.colors = [(int(r * 255), int(g * 255), int(b * 255)) for r, g, b, _ in self.colors_01]
+        # random.shuffle(self.colors)
         self.colors_01 = plt.get_cmap("tab10").colors
         self.colors = [(int(b*255), int(g*255), int(r*255)) for r, g, b in self.colors_01]
+        self.colors=self.colors+self.colors
+        self.colors=self.colors+self.colors
+        self.colors=self.colors+self.colors
+        self.colors=self.colors+self.colors
 
         # switch
         self.left_right="right"
@@ -691,16 +705,20 @@ class RealtimeEvaluator(Manager,GraphManager):
         # ELP画像
         # bbox情報を用意（rank連携要検討）
         # 描画
-        elp_img=self.draw_bbox(elp_img=elp_img,json_latest_data=json_latest_data,patients=patients)
-        elp_img=self.draw_timestamp(elp_img=elp_img,json_latest_data=json_latest_data)
-        # rankの追記
-        elp_img=self.draw_rank(img=elp_img,data_dicts=data_dicts,additional_data_dicts=additional_data_dicts,patients=patients)
-        # draw notification text
-        elp_img=self.draw_notification(img=elp_img,additional_data_dicts=additional_data_dicts)
-        # 保存
-        cv2.imwrite(self.data_dir_dict["mobilesensing_dir_path"]+"/jpg/bbox/"+os.path.basename(elp_img_path),elp_img)
-        cv2.imwrite(self.data_dir_dict["mobilesensing_dir_path"]+"/jpg/console/bbox.jpg",elp_img)
-        pass
+        try:
+            elp_img=self.draw_bbox(elp_img=elp_img,json_latest_data=json_latest_data,patients=patients)
+            elp_img=self.draw_timestamp(elp_img=elp_img,json_latest_data=json_latest_data)
+            # rankの追記
+            elp_img=self.draw_rank(img=elp_img,data_dicts=data_dicts,additional_data_dicts=additional_data_dicts,patients=patients)
+            # draw notification text
+            elp_img=self.draw_notification(img=elp_img,additional_data_dicts=additional_data_dicts)
+            # 保存
+            cv2.imwrite(self.data_dir_dict["mobilesensing_dir_path"]+"/jpg/bbox/"+os.path.basename(elp_img_path),elp_img)
+            cv2.imwrite(self.data_dir_dict["mobilesensing_dir_path"]+"/jpg/console/bbox.jpg",elp_img)
+        except Exception as e:
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            self.logger.error(f"line {exc_tb.tb_lineno}: {e}")
+            pass
 
     def evaluate_main(self):
         try:
@@ -774,7 +792,7 @@ class RealtimeEvaluator(Manager,GraphManager):
         self.notify_history.to_csv(self.data_dir_dict["mobilesensing_dir_path"]+"/csv/notify_history.csv",index=False)
 
 if __name__=="__main__":
-    trial_name="20250225NewPosition"
+    trial_name="20250225Ball"
     strage="local"
     json_dir_path="/catkin_ws/src/database"+"/"+trial_name+"/json"
 
@@ -800,7 +818,7 @@ if __name__=="__main__":
         except FileNotFoundError:
             print("dict_after_reid.json nor dict_after_reid_old.json not found")
             time.sleep(0.1)
-            continue        
+            continue
     print("Observation started")
 
     try:

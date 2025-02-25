@@ -114,7 +114,7 @@ class Visualizer(Manager):
         pass
 
 if __name__=="__main__":
-    trial_name="20250224NameDict"
+    trial_name="20250225Ball"
     strage="local"
     cls=Visualizer(trial_name,strage)
     cls.export_movies(map=False,bbox=True)
