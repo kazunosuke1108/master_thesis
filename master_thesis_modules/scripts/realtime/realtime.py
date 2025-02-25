@@ -774,7 +774,7 @@ class RealtimeEvaluator(Manager,GraphManager):
         self.notify_history.to_csv(self.data_dir_dict["mobilesensing_dir_path"]+"/csv/notify_history.csv",index=False)
 
 if __name__=="__main__":
-    trial_name="20250225fixconfig"
+    trial_name="20250225NewPosition"
     strage="local"
     json_dir_path="/catkin_ws/src/database"+"/"+trial_name+"/json"
 
