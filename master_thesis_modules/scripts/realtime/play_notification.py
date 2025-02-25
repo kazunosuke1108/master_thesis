@@ -35,6 +35,7 @@ class JSONFileChangeHandler(FileSystemEventHandler):
         if os.path.basename(event.src_path) in WATCHED_FILES:
             print(f"File changed: {event.src_path}")
             cls.play_sound()
+            cls.play_voice()
             
 class NotificationPlayer(Manager):
     def __init__(self,trial_name,strage):
@@ -50,14 +51,19 @@ class NotificationPlayer(Manager):
         pass
 
     def play_voice(self):
-        
+        json_path=self.data_dir_dict["mobilesensing_dir_path"]+"/json/notify_dict.json"
+        notify_dict=self.load_json(json_path=json_path)
+        text=notify_dict["sentence"]
+        mp3_path=self.data_dir_dict["mobilesensing_dir_path"]+f"/mp3/{str(notify_dict['notificationId']).zfill(3)}.mp3"
+        self.cls_notification.export_audio(text=text,mp3_path=mp3_path)
+        self.cls_notification.play_mp3(mp3_path=mp3_path)
         pass
         
     
 
 
 if __name__=="__main__":
-    trial_name="20250224ShowText"
+    trial_name="20250224NameDict"
     strage="local"
     json_dir_path="/catkin_ws/src/database"+"/"+trial_name+"/json"
     cls=NotificationPlayer(trial_name,strage)

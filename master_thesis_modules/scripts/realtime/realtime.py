@@ -112,10 +112,11 @@ class RealtimeEvaluator(Manager,GraphManager):
         self.colors = [(int(b*255), int(g*255), int(r*255)) for r, g, b in self.colors_01]
 
         # switch
-        self.left_right="left"
+        self.left_right="right"
         self.yolo_debug=True
         self.tf_draw_map=False
         self.tf_draw_bbox=True
+        self.tf_draw_name_on_bbox=False
         self.tf_throttling=False
 
         self.logger.info(f"RealtimeEvaluator has woken up")
@@ -563,9 +564,10 @@ class RealtimeEvaluator(Manager,GraphManager):
             # else:
             thickness=4
             cv2.rectangle(elp_img,bbox_info[0],bbox_info[1],self.colors[int(patient)], thickness=thickness)
-            elp_img=self.draw_japanese_text(img=elp_img,text=self.get_patient_name(patient),position=bbox_info[0],bg_color=self.color_converter(self.colors[int(patient)]),font_size=15)
 
-            # 氏名・順位を書き足したい
+            # 氏名を書き足す
+            if self.tf_draw_name_on_bbox:
+                elp_img=self.draw_japanese_text(img=elp_img,text=self.get_patient_name(patient),position=bbox_info[0],bg_color=self.color_converter(self.colors[int(patient)]),font_size=15)
         return elp_img
         
     def draw_timestamp(self,elp_img,json_latest_data):
@@ -667,10 +669,14 @@ class RealtimeEvaluator(Manager,GraphManager):
         return img
     
     def draw_notification(self,img,additional_data_dicts):
-        text=additional_data_dicts["alert"]
-        most_risky_patient=additional_data_dicts["most_risky_patient"]
         anchor=(50,600)
-        img=self.draw_japanese_text(img=img,text=text,position=anchor,text_color=(255,255,255),bg_color=self.color_converter(self.colors[int(most_risky_patient)]),)
+        try:
+            text=additional_data_dicts["alert"]
+            most_risky_patient=additional_data_dicts["most_risky_patient"]
+            img=self.draw_japanese_text(img=img,text=text,position=anchor,text_color=(255,255,255),bg_color=self.color_converter(self.colors[int(most_risky_patient)]),)
+        except KeyError:
+            text=""
+            most_risky_patient="00000"
         return img
 
     def draw_pos(self,data_dicts,patients):
@@ -768,7 +774,7 @@ class RealtimeEvaluator(Manager,GraphManager):
         self.notify_history.to_csv(self.data_dir_dict["mobilesensing_dir_path"]+"/csv/notify_history.csv",index=False)
 
 if __name__=="__main__":
-    trial_name="20250224NameOnBbox"
+    trial_name="20250225fixconfig"
     strage="local"
     json_dir_path="/catkin_ws/src/database"+"/"+trial_name+"/json"
 
