@@ -26,7 +26,7 @@ if "catkin_ws" in os.getcwd():
 else:
     sys.path.append(os.path.expanduser("~")+"/kazu_ws/master_thesis/master_thesis_modules")
 from scripts.management.manager import Manager
-from scripts.master_v3 import Master
+from scripts.master_v4 import Master
 from scripts.network.graph_manager_v3 import GraphManager
 # from scripts.preprocess.preprocess_blip_snapshot import PreprocessBlip
 from scripts.preprocess.preprocess_zokusei_snapshot import PreprocessZokusei
@@ -259,6 +259,7 @@ class RealtimeEvaluator(Manager,GraphManager):
             # position (6)
             data_dicts[patient]["60010000"]=self.json_latest_data[patient+"_x"]
             data_dicts[patient]["60010001"]=self.json_latest_data[patient+"_y"]
+            data_dicts[patient]["60010002"]=self.json_latest_data[patient+"_zmax"]
 
             # feature (5)
             ## BLIP系 属性・物体(手すり以外)
@@ -792,7 +793,7 @@ class RealtimeEvaluator(Manager,GraphManager):
         self.notify_history.to_csv(self.data_dir_dict["mobilesensing_dir_path"]+"/csv/notify_history.csv",index=False)
 
 if __name__=="__main__":
-    trial_name="20250226B28v2"
+    trial_name="20250226B28short"
     strage="local"
     json_dir_path="/catkin_ws/src/database"+"/"+trial_name+"/json"
 

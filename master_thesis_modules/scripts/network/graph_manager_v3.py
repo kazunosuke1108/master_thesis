@@ -442,6 +442,15 @@ class GraphManager():
                     "description_ja":"",
                     "node_code_to":[]
                     },
+            "60010002":{
+                    "score":np.nan,
+                    "status":"active",
+                    "description_en":"Risk ratio",
+                    "layer":6,
+                    "node_type":"static",
+                    "description_ja":"",
+                    "node_code_to":[]
+                    },
             "70000000":{
                     "score":np.nan,
                     "status":"active",

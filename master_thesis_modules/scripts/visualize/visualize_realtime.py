@@ -119,7 +119,7 @@ class Visualizer(Manager):
         pass
 
 if __name__=="__main__":
-    trial_name="20250226B28v2"
+    trial_name="20250226B28short"
     strage="local"
     cls=Visualizer(trial_name,strage)
     # cls.export_movies(map=False,bbox=True)
