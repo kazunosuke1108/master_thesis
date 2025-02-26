@@ -168,7 +168,7 @@ class PreprocessYolo(Manager,blipTools):
         # 拡張bounding boxの切り出し
         extend_ratio_tb=0.025
         extend_ratio_lr=0.025
-        t_e,b_e,l_e,r_e,=np.max([t-extend_ratio_tb*rgb_img.shape[0],0]),np.min([b+extend_ratio_tb*rgb_img.shape[0],rgb_img.shape[0]]),np.max([l-extend_ratio_lr*rgb_img.shape[1],0]),np.min([r+extend_ratio_lr*rgb_img.shape[1],rgb_img.shape[0]])
+        t_e,b_e,l_e,r_e,=np.max([t-extend_ratio_tb*rgb_img.shape[0],0]),np.min([b+extend_ratio_tb*rgb_img.shape[0],rgb_img.shape[0]]),np.max([l-extend_ratio_lr*rgb_img.shape[1],0]),np.min([r+extend_ratio_lr*rgb_img.shape[1],rgb_img.shape[1]])
         t_e,b_e,l_e,r_e=int(t_e),int(b_e),int(l_e),int(r_e)
         extended_bbox_rgb_img=rgb_img[t_e:b_e,l_e:r_e]
 

@@ -91,6 +91,10 @@ class Visualizer(Manager):
         eval_data=pd.read_csv(csv_eval_path,header=0)
         patients=sorted(list(set([k.split("_")[0] for k in eval_data.keys() if "timestamp" not in k])))
         nodes=sorted(list(set([k.split("_")[1] for k in eval_data.keys() if "timestamp" not in k])))
+
+        t_range=[1740479370,1740479450]
+
+
         for node in nodes:
             print(node)
             for patient in patients:
@@ -105,6 +109,7 @@ class Visualizer(Manager):
                 else:
                     # plt.plot(eval_data["timestamp"],eval_data[patient+"_"+node],label=patient)
                     plt.plot(eval_data["timestamp"].rolling(5).mean(),eval_data[patient+"_"+node].rolling(5).mean(),label=patient)
+                    plt.xlim(t_range)
             plt.legend()
             plt.grid()
             plt.title(node)
@@ -114,9 +119,9 @@ class Visualizer(Manager):
         pass
 
 if __name__=="__main__":
-    trial_name="20250225Ball"
+    trial_name="20250226B28v2"
     strage="local"
     cls=Visualizer(trial_name,strage)
-    cls.export_movies(map=False,bbox=True)
+    # cls.export_movies(map=False,bbox=True)
     cls.export_timeseries()
-    cls.export_characters()
+    # cls.export_characters()

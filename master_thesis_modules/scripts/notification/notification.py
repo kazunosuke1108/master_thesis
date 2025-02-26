@@ -98,8 +98,8 @@ class Notification(Manager):
         # self.export_audio(text=text,mp3_path="/media/hayashide/MasterThesis/20250121VoiceDemo"+"/chime1.mp3",chime_type=1,speed=1.25)
         # self.export_audio(text=text,mp3_path="/media/hayashide/MasterThesis/20250121VoiceDemo"+"/chime2.mp3",chime_type=2,speed=1.25)
         self.data_dir_dict=self.get_database_dir(trial_name=self.trial_name,strage=self.strage)
-        text="音声生成のテストデータです。"
-        self.export_audio(text=text,mp3_path=self.data_dir_dict["mobilesensing_dir_path"]+f"/mp3/test.mp3")
+        text="Aさんが、車椅子を動かそうとしています"
+        self.export_audio(text=text,mp3_path="test_simmple.mp3")
 
         pass
 
@@ -109,10 +109,10 @@ if __name__=="__main__":
     # cls=Notification(trial_name,strage)
     # cls.main_dev()
 
-    trial_name="20250225VoiceSetup"
+    trial_name="20250226SampleVoice"
     strage="local"
     cls=Notification(trial_name,strage)
-    cls.play_only_chime()
+    # cls.play_only_chime()
     cls.main_dev()
 
 
