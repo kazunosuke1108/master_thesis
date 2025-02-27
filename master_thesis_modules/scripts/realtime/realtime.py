@@ -74,7 +74,7 @@ class RealtimeEvaluator(Manager,GraphManager):
         self.notify_threshold_by_dinamic_factor={
             "40000000":0.3,
             "40000001":0.4,
-            "40000010":0.9,
+            "40000010":0.75,
             "40000011":0.9,
             "40000012":0.9,
             "40000013":0.4,
@@ -87,7 +87,7 @@ class RealtimeEvaluator(Manager,GraphManager):
             "40000110":0.5,
             "40000111":0.5,
         }
-        self.total_risk_threshold=0.4
+        self.total_risk_threshold=0.3
         self.notification_id=0
         self.previous_risky_patient=""
 
@@ -833,7 +833,7 @@ class RealtimeEvaluator(Manager,GraphManager):
         save_notify_history.to_csv(self.data_dir_dict["mobilesensing_dir_path"]+f"/csv/notify_history_{self.timestamp}.csv",index=False)
 
 if __name__=="__main__":
-    trial_name="20250227sleep7"
+    trial_name="20250227Both3"
     strage="local"
     json_dir_path="/catkin_ws/src/database"+"/"+trial_name+"/json"
 

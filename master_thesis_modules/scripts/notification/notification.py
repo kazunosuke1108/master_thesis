@@ -98,26 +98,35 @@ class Notification(Manager):
         # self.export_audio(text=text,mp3_path="/media/hayashide/MasterThesis/20250121VoiceDemo"+"/chime1.mp3",chime_type=1,speed=1.25)
         # self.export_audio(text=text,mp3_path="/media/hayashide/MasterThesis/20250121VoiceDemo"+"/chime2.mp3",chime_type=2,speed=1.25)
         self.data_dir_dict=self.get_database_dir(trial_name=self.trial_name,strage=self.strage)
-        text="Aさんが、車椅子を動かそうとしています"
-        self.export_audio(text=text,mp3_path=self.data_dir_dict["trial_dir_path"]+f"/{text}.mp3")
-        text="車椅子を自立して操縦してはいけないAさんが、車椅子を動かそうとしています"
-        self.export_audio(text=text,mp3_path=self.data_dir_dict["trial_dir_path"]+f"/{text}.mp3")
-        text="Aさんが、姿勢を崩しています"
-        self.export_audio(text=text,mp3_path=self.data_dir_dict["trial_dir_path"]+f"/{text}.mp3")
-        text="転倒リスクが高いAさんが、姿勢を崩しています"
-        self.export_audio(text=text,mp3_path=self.data_dir_dict["trial_dir_path"]+f"/{text}.mp3")
-        text="Aさんが、立とうとしています"
-        self.export_audio(text=text,mp3_path=self.data_dir_dict["trial_dir_path"]+f"/{text}.mp3")
-        text="転倒リスクが高いAさんが、立とうとしています"
-        self.export_audio(text=text,mp3_path=self.data_dir_dict["trial_dir_path"]+f"/{text}.mp3")
-        text="Aさんが、顔を触っています"
-        self.export_audio(text=text,mp3_path=self.data_dir_dict["trial_dir_path"]+f"/{text}.mp3")
-        text="チューブを挿入しているAさんが、顔を触っています"
-        self.export_audio(text=text,mp3_path=self.data_dir_dict["trial_dir_path"]+f"/{text}.mp3")
-        text="Aさんが、手を挙げています"
-        self.export_audio(text=text,mp3_path=self.data_dir_dict["trial_dir_path"]+f"/{text}.mp3")
-        text="重症度の高いAさんが、手を挙げています"
-        self.export_audio(text=text,mp3_path=self.data_dir_dict["trial_dir_path"]+f"/{text}.mp3")
+        
+        text="スタッフが見ていないAさんが，姿勢を崩しています．"
+        self.export_audio(text=text,mp3_path=self.data_dir_dict["trial_dir_path"]+f"/0_{text}.mp3")
+        text="スタッフが見ていないFさんが，立ち上がっています．"
+        self.export_audio(text=text,mp3_path=self.data_dir_dict["trial_dir_path"]+f"/1_{text}.mp3")
+        text="スタッフが見ていないAさんが，姿勢を崩しています．"
+        self.export_audio(text=text,mp3_path=self.data_dir_dict["trial_dir_path"]+f"/2_{text}.mp3")
+        text="スタッフが見ていないLさんが，姿勢を崩しています．"
+        self.export_audio(text=text,mp3_path=self.data_dir_dict["trial_dir_path"]+f"/3_{text}.mp3")
+        # text="Aさんが、車椅子を動かそうとしています"
+        # self.export_audio(text=text,mp3_path=self.data_dir_dict["trial_dir_path"]+f"/{text}.mp3")
+        # text="車椅子を自立して操縦してはいけないAさんが、車椅子を動かそうとしています"
+        # self.export_audio(text=text,mp3_path=self.data_dir_dict["trial_dir_path"]+f"/{text}.mp3")
+        # text="Aさんが、姿勢を崩しています"
+        # self.export_audio(text=text,mp3_path=self.data_dir_dict["trial_dir_path"]+f"/{text}.mp3")
+        # text="転倒リスクが高いAさんが、姿勢を崩しています"
+        # self.export_audio(text=text,mp3_path=self.data_dir_dict["trial_dir_path"]+f"/{text}.mp3")
+        # text="Aさんが、立とうとしています"
+        # self.export_audio(text=text,mp3_path=self.data_dir_dict["trial_dir_path"]+f"/{text}.mp3")
+        # text="転倒リスクが高いAさんが、立とうとしています"
+        # self.export_audio(text=text,mp3_path=self.data_dir_dict["trial_dir_path"]+f"/{text}.mp3")
+        # text="Aさんが、顔を触っています"
+        # self.export_audio(text=text,mp3_path=self.data_dir_dict["trial_dir_path"]+f"/{text}.mp3")
+        # text="チューブを挿入しているAさんが、顔を触っています"
+        # self.export_audio(text=text,mp3_path=self.data_dir_dict["trial_dir_path"]+f"/{text}.mp3")
+        # text="Aさんが、手を挙げています"
+        # self.export_audio(text=text,mp3_path=self.data_dir_dict["trial_dir_path"]+f"/{text}.mp3")
+        # text="重症度の高いAさんが、手を挙げています"
+        # self.export_audio(text=text,mp3_path=self.data_dir_dict["trial_dir_path"]+f"/{text}.mp3")
         
 if __name__=="__main__":
     # trial_name="20250121VoiceDemo"
@@ -125,7 +134,7 @@ if __name__=="__main__":
     # cls=Notification(trial_name,strage)
     # cls.main_dev()
 
-    trial_name="20250226SampleVoice"
+    trial_name="20250227Visualize2"
     strage="local"
     cls=Notification(trial_name,strage)
     # cls.play_only_chime()

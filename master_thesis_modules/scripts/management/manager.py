@@ -79,6 +79,7 @@ class Manager():
 
     def get_database_dir(self,trial_name="NoTrialNameGiven",strage="NASK"):
         module_dir_path=self.get_module_path()
+        print(module_dir_path)
 
         if (strage=="NASK") or (strage=="nask"):
             if os.name=="nt": # Windows
@@ -110,6 +111,7 @@ class Manager():
             "trial_dir_path":trial_dir_path,
             "common_dir_path":common_dir_path,
         }
+        print(database_dir_dict)
 
         for path in database_dir_dict.values():
             os.makedirs(path,exist_ok=True)
