@@ -70,14 +70,14 @@ class RealtimeEvaluator(Manager,GraphManager):
         self.map_fig,self.map_ax=self.plot_map_matplotlib()
 
         # notification params
-        self.notify_interval_dict={"general":5,"notice":5,"help":10,"notice2help":5}
+        self.notify_interval_dict={"general":10,"notice":5,"help":10,"notice2help":5}
         self.notify_threshold_by_dinamic_factor={
             "40000000":0.3,
             "40000001":0.4,
-            "40000010":0.2,
-            "40000011":0.33,
-            "40000012":0.4,
-            "40000013":0.6,
+            "40000010":0.9,
+            "40000011":0.9,
+            "40000012":0.9,
+            "40000013":0.4,
             "40000014":0.6,
             "40000015":0.5,
             "40000016":0.5,
@@ -87,6 +87,7 @@ class RealtimeEvaluator(Manager,GraphManager):
             "40000110":0.5,
             "40000111":0.5,
         }
+        self.total_risk_threshold=0.4
         self.notification_id=0
         self.previous_risky_patient=""
 
@@ -131,7 +132,7 @@ class RealtimeEvaluator(Manager,GraphManager):
         self.colors=self.colors+self.colors
         self.colors=self.colors+self.colors
 
-        self.num2alpha = lambda c: chr(c+64)
+        self.num2alpha = lambda c: chr(c+65)
 
         # switch
         self.left_right="right"
@@ -398,6 +399,13 @@ class RealtimeEvaluator(Manager,GraphManager):
                 data_corr=data.corr()[focus_patient+"_10000000"]
                 # 一番相関が高い4000番台の因子を抜き出す
                 data_corr_4000=data_corr[[focus_patient+"_"+k for k in focus_keys_dynamic]]
+                data_corr_4000[focus_patient+"_40000010"]=data_corr_4000[focus_patient+"_40000010"]*0.49
+                data_corr_4000[focus_patient+"_40000011"]=data_corr_4000[focus_patient+"_40000011"]*0.08
+                data_corr_4000[focus_patient+"_40000012"]=data_corr_4000[focus_patient+"_40000012"]*0.16
+                data_corr_4000[focus_patient+"_40000013"]=data_corr_4000[focus_patient+"_40000013"]*0.17
+                data_corr_4000[focus_patient+"_40000014"]=data_corr_4000[focus_patient+"_40000014"]*0.03
+                data_corr_4000[focus_patient+"_40000015"]=data_corr_4000[focus_patient+"_40000015"]*0.05
+                data_corr_4000[focus_patient+"_40000016"]=data_corr_4000[focus_patient+"_40000016"]*0.03
                 most_corr_key=list(data_corr_4000.keys())[data_corr_4000.argmax()]
                 most_corr_node=most_corr_key.replace(focus_patient+"_","")
                 additional_data_dicts["dynamic_factor"]["most_significant_node"]=most_corr_node
@@ -476,6 +484,13 @@ class RealtimeEvaluator(Manager,GraphManager):
                     rank_change=True
                 return rank_change
             
+            def judge_total_risk(most_risky_patient,data_dicts):
+                total_risk=data_dicts[most_risky_patient]["10000000"]
+                if total_risk>self.total_risk_threshold:
+                    return True
+                else:
+                    return False
+
             def judge_above_dynamic_thre(most_risky_patient,dynamic_factor_node):
                 node_val=self.df_eval.loc[len(self.df_eval)-1,most_risky_patient+"_"+dynamic_factor_node]
                 if node_val>self.notify_threshold_by_dinamic_factor[dynamic_factor_node]:
@@ -497,12 +512,15 @@ class RealtimeEvaluator(Manager,GraphManager):
                 ## C dynamic_factor_node毎の通知基準値を超越しているか
                 tf_dynamic_node=judge_above_dynamic_thre(most_risky_patient,dynamic_factor_node)
 
+                ## D total riskが基準値以上か
+                tf_total_risk=judge_total_risk(most_risky_patient=most_risky_patient,data_dicts=data_dicts)
+
                 
-                if tf_interval_notify and tf_rank_change and tf_dynamic_node: # すべての条件を充足したら通知を実行
-                    self.logger.warning(f"経過時間：{tf_interval_notify}　順位変更：{tf_rank_change}　ノード閾値以上：{tf_dynamic_node}　➡　通知実行")
+                if tf_interval_notify and tf_rank_change and tf_dynamic_node and tf_total_risk: # すべての条件を充足したら通知を実行
+                    self.logger.warning(f"経過時間：{tf_interval_notify}　順位変更：{tf_rank_change}　ノード閾値以上：{tf_dynamic_node}　総合危険度しきい値以上：{tf_total_risk}　➡　通知実行")
                     return True
                 else:
-                    self.logger.warning(f"経過時間：{tf_interval_notify}　順位変更：{tf_rank_change}　ノード閾値以上：{tf_dynamic_node}　➡　通知見送り")
+                    self.logger.warning(f"経過時間：{tf_interval_notify}　順位変更：{tf_rank_change}　ノード閾値以上：{tf_dynamic_node}　総合危険度しきい値以上：{tf_total_risk}　➡　通知見送り")
                     return False
 
             except Exception as e:
@@ -561,7 +579,9 @@ class RealtimeEvaluator(Manager,GraphManager):
                     "patient":most_risky_patient,
                     "sentence":text,
                     "type":"notice",
-                    "10000000":10000000
+                    "10000000":data_dicts[most_risky_patient]["10000000"],
+                    "significantDynamicVal":data_dicts[most_risky_patient][additional_data_dicts["dynamic_factor"]["most_significant_node"]],
+                    "significantStaticVal":data_dicts[most_risky_patient][additional_data_dicts["static_factor"]["most_significant_node"]],
                     }
                 self.notify_history.loc[len(self.notify_history),:]=[self.notification_id,self.timestamp,self.timestamp,most_risky_patient,text,"notice",data_dicts[most_risky_patient]["10000000"]]
                 self.notification_id+=1
@@ -697,15 +717,18 @@ class RealtimeEvaluator(Manager,GraphManager):
 
         return img
     
-    def draw_notification(self,img,additional_data_dicts):
+    def draw_notification(self,img,additional_data_dicts,notify_history):
         anchor=(50,600)
-        try:
-            text=additional_data_dicts["alert"]
-            most_risky_patient=additional_data_dicts["most_risky_patient"]
-            img=self.draw_japanese_text(img=img,text=text,position=anchor,text_color=(255,255,255),bg_color=self.color_converter(self.colors[int(most_risky_patient)]),)
-        except KeyError:
-            text=""
-            most_risky_patient="00000"
+        if len(notify_history)>0:
+            last_notice_timestamp=notify_history.loc[len(notify_history)-1,"timestamp"]
+            if self.timestamp-last_notice_timestamp>10:
+                try:
+                    text=additional_data_dicts["alert"]
+                    most_risky_patient=additional_data_dicts["most_risky_patient"]
+                    img=self.draw_japanese_text(img=img,text=text,position=anchor,text_color=(255,255,255),bg_color=self.color_converter(self.colors[int(most_risky_patient)]),)
+                except KeyError:
+                    text=""
+                    most_risky_patient="00000"
         return img
 
     def draw_pos(self,data_dicts,patients):
@@ -716,7 +739,7 @@ class RealtimeEvaluator(Manager,GraphManager):
         plt.title(self.timestamp)
         plt.savefig(self.data_dir_dict["mobilesensing_dir_path"]+f"/jpg/map/{os.path.basename(self.elp_img_path)}")
         
-    def draw_export_img(self,elp_img_path,elp_img,json_latest_data,data_dicts,additional_data_dicts,patients):
+    def draw_export_img(self,elp_img_path,elp_img,json_latest_data,data_dicts,additional_data_dicts,patients,notify_dict):
         # ELP画像
         # bbox情報を用意（rank連携要検討）
         # 描画
@@ -726,7 +749,7 @@ class RealtimeEvaluator(Manager,GraphManager):
             # rankの追記
             elp_img=self.draw_rank(img=elp_img,data_dicts=data_dicts,additional_data_dicts=additional_data_dicts,patients=patients)
             # draw notification text
-            elp_img=self.draw_notification(img=elp_img,additional_data_dicts=additional_data_dicts)
+            elp_img=self.draw_notification(img=elp_img,additional_data_dicts=additional_data_dicts,notify_history=self.notify_history)
             # 保存
             cv2.imwrite(self.data_dir_dict["mobilesensing_dir_path"]+"/jpg/bbox/"+os.path.basename(elp_img_path),elp_img)
             cv2.imwrite(self.data_dir_dict["mobilesensing_dir_path"]+"/jpg/console/bbox.jpg",elp_img)
@@ -784,7 +807,7 @@ class RealtimeEvaluator(Manager,GraphManager):
             if self.tf_draw_bbox:
                 self.logger.info(f"Drawing bbox image...Time: {np.round(time.time()-self.start,4)}")
                 patients=list(data_dicts.keys())
-                self.draw_export_img(self.elp_img_path,self.elp_img,json_latest_data,data_dicts,additional_data_dicts,patients)
+                self.draw_export_img(self.elp_img_path,self.elp_img,json_latest_data,data_dicts,additional_data_dicts,patients,notify_dict)
             if self.tf_draw_map:
                 self.logger.info(f"Drawing map image...Time: {np.round(time.time()-self.start,4)}")
                 self.draw_pos(data_dicts=data_dicts,patients=patients)
@@ -810,7 +833,7 @@ class RealtimeEvaluator(Manager,GraphManager):
         save_notify_history.to_csv(self.data_dir_dict["mobilesensing_dir_path"]+f"/csv/notify_history_{self.timestamp}.csv",index=False)
 
 if __name__=="__main__":
-    trial_name="20250226Night"
+    trial_name="20250227sleep7"
     strage="local"
     json_dir_path="/catkin_ws/src/database"+"/"+trial_name+"/json"
 

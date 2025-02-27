@@ -92,7 +92,7 @@ class Visualizer(Manager):
         patients=sorted(list(set([k.split("_")[0] for k in eval_data.keys() if "timestamp" not in k])))
         nodes=sorted(list(set([k.split("_")[1] for k in eval_data.keys() if "timestamp" not in k])))
 
-        t_range=[1740479370,1740479450]
+        # t_range=[1740479370,1740479450]
 
 
         for node in nodes:
@@ -109,7 +109,7 @@ class Visualizer(Manager):
                 else:
                     # plt.plot(eval_data["timestamp"],eval_data[patient+"_"+node],label=patient)
                     plt.plot(eval_data["timestamp"].rolling(5).mean(),eval_data[patient+"_"+node].rolling(5).mean(),label=patient)
-                    plt.xlim(t_range)
+                    # plt.xlim(t_range)
             plt.legend()
             plt.grid()
             plt.title(node)
@@ -119,7 +119,7 @@ class Visualizer(Manager):
         pass
 
 if __name__=="__main__":
-    trial_name="20250226B28short"
+    trial_name="20250227sleep6"
     strage="local"
     cls=Visualizer(trial_name,strage)
     # cls.export_movies(map=False,bbox=True)
