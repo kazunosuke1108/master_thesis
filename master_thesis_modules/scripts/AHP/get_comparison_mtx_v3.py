@@ -121,7 +121,7 @@ class getConsistencyMtx(Manager):
 
 if __name__=="__main__":
     cls=getConsistencyMtx()
-    AHP_dict=cls.get_all_comparison_mtx_and_weight(trial_name="",strage="local",save_mtx=True,array_type=1)
+    AHP_dict=cls.get_all_comparison_mtx_and_weight(trial_name="",strage="local",save_mtx=True,array_type=3)
     print(AHP_dict["30000001"])
     print(AHP_dict["30000001"]["CI"])
     print(AHP_dict["30000010"])

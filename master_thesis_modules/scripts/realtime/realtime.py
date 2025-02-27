@@ -27,7 +27,7 @@ else:
     sys.path.append(os.path.expanduser("~")+"/kazu_ws/master_thesis/master_thesis_modules")
 from scripts.management.manager import Manager
 from scripts.master_v4 import Master
-from scripts.network.graph_manager_v3 import GraphManager
+from scripts.network.graph_manager_v4 import GraphManager
 # from scripts.preprocess.preprocess_blip_snapshot import PreprocessBlip
 from scripts.preprocess.preprocess_zokusei_snapshot import PreprocessZokusei
 from scripts.preprocess.preprocess_yolo_snapshot import PreprocessYolo
@@ -36,6 +36,8 @@ from scripts.preprocess.preprocess_objects_snapshot import PreprocessObject
 
 # 定数
 WATCHED_FILES = ["dict_after_reid.json","dict_after_reid_old.json"]
+START_TIME = time.time()  # 実行開始時刻を記録
+TIME_LIMIT = 5 * 60 * 60  # 5時間（18000秒）
 
 class JSONFileChangeHandler(FileSystemEventHandler):
     def on_modified(self, event):
@@ -95,20 +97,24 @@ class RealtimeEvaluator(Manager,GraphManager):
         # visualize関連
         self.structure_dict={
             "ivPole":[
-                np.array([-4,5]), # muに相当
-                np.array([6,5]),
+                np.array([-10,9]), # muに相当
+                np.array([-4,9]),
                 ],
             "wheelchair":[
-                np.array([0,6]),
-                np.array([0,8]),
+                np.array([-9,12]),
+                np.array([-5,12]),
                 ],
             "handrail":{
-                "xrange":[6,15],
-                "yrange":[-11,-4]
+                "xrange":[-10,-4],
+                "yrange":[9,15]
+                # "xrange":[6,15],
+                # "yrange":[-11,-4]
                 },
             "staff_station":{
-                "pos":[6,-7.5],
+                "pos":[-8,7],
                 "direction":[0,0.1]
+                # "pos":[6,-7.5],
+                # "direction":[0,0.1]
                 }
         }
 
@@ -124,6 +130,8 @@ class RealtimeEvaluator(Manager,GraphManager):
         self.colors=self.colors+self.colors
         self.colors=self.colors+self.colors
         self.colors=self.colors+self.colors
+
+        self.num2alpha = lambda c: chr(c+64)
 
         # switch
         self.left_right="right"
@@ -145,7 +153,7 @@ class RealtimeEvaluator(Manager,GraphManager):
 
         for patient in patients:
             if patient not in list(name_dict.keys()):
-                name_dict[patient]=patient
+                name_dict[patient]=self.num2alpha(int(patient))
         self.write_json(name_dict,self.name_dict_path)
         return name_dict
 
@@ -330,6 +338,9 @@ class RealtimeEvaluator(Manager,GraphManager):
                 for k in focus_keys:
                     if int(k[-2])==0: # static node
                         focus_keys_static.append(k)
+                # 見守り状況を追加
+                focus_keys_static.append("40000110")
+                focus_keys_static.append("40000111")
 
                 additional_data_dicts["static_factor"]["significance"]={}
                 # 顕著なノードの検出
@@ -378,8 +389,10 @@ class RealtimeEvaluator(Manager,GraphManager):
                         focus_keys.append(k)
                 focus_keys_dynamic=[]
                 for k in focus_keys:
-                    if int(k[-2])==1: # dynamic node
+                    if (int(k)>=40000010) and (int(k)<=40000019):
                         focus_keys_dynamic.append(k)
+                    # if int(k[-2])==1: # dynamic node
+                    #     focus_keys_dynamic.append(k)
                 
                 data=self.df_eval[[focus_patient+f"_{k}" for k in ["10000000"]+focus_keys_dynamic]].tail(20).rolling(self.smoothing_w).mean()
                 data_corr=data.corr()[focus_patient+"_10000000"]
@@ -507,7 +520,8 @@ class RealtimeEvaluator(Manager,GraphManager):
             else:
                 text_static=self.default_graph["node_dict"][static_factor_node]["description_ja"]
                 text_dynamic=self.default_graph["node_dict"][dynamic_factor_node]["description_ja"]
-                alert_text=f"{self.get_patient_name(patient_id=most_risky_patient)}さんが，元々{text_static}のに，{text_dynamic}ので，危険です．"
+                # alert_text=f"{self.get_patient_name(patient_id=most_risky_patient)}さんが，元々{text_static}のに，{text_dynamic}ので，危険です．"
+                alert_text=f"{text_static}{self.get_patient_name(patient_id=most_risky_patient)}さんが，{text_dynamic}．"
             return alert_text
 
         try:
@@ -544,7 +558,7 @@ class RealtimeEvaluator(Manager,GraphManager):
                     "notificationId":self.notification_id,
                     "timestamp":self.timestamp,
                     "relativeTimestamp":self.timestamp,
-                    "patient":patient,
+                    "patient":most_risky_patient,
                     "sentence":text,
                     "type":"notice",
                     "10000000":10000000
@@ -786,14 +800,17 @@ class RealtimeEvaluator(Manager,GraphManager):
     def save(self):
         self.df_eval.sort_index(axis=1,inplace=True)
         self.df_eval.to_csv(self.data_dir_dict["mobilesensing_dir_path"]+"/csv/df_eval.csv",index=False)
+        self.df_eval.to_csv(self.data_dir_dict["mobilesensing_dir_path"]+f"/csv/df_eval_{self.timestamp}.csv",index=False)
         self.df_post.sort_index(axis=1,inplace=True)
         self.df_post.to_csv(self.data_dir_dict["mobilesensing_dir_path"]+"/csv/df_post.csv",index=False)
+        self.df_post.to_csv(self.data_dir_dict["mobilesensing_dir_path"]+f"/csv/df_post_{self.timestamp}.csv",index=False)
     
-        self.notify_history.sort_index(axis=1,inplace=True)
-        self.notify_history.to_csv(self.data_dir_dict["mobilesensing_dir_path"]+"/csv/notify_history.csv",index=False)
+        save_notify_history=self.notify_history.sort_index(axis=1)
+        save_notify_history.to_csv(self.data_dir_dict["mobilesensing_dir_path"]+"/csv/notify_history.csv",index=False)
+        save_notify_history.to_csv(self.data_dir_dict["mobilesensing_dir_path"]+f"/csv/notify_history_{self.timestamp}.csv",index=False)
 
 if __name__=="__main__":
-    trial_name="20250226B28short"
+    trial_name="20250226Night"
     strage="local"
     json_dir_path="/catkin_ws/src/database"+"/"+trial_name+"/json"
 
@@ -825,6 +842,15 @@ if __name__=="__main__":
     try:
         while True:
             time.sleep(1)  # イベントループ
+            if int(time.time()-START_TIME)%60==0:
+                cls.save()
+        # 5時間経過したら終了
+            if time.time() - START_TIME > TIME_LIMIT:
+                print("5時間が経過したため、プログラムを終了します。")
+                observer.stop()
+                observer.join()
+                atexit.register(cls.save)
+                sys.exit()
     except KeyboardInterrupt:
         observer.stop()
     observer.join()
