@@ -18,7 +18,12 @@ from scripts.management.manager import Manager
 
 csv_path="C:/Users/hyper/kazu_ws/master_thesis/master_thesis_modules/scripts/exp_analysis/preference_order/preference.csv"
 data=pd.read_csv(csv_path,header=0,index_col=0).T
-print(data)
+# print(data)
+# print(data["経験年数"].astype(float).mean())
+# data=data[data["経験年数"].astype(float)>data["経験年数"].astype(float).mean()/2]
+# print(data)
+# raise NotImplementedError
+# data=data[data["経験年数"]<10]
 
 result_dict={}
 result_table_dict={}
