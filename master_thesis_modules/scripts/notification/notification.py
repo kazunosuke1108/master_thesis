@@ -98,15 +98,26 @@ class Notification(Manager):
         # self.export_audio(text=text,mp3_path="/media/hayashide/MasterThesis/20250121VoiceDemo"+"/chime1.mp3",chime_type=1,speed=1.25)
         # self.export_audio(text=text,mp3_path="/media/hayashide/MasterThesis/20250121VoiceDemo"+"/chime2.mp3",chime_type=2,speed=1.25)
         self.data_dir_dict=self.get_database_dir(trial_name=self.trial_name,strage=self.strage)
+
         
-        text="スタッフが見ていないAさんが，姿勢を崩しています．"
+        text="スタッフが見ていないDさんが，姿勢を崩しています．"
         self.export_audio(text=text,mp3_path=self.data_dir_dict["trial_dir_path"]+f"/0_{text}.mp3")
-        text="スタッフが見ていないFさんが，立ち上がっています．"
-        self.export_audio(text=text,mp3_path=self.data_dir_dict["trial_dir_path"]+f"/1_{text}.mp3")
-        text="スタッフが見ていないAさんが，姿勢を崩しています．"
-        self.export_audio(text=text,mp3_path=self.data_dir_dict["trial_dir_path"]+f"/2_{text}.mp3")
-        text="スタッフが見ていないLさんが，姿勢を崩しています．"
-        self.export_audio(text=text,mp3_path=self.data_dir_dict["trial_dir_path"]+f"/3_{text}.mp3")
+        
+        # text="スタッフが見ていないDさんが，姿勢を崩しています．"
+        # self.export_audio(text=text,mp3_path=self.data_dir_dict["trial_dir_path"]+f"/0_{text}.mp3")
+        # text="スタッフが見ていないIさんが，バランスを崩しています．"
+        # self.export_audio(text=text,mp3_path=self.data_dir_dict["trial_dir_path"]+f"/1_{text}.mp3")
+        
+        # text="スタッフが見ていないDさんが，バランスを崩しています．"
+        # self.export_audio(text=text,mp3_path=self.data_dir_dict["trial_dir_path"]+f"/0_{text}.mp3")
+        # text="スタッフが見ていないFさんが，立ち上がっています．"
+        # self.export_audio(text=text,mp3_path=self.data_dir_dict["trial_dir_path"]+f"/1_{text}.mp3")
+        # text="スタッフが見ていないAさんが，姿勢を崩しています．"
+        # self.export_audio(text=text,mp3_path=self.data_dir_dict["trial_dir_path"]+f"/2_{text}.mp3")
+        # text="スタッフが見ていないLさんが，姿勢を崩しています．"
+        # self.export_audio(text=text,mp3_path=self.data_dir_dict["trial_dir_path"]+f"/3_{text}.mp3")
+
+
         # text="Aさんが、車椅子を動かそうとしています"
         # self.export_audio(text=text,mp3_path=self.data_dir_dict["trial_dir_path"]+f"/{text}.mp3")
         # text="車椅子を自立して操縦してはいけないAさんが、車椅子を動かそうとしています"
@@ -134,7 +145,7 @@ if __name__=="__main__":
     # cls=Notification(trial_name,strage)
     # cls.main_dev()
 
-    trial_name="20250227Visualize2"
+    trial_name="20250227Visualize5"
     strage="local"
     cls=Notification(trial_name,strage)
     # cls.play_only_chime()

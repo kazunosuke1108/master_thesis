@@ -833,7 +833,7 @@ class RealtimeEvaluator(Manager,GraphManager):
         save_notify_history.to_csv(self.data_dir_dict["mobilesensing_dir_path"]+f"/csv/notify_history_{self.timestamp}.csv",index=False)
 
 if __name__=="__main__":
-    trial_name="20250227Both3"
+    trial_name="20250227Both5"
     strage="local"
     json_dir_path="/catkin_ws/src/database"+"/"+trial_name+"/json"
 

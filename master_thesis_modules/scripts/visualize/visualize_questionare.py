@@ -25,7 +25,7 @@ from scripts.management.manager import Manager
 class VisualizeQuestionare(Manager):
     def __init__(self):
         super().__init__()
-        self.trial_dir_path="/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/database/20250227Visualize2"
+        self.trial_dir_path="/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/database/20250227Visualize21"
         os.makedirs(self.trial_dir_path+"/jpg",exist_ok=True)
         # ELP images
         self.elp_image_paths=sorted(glob("/home/hayashide/ytlab_ros_ws/ytlab_handheld_sensoring_system/ytlab_handheld_sensoring_system_modules/database/20250227Both3/jpg/elp/right/*.jpg"))
@@ -86,7 +86,7 @@ class VisualizeQuestionare(Manager):
         return elp_img
     
     def draw_notification(self,img,notify_dict):
-        img=self.draw_japanese_text(img=img,text=f"通知 {notify_dict['notificationId']+1}",position=(0,50),text_color=(255,255,255),bg_color=self.color_converter(self.colors[int(notify_dict["patient"])]),font_size=45)
+        img=self.draw_japanese_text(img=img,text=f"通知 {notify_dict['notificationId']+1+3}",position=(0,50),text_color=(255,255,255),bg_color=self.color_converter(self.colors[int(notify_dict["patient"])]),font_size=45)
         anchor=(50,600)
         text=notify_dict["sentence"].replace("バランス","姿勢")
         img=self.draw_japanese_text(img=img,text=text,position=anchor,text_color=(255,255,255),bg_color=self.color_converter(self.colors[int(notify_dict["patient"])]),font_size=45)
