@@ -1,5 +1,3 @@
-from icecream import ic
-
 import numpy as np
 np.random.seed(0)
 import pandas as pd
@@ -37,10 +35,6 @@ class EntropyWeightGenerator():
         entropy=-1/np.log(len(score_df.index))*(score_df*np.log(score_df)).sum()
         degree_of_diversification=1-entropy+1e-5
         weight=degree_of_diversification/degree_of_diversification.sum()
-        ic(score_df)
-        # ic(entropy)
-        ic(degree_of_diversification)
-        # ic(weight)
         # NaNが含まれた場合の対応
         for node in score_df.keys():
             if np.isnan(weight[node]) or abs(weight[node])==np.inf:

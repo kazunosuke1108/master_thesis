@@ -4,6 +4,7 @@ from pprint import pprint
 import json
 import yaml
 import pickle
+from collections import defaultdict
 
 import numpy as np
 import pandas as pd
@@ -447,7 +448,38 @@ class Manager():
     def color_converter(self,rgb_array):
         bgr_array=(rgb_array[2],rgb_array[1],rgb_array[0])
         return bgr_array
+
+
+    def nested_dict(self):
+        return defaultdict(self.nested_dict)
+
+    def nest_dict(self,flat_dict):
+        nested = self.nested_dict()
+        for composite_key, value in flat_dict.items():
+            keys = composite_key.split("_")
+            d = nested
+            for key in keys[:-1]:  # 最後のキーの一つ手前まで辞書をたどる
+                d = d[key]
+            d[keys[-1]] = value  # 最後のキーに値をセット
+        
+        return self.convert_defaultdict_to_dict(nested)
+
+    def convert_defaultdict_to_dict(self,d):
+        """defaultdictを通常のdictに変換する"""
+        if isinstance(d, defaultdict):
+            d = {k: self.convert_defaultdict_to_dict(v) for k, v in d.items()}
+        return d
     
+    def nest_dict_original(self,flat_dict):
+        new_dict={}
+        patients=sorted(list(set([k.split("_")[0] for k in flat_dict.keys() if "timestamp" not in k])))
+        values=sorted(list(set([k.split("_")[1] for k in flat_dict.keys() if "timestamp" not in k])))
+        for patient in patients:
+            new_dict[patient]={}
+            for value in values:
+                new_dict[patient][value]=flat_dict[patient+"_"+value]
+        new_dict["timestamp"]=flat_dict["timestamp"]
+        return new_dict
 if __name__=="__main__":
     cls=Manager()
     # cls.get_database_dir("NASK")

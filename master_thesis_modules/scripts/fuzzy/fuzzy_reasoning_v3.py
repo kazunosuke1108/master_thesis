@@ -1,7 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec
-from icecream import ic
 
 class FuzzyReasoning():
     def __init__(self):

@@ -3,7 +3,6 @@ import sys
 import copy
 from glob import glob
 
-from icecream import ic
 from pprint import pprint
 
 import numpy as np

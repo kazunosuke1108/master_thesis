@@ -108,7 +108,7 @@ class Visualizer(Manager):
                     pass
                 else:
                     # plt.plot(eval_data["timestamp"],eval_data[patient+"_"+node],label=patient)
-                    plt.plot(eval_data["timestamp"].rolling(5).mean(),eval_data[patient+"_"+node].rolling(5).mean(),label=patient)
+                    plt.plot(eval_data["timestamp"].rolling(20).mean(),eval_data[patient+"_"+node].rolling(20).mean(),label=patient)
                     # plt.xlim(t_range)
             plt.legend()
             plt.grid()
@@ -122,6 +122,6 @@ if __name__=="__main__":
     trial_name="20250307postAnalysis"
     strage="NASK"
     cls=Visualizer(trial_name,strage)
-    cls.export_movies(map=False,bbox=True)
+    # cls.export_movies(map=False,bbox=True)
     cls.export_timeseries()
     # cls.export_characters()

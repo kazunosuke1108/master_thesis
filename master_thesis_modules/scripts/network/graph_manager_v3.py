@@ -1,6 +1,5 @@
 # pip install -U kaleido
 import os
-from icecream import ic
 import copy
 import numpy as np
 import networkx as nx

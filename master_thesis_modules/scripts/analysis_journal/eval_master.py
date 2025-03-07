@@ -912,8 +912,8 @@ class RealtimeEvaluator(Manager,GraphManager):
 
 
 if __name__=="__main__":
-    trial_name="20250307postAnalysis"
-    attempt_name="changeYOLOparam2"
+    trial_name="20250307postAnalysis3"
+    attempt_name=""
     strage="NASK"
     # json_dir_path="/catkin_ws/src/database"+"/"+trial_name+"/json"
 
