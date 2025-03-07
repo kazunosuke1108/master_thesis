@@ -96,8 +96,10 @@ class Manager():
         elif strage=="local":
             database_dir_path=module_dir_path+"/database"
 
-        mobilesensing_dir_path=database_dir_path.replace("MasterThesis_database","MobileSensing")
-        mobilesensing_dir_path=f"/catkin_ws/src/database/{trial_name}"
+        if (strage=="NASK") or (strage=="nask"):
+            mobilesensing_dir_path=database_dir_path.replace("MasterThesis","MobileSensing")+f"/{trial_name}"
+        else:
+            mobilesensing_dir_path=f"/catkin_ws/src/database/{trial_name}"
 
         if "/" in trial_name:
             os.makedirs(database_dir_path+"/"+trial_name.split("/")[0],exist_ok=True)

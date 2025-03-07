@@ -298,7 +298,7 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
     
     def evaluate(self):
         # raise NotImplementedError
-        print("# 5 -> 4層推論 #")
+        # print("# 5 -> 4層推論 #")
         # 内的・静的
         self.fuzzy_logic()
         # 内的・動的
@@ -308,7 +308,7 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
         # 外的・動的
         self.staff_risk()
 
-        print("# 4 -> 3層推論 #")
+        # print("# 4 -> 3層推論 #")
         # 内定・静的
         self.fuzzy_multiply()
         # 内的・動的
@@ -318,7 +318,7 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
         # 外的・動的
         self.fuzzy_reasoning_master(input_node_codes=["40000110","40000111"],output_node_code="30000011")
 
-        print("# 3 -> 2層推論 #")
+        # print("# 3 -> 2層推論 #")
         # 内的
         # self.ewm_master(input_node_codes=["30000000","30000001"],output_node_code=20000000,dim="p")
         # self.fuzzy_reasoning_master(input_node_codes=["30000000","30000001"],output_node_code=20000000)
@@ -327,7 +327,7 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
         # self.ewm_master(input_node_codes=["30000010","30000011"],output_node_code=20000001)
         self.fuzzy_reasoning_master(input_node_codes=["30000010","30000011"],output_node_code="20000001")
         
-        print("# 2 -> 1層推論 #")
+        # print("# 2 -> 1層推論 #")
         # self.ewm_master(input_node_codes=[20000000,20000001],output_node_code=10000000)
         self.fuzzy_reasoning_master(input_node_codes=["20000000","20000001"],output_node_code="10000000")
         return self.data_dicts

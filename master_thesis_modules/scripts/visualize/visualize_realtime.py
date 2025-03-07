@@ -119,8 +119,8 @@ class Visualizer(Manager):
         pass
 
 if __name__=="__main__":
-    trial_name="20250227Both3"
-    strage="local"
+    trial_name="20250307postAnalysis"
+    strage="NASK"
     cls=Visualizer(trial_name,strage)
     cls.export_movies(map=False,bbox=True)
     cls.export_timeseries()

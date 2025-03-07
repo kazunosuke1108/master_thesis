@@ -106,6 +106,16 @@ class PreprocessYolo(Manager,blipTools):
         stand_ratio=3.5
         ratio=(np.clip(ratio,sit_ratio,stand_ratio)-sit_ratio)/(stand_ratio-sit_ratio)
         ratio=np.clip(ratio,0,1)# 念の為
+        if ((len(self.previous_eval_data)!=0) and (np.isnan(ratio))):
+            print("50000100がnanなので，前の値で補填")
+            try:
+                ratio=self.previous_eval_data[self.patient+"_50000100"]
+            except KeyError:
+                print("埋めようとしたけど当該患者の記録がない（初出患者？）のため，pass")
+                pass
+        if np.isnan(ratio):
+            print("50000100がnan．前の値で補填出来ず，0.5で埋める")
+            ratio=0.5
         return ratio
 
     def feature_lean(self,kp_dict):
@@ -113,9 +123,19 @@ class PreprocessYolo(Manager,blipTools):
         hip=np.array([np.nanmean([kp_dict["l_hip"]["x"],kp_dict["r_hip"]["x"]]),np.nanmean([kp_dict["l_hip"]["y"],kp_dict["r_hip"]["y"]])])
         theta=abs(np.arctan2(abs(shoulder[0]-hip[0]),abs(shoulder[1]-hip[1])))
         # stand_ratio=np.nanmax([0,np.nanmin([1,theta/(np.pi/2)])])
-        stand_ratio=theta/(np.pi/4)
-        stand_ratio=np.clip(stand_ratio,0,1)
-        return stand_ratio
+        lean_ratio=theta/(np.pi/4)
+        lean_ratio=np.clip(lean_ratio,0,1)
+        if ((len(self.previous_eval_data)!=0) and (np.isnan(lean_ratio))):
+            print("50000101がnanなので，前の値で補填")
+            try:
+                lean_ratio=self.previous_eval_data[self.patient+"_50000101"]
+            except KeyError:
+                print("埋めようとしたけど当該患者の記録がない（初出患者？）のため，pass")
+                pass
+        if np.isnan(lean_ratio):
+            print("50000101がnan．前の値で補填出来ず，0.5で埋める")
+            lean_ratio=0.5
+        return lean_ratio
     
     def feature_wrist(self,kp_dict):
         l_wrist_distance=np.sqrt(
@@ -135,7 +155,16 @@ class PreprocessYolo(Manager,blipTools):
         # wrist_ratio=np.nanmax([0,np.nanmin([1,wrist_distance/sebone])])
         wrist_ratio=wrist_distance/(sebone*2)
         wrist_ratio=np.clip(wrist_ratio,0,1)
-
+        if ((len(self.previous_eval_data)!=0) and (np.isnan(wrist_ratio))):
+            print("50000102がnanなので，前の値で補填")
+            try:
+                wrist_ratio=self.previous_eval_data[self.patient+"_50000102"]
+            except KeyError:
+                print("埋めようとしたけど当該患者の記録がない（初出患者？）のため，pass")
+                pass
+        if np.isnan(wrist_ratio):
+            print("50000102がnan．前の値で補填出来ず，0.5で埋める")
+            wrist_ratio=0.5
         return wrist_ratio
     
     def feature_ankle(self,kp_dict):
@@ -160,14 +189,30 @@ class PreprocessYolo(Manager,blipTools):
         # ankle_ratio=np.nanmax([0,np.nanmin([1,ankle_distance/sebone])])
         ankle_ratio=ankle_distance/sebone
         ankle_ratio=np.clip(ankle_ratio,0,1)
+        if ((len(self.previous_eval_data)!=0) and (np.isnan(ankle_ratio))):
+            print("50000103がnanなので，前の値で補填")
+            try:
+                ankle_ratio=self.previous_eval_data[self.patient+"_50000103"]
+            except KeyError:
+                print("埋めようとしたけど当該患者の記録がない（初出患者？）のため，pass")
+                pass
+        if np.isnan(ankle_ratio):
+            print("50000103がnan．前の値で補填出来ず，0.5で埋める")
+            ankle_ratio=0.5
         return ankle_ratio
 
-    def yolo_snapshot(self,data_dict,rgb_img,t,b,l,r,yolo_debug,debug_dir_path,patient,timestamp):
+    def yolo_snapshot(self,data_dict,rgb_img,t,b,l,r,yolo_debug,debug_dir_path,patient,timestamp,df_eval):
+        try:
+            self.previous_eval_data=df_eval.iloc[df_eval.index[-1]].to_dict()
+        except IndexError:
+            self.previous_eval_data={}
+        
+        self.patient=patient
         t,b,l,r=int(t),int(b),int(l),int(r)
         # bbox_rgb_img=rgb_img[t:b,l:r]
         # 拡張bounding boxの切り出し
-        extend_ratio_tb=0.025
-        extend_ratio_lr=0.025
+        extend_ratio_tb=0
+        extend_ratio_lr=0
         t_e,b_e,l_e,r_e,=np.max([t-extend_ratio_tb*rgb_img.shape[0],0]),np.min([b+extend_ratio_tb*rgb_img.shape[0],rgb_img.shape[0]]),np.max([l-extend_ratio_lr*rgb_img.shape[1],0]),np.min([r+extend_ratio_lr*rgb_img.shape[1],rgb_img.shape[1]])
         t_e,b_e,l_e,r_e=int(t_e),int(b_e),int(l_e),int(r_e)
         extended_bbox_rgb_img=rgb_img[t_e:b_e,l_e:r_e]
