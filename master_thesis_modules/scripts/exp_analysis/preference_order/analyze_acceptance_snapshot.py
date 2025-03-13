@@ -23,10 +23,17 @@ data=pd.read_csv(csv_path,header=0,index_col=0).T
 # data=data[data["経験年数"].astype(float)>data["経験年数"].astype(float).mean()/2]
 # print(data)
 # raise NotImplementedError
-# data=data[data["経験年数"]<10]
 
 result_dict={}
 result_table_dict={}
 
 case_list=sorted(list(set([k.split("_")[0] for k in data.keys() if "事例" in k])))
 condition_list=sorted(list(set([k.split("_")[1] for k in data.keys() if "事例" in k])))
+
+print(data)
+data=data[data["経験年数"].astype(float)<15]
+
+for case_name in case_list:
+    df=data[data[case_name+"_条件1"]>data[case_name+"_条件2"]]
+    print(len(df),"/",len(data))
+    # print(df)
