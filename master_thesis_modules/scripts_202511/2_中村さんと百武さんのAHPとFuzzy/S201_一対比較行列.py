@@ -46,7 +46,7 @@ for staff_name in data.columns:
     cls = getConsistencyMtx()
     A=cls.get_comparison_mtx(criteria,comparison_answer)
     eigvals,eigvecs,max_eigval,weights,CI = cls.evaluate_mtx(A)
-    comparison_mtx_csv_path=f"/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/database/common/comparison_mtx_30000001_{staff_name}.csv"
+    comparison_mtx_csv_path=f"/media/hayashide/MasterThesis/common/comparison_mtx_30000001_{staff_name}.csv"
     pd.DataFrame(A).to_csv(comparison_mtx_csv_path,index=False,header=False)
     print(CI)
 
@@ -61,6 +61,6 @@ for staff_name in data.columns:
     cls = getConsistencyMtx()
     A=cls.get_comparison_mtx(criteria,comparison_answer)
     eigvals,eigvecs,max_eigval,weights,CI = cls.evaluate_mtx(A)
-    comparison_mtx_csv_path=f"/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/database/common/comparison_mtx_30000010_{staff_name}.csv"
+    comparison_mtx_csv_path=f"/media/hayashide/MasterThesis/common/comparison_mtx_30000010_{staff_name}.csv"
     pd.DataFrame(A).to_csv(comparison_mtx_csv_path,index=False,header=False)
     print(CI)

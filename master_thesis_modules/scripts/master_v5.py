@@ -332,7 +332,7 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
         return self.data_dicts
 
 if __name__=="__main__":
-    trial_name="20250126EnvCheck"
+    trial_name="20251116EnvCheck"
     strage="NASK"
     runtype="simulation"
     cls=Master(trial_name,strage,runtype=runtype)
