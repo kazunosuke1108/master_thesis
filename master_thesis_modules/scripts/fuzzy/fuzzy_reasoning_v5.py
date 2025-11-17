@@ -11,6 +11,101 @@ class FuzzyReasoning():
         self.define_rules()
         pass
 
+    def define_custom_rules(self,TFN_data):
+        self.reasoning_rule_dict={
+            30000011:{
+                1:{
+                    "conditions":{40000110:"high",40000111:"high"},
+                    "result":"high",
+                },
+                2:{
+                    "conditions":{40000110:"low",40000111:"high"},
+                    "result":"high",
+                },
+                3:{
+                    "conditions":{40000110:"high",40000111:"low"},
+                    "result":"middle",
+                },
+                4:{
+                    "conditions":{40000110:"low",40000111:"low"},
+                    "result":"low",
+                },
+            },
+            20000000:{
+                1:{
+                    "conditions":{30000000:"high",30000001:"high"},
+                    "result":TFN_data.loc[0,"c"],
+                },
+                2:{
+                    "conditions":{30000000:"high",30000001:"low"},
+                    "result":TFN_data.loc[1,"c"],
+                },
+                3:{
+                    "conditions":{30000000:"low",30000001:"high"},
+                    "result":TFN_data.loc[2,"c"],
+                },
+                4:{
+                    "conditions":{30000000:"low",30000001:"low"},
+                    "result":TFN_data.loc[3,"c"],
+                },
+            },
+            20000001:{
+                1:{
+                    "conditions":{30000010:"high",30000011:"high"},
+                    "result":TFN_data.loc[4,"c"],
+                },
+                2:{
+                    "conditions":{30000010:"high",30000011:"low"},
+                    "result":TFN_data.loc[5,"c"],
+                },
+                3:{
+                    "conditions":{30000010:"low",30000011:"high"},
+                    "result":TFN_data.loc[6,"c"],
+                },
+                4:{
+                    "conditions":{30000010:"low",30000011:"low"},
+                    "result":TFN_data.loc[7,"c"],
+                },
+            },
+            10000000:{
+                1:{
+                    "conditions":{20000000:"high",20000001:"high"},
+                    "result":TFN_data.loc[8,"c"],
+                },
+                2:{
+                    "conditions":{20000000:"high",20000001:"low"},
+                    "result":TFN_data.loc[9,"c"],
+                },
+                3:{
+                    "conditions":{20000000:"low",20000001:"high"},
+                    "result":TFN_data.loc[10,"c"],
+                },
+                4:{
+                    "conditions":{20000000:"low",20000001:"low"},
+                    "result":TFN_data.loc[11,"c"],
+                },
+            },
+            70000000:{
+                1:{
+                    "conditions":{70000000:"high",70000001:"high"},
+                    "result":"high",
+                },
+                2:{
+                    "conditions":{70000000:"high",70000001:"low"},
+                    "result":"middle",
+                },
+                3:{
+                    "conditions":{70000000:"low",70000001:"high"},
+                    "result":"middle",
+                },
+                4:{
+                    "conditions":{70000000:"low",70000001:"low"},
+                    "result":"low",
+                },
+            },
+        }
+        pass
+
     def define_rules(self):
         self.reasoning_rule_dict={
             30000011:{
@@ -125,6 +220,7 @@ class FuzzyReasoning():
             },
         }
 
+
     def membership_func(self,x,type="high"):
         def high(x):
             y=x
@@ -146,7 +242,7 @@ class FuzzyReasoning():
         #     return middle(x)
         elif type=="low":
             return low(x)
-    
+
     def triangle_func(self,height,result):
         if result=="low":
             peak=0
@@ -155,7 +251,9 @@ class FuzzyReasoning():
         elif result=="high":
             peak=1
         else:
-            raise KeyError
+            if type(result)!=str:
+                peak=result
+            # raise KeyError
         return (peak,height)
     
     def calculate_fuzzy(self,input_nodes={40000110:0.5,40000111:0.5},output_node=30000011):
@@ -172,11 +270,19 @@ class FuzzyReasoning():
         return reasoning_result
 
     def main(self):
-        ans=self.calculate_fuzzy(input_nodes={40000110:0.5,40000111:0.5},output_node=30000011)
+        # ans=self.calculate_fuzzy(input_nodes={40000110:0.5,40000111:0.5},output_node=30000011)
+        ans=self.calculate_fuzzy(input_nodes={30000000:0.5,30000001:0.5},output_node=20000000)
         print(ans)
         pass
 
 
 if __name__=="__main__":
     cls=FuzzyReasoning()
+    # cls.main()
+    import pandas as pd
+    staff_name="中村"
+    TFN_csv_path=f"/media/hayashide/MasterThesis/common/TFN_{staff_name}.csv"
+    TFN_data = pd.read_csv(TFN_csv_path,names=["l","c","r"])
+    cls.define_custom_rules(TFN_data)
     cls.main()
+    print(TFN_data)

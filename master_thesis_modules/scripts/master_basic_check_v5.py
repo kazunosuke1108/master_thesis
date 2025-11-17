@@ -16,7 +16,7 @@ sys.path.append(os.path.expanduser("~")+"/kazu_ws/master_thesis/master_thesis_mo
 from scripts.management.manager import Manager
 from scripts.network.graph_manager import GraphManager
 from scripts.AHP.get_comparison_mtx import getConsistencyMtx
-from scripts.fuzzy.fuzzy_reasoning import FuzzyReasoning
+from scripts.fuzzy.fuzzy_reasoning_v5 import FuzzyReasoning
 from scripts.entropy.entropy_weight_generator import EntropyWeightGenerator
 from scripts.pseudo_data.pseudo_data_generator import PseudoDataGenerator
 
@@ -137,6 +137,10 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
         else:
             array_type=self.staff_name
         self.AHP_dict=getConsistencyMtx().get_all_comparison_mtx_and_weight(trial_name=self.trial_name,strage=self.strage,array_type=array_type)
+
+        # Fuzzy推論 定義
+        
+        raise NotImplementedError
 
 
     def pseudo_throttling(self,data_dicts):
