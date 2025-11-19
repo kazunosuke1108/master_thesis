@@ -96,7 +96,7 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
         # staffごとのFuzzy推論のカスタマイズ
         TFN_csv_path=f"/media/hayashide/MasterThesis/common/TFN_{self.staff_name}.csv"
         TFN_data = pd.read_csv(TFN_csv_path,names=["l","c","r"])
-        print(TFN_data)
+        self.define_custom_rules(TFN_data=TFN_data)
 
         
         # 危険動作の事前定義
@@ -137,10 +137,6 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
         else:
             array_type=self.staff_name
         self.AHP_dict=getConsistencyMtx().get_all_comparison_mtx_and_weight(trial_name=self.trial_name,strage=self.strage,array_type=array_type)
-
-        # Fuzzy推論 定義
-        
-        raise NotImplementedError
 
 
     def pseudo_throttling(self,data_dicts):
@@ -686,7 +682,7 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
             risk=self.calculate_fuzzy(input_nodes=input_nodes,output_node=output_node_code)
             return risk
         for patient in self.data_dicts.keys():
-            self.data_dicts[patient][output_node_code]=list(map(ask_risk_to_calculator,self.data_dicts[patient][input_node_codes].iterrows()))
+            self.data_dicts[patient][output_node_code]=list(map(ask_risk_to_calculator,self.data_dicts[patient].loc[:,input_node_codes].iterrows()))
 
     def ewm_master(self,input_node_codes,output_node_code,dim="t"):
         horizon=100
@@ -759,7 +755,7 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
         # 外的・静的
         self.AHP_weight_sum(input_node_codes=[40000100,40000101,40000102],output_node_code=30000010)
         # 外的・動的
-        self.fuzzy_reasoning_master(input_node_codes=["40000110","40000111"],output_node_code="30000011")
+        self.fuzzy_reasoning_master(input_node_codes=[40000110,40000111],output_node_code=30000011)
 
         print("# 3 -> 2層推論 #")
         # 内的
@@ -768,15 +764,16 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
         self.simple_weight_sum(input_node_codes=[30000000,30000001],output_node_code=20000000,weights=[0.1,0.9])
         # 外的
         # self.ewm_master(input_node_codes=[30000010,30000011],output_node_code=20000001)
-        self.fuzzy_reasoning_master(input_node_codes=["30000010","30000011"],output_node_code="20000001")
+        self.fuzzy_reasoning_master(input_node_codes=[30000010,30000011],output_node_code=20000001)
         
         print("# 2 -> 1層推論 #")
         # self.ewm_master(input_node_codes=[20000000,20000001],output_node_code=10000000)
-        self.fuzzy_reasoning_master(input_node_codes=["20000000","20000001"],output_node_code="10000000")
+        self.fuzzy_reasoning_master(input_node_codes=[20000000,20000001],output_node_code=10000000)
         pass
 
 if __name__=="__main__":
     staff_name="中村"
+    staff_name="百武"
     trial_name=f"20251116{staff_name}_DevFuzzyCustomize"
     strage="NASK"
     runtype="basic_check"

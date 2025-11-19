@@ -253,6 +253,8 @@ class FuzzyReasoning():
         else:
             if type(result)!=str:
                 peak=result
+            else:
+                raise KeyError
             # raise KeyError
         return (peak,height)
     
