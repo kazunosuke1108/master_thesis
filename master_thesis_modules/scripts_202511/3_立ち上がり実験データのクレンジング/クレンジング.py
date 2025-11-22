@@ -26,21 +26,34 @@ class Visualizer(Manager):
     def __init__(self,trial_name,strage):
         super().__init__()
         self.data_dir_dict=self.get_database_dir(trial_name=trial_name,strage=strage)
+        # 位置・bboxデータ
         self.df_after_reid_csv_path=self.data_dir_dict["mobilesensing_dir_path"]+"/csv/df_after_reid.csv"
         self.df_after_reid=pd.read_csv(self.df_after_reid_csv_path,header=0).dropna(how="all",axis=1)
+        # 特徴量から評価までいろいろ入ってる
         self.df_eval_csv_path=self.data_dir_dict["mobilesensing_dir_path"]+"/csv/df_eval.csv"
         self.df_eval=pd.read_csv(self.df_eval_csv_path,header=0).dropna(how="all",axis=1)        
         self.patients=sorted(list(set([k.split("_")[0] for k in self.df_after_reid.keys() if (("timestamp" not in k) and ("activeBinary" not in k))])))
-        print(self.df_after_reid.shape)
-        print(self.df_eval.shape)
-        print(self.patients)
+
+        self.spatial_normalization_param=np.sqrt(2)*6
+
+        # self.df_eval
 
     def repair_data(self):
-        # 車椅子の位置
-        
-        # 点滴の位置
-        # スタッフの位置
-        # スタッフの向き
+        for patient in self.patients:
+            print(patient)
+            # 車椅子の位置
+            for idx,row in self.df_eval.iterrows():
+                min_candidates=[
+                    np.sqrt((self.df_eval.loc[idx,patient+"_60010000"]-self.df_eval.loc[idx,"00001_60010000"])**2+(self.df_eval.loc[idx,patient+"_60010001"]-self.df_eval.loc[idx,"00001_60010001"])**2),
+                    np.sqrt((self.df_eval.loc[idx,patient+"_60010000"]-self.df_eval.loc[idx,"00002_60010000"])**2+(self.df_eval.loc[idx,patient+"_60010001"]-self.df_eval.loc[idx,"00002_60010001"])**2),
+                    np.sqrt((self.df_eval.loc[idx,patient+"_60010000"]-self.df_eval.loc[idx,"00006_60010000"])**2+(self.df_eval.loc[idx,patient+"_60010001"]-self.df_eval.loc[idx,"00006_60010001"])**2),
+                ]
+
+                
+
+            # 点滴の位置
+            # スタッフの位置
+            # スタッフの向き
         pass
 
 if __name__=="__main__":
