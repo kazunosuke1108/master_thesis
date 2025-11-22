@@ -18,7 +18,7 @@ class Manager():
     def __init__(self):
         super().__init__()
         plt.rcParams["figure.figsize"] = (15/2.54,10/2.54)
-        plt.rcParams["figure.autolayout"] = True
+        # plt.rcParams["figure.autolayout"] = True
         plt.rcParams["font.size"] = 11
         plt.rcParams['font.family'] = 'Times New Roman'
         plt.rcParams['mathtext.fontset'] = 'stix' # math fontの設定

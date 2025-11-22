@@ -49,7 +49,7 @@ class Visualizer(Manager):
             
             return bbox_elp_img
         # load
-        elp_img_paths=sorted(glob(self.data_dir_dict["mobilesensing_dir_path"]+"/jpg/elp/left/*.jpg"))
+        elp_img_paths=sorted(glob(self.data_dir_dict["mobilesensing_dir_path"]+"/jpg/elp/right/*.jpg"))
         elp_img_stamps=np.array([float(os.path.basename(p).split("_")[1][:-len(".jpg")]) for p in elp_img_paths])
         df_after_reid_csv_path=self.data_dir_dict["mobilesensing_dir_path"]+"/csv/df_after_reid.csv"
         df_after_reid=pd.read_csv(df_after_reid_csv_path,header=0).dropna(how="all",axis=1)
@@ -98,6 +98,9 @@ class Visualizer(Manager):
         for node in nodes:
             print(node)
             for patient in patients:
+                # nanだけならスキップ
+                if len(eval_data)==sum(eval_data[patient+"_"+node].isna()):
+                    continue
                 if node in ["40000000","40000001",]: #TFN
                     try:
                         plt.plot(eval_data["timestamp"],[eval(d)[1] for d in eval_data[patient+"_"+node].fillna(method="ffill")],label=patient)
@@ -108,7 +111,7 @@ class Visualizer(Manager):
                     pass
                 else:
                     # plt.plot(eval_data["timestamp"],eval_data[patient+"_"+node],label=patient)
-                    plt.plot(eval_data["timestamp"].rolling(20).mean(),eval_data[patient+"_"+node].rolling(20).mean(),label=patient)
+                    plt.plot(eval_data["timestamp"].rolling(1).mean(),eval_data[patient+"_"+node].rolling(1).mean(),label=patient)
                     # plt.xlim(t_range)
             plt.legend()
             plt.grid()
@@ -119,7 +122,7 @@ class Visualizer(Manager):
         pass
 
 if __name__=="__main__":
-    trial_name="20250307postAnalysis"
+    trial_name="20251122_postAnalysis3"
     strage="NASK"
     cls=Visualizer(trial_name,strage)
     # cls.export_movies(map=False,bbox=True)
