@@ -261,9 +261,17 @@ class FuzzyReasoning():
     def calculate_fuzzy(self,input_nodes={40000110:0.5,40000111:0.5},output_node=30000011):
         rule_id=output_node
         reasoning_result=0
-        for proposition_id in self.reasoning_rule_dict[rule_id]:
+        try:
+            proposition_ids=self.reasoning_rule_dict[rule_id]
+        except KeyError:
+            proposition_ids=self.reasoning_rule_dict[int(rule_id)]
+        for proposition_id in proposition_ids:
+            proposition_id=int(proposition_id)
             height=1
-            for condition in self.reasoning_rule_dict[rule_id][proposition_id]["conditions"].keys():
+            for condition in proposition_ids[proposition_id]["conditions"].keys():
+                print(input_nodes)
+                print(condition)
+                print(input_nodes[condition])
                 h=self.membership_func(x=input_nodes[condition],type=self.reasoning_rule_dict[rule_id][proposition_id]["conditions"][condition])
                 height=height*h
             peak,height=self.triangle_func(height,result=self.reasoning_rule_dict[rule_id][proposition_id]["result"])

@@ -311,7 +311,7 @@ class RealtimeEvaluator(Manager,GraphManager):
                     data_dicts[patient][k]=self.df_eval.loc[self.df_eval.index[-1], f"{patient}_{k}"]
 
         ## 見守り状況
-        def get_relative_distance(data_dicts,p,s,):
+        def s(data_dicts,p,s,):
             d=np.linalg.norm(np.array([data_dicts[p]["60010000"],data_dicts[p]["60010001"]])-np.array([data_dicts[s]["60010000"],data_dicts[s]["60010001"]]))
             return d
 

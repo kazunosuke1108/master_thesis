@@ -18,196 +18,196 @@ class GraphManager():
     def get_default_graph(self):
         # node定義
         node_dict={
-            "10000000":{
+            10000000:{
                     "score":np.nan,
                     "status":"active",
                     "description_en":"Overall risk ratio",
                     "layer":1,
                     "node_type":"dynamic",
                     "description_ja":"",
-                    "node_code_to":["20000000","20000001"]
+                    "node_code_to":[20000000,20000001]
                     },
-            "20000000":{
+            20000000:{
                     "score":np.nan,
                     "status":"active",
                     "description_en":"Internal risk ratio",
                     "layer":2,
                     "node_type":"static",
                     "description_ja":"",
-                    "node_code_to":["30000000","30000001"]
+                    "node_code_to":[30000000,30000001]
                     },
-            "20000001":{
+            20000001:{
                     "score":np.nan,
                     "status":"active",
                     "description_en":"External risk ratio",
                     "layer":2,
                     "node_type":"dynamic",
                     "description_ja":"",
-                    "node_code_to":["30000010","30000011"]
+                    "node_code_to":[30000010,30000011]
                     },
-            "30000000":{
+            30000000:{
                     "score":np.nan,
                     "status":"active",
                     "description_en":"Risk regarding their attribution",
                     "layer":3,
                     "node_type":"static",
                     "description_ja":"",
-                    "node_code_to":["40000000","40000001"]
+                    "node_code_to":[40000000,40000001]
                     },
-            "30000001":{
+            30000001:{
                     "score":np.nan,
                     "status":"active",
                     "description_en":"Risk regarding their action",
                     "layer":3,
                     "node_type":"static",
                     "description_ja":"",
-                    "node_code_to":["40000010","40000011","40000012","40000013","40000014","40000015","40000016"]
+                    "node_code_to":[40000010,40000011,40000012,40000013,40000014,40000015,40000016]
                     },
-            "30000010":{
+            30000010:{
                     "score":np.nan,
                     "status":"active",
                     "description_en":"Risk regarding surrounding objects",
                     "layer":3,
                     "node_type":"dynamic",
                     "description_ja":"",
-                    "node_code_to":["40000100","40000101","40000102"]
+                    "node_code_to":[40000100,40000101,40000102]
                     },
-            "30000011":{
+            30000011:{
                     "score":np.nan,
                     "status":"active",
                     "description_en":"Risk regarding the surrounding staff",
                     "layer":3,
                     "node_type":"dynamic",
                     "description_ja":"",
-                    "node_code_to":["40000110","40000111"]
+                    "node_code_to":[40000110,40000111]
                     },
-            "40000000":{
+            40000000:{
                     "score":np.nan,
                     "status":"active",
                     "description_en":"Probability of patient",
                     "layer":4,
                     "node_type":"static",
                     "description_ja":"患者である",
-                    "node_code_to":["50000000","50000001"]
+                    "node_code_to":[50000000,50000001]
                     },
-            "40000001":{
+            40000001:{
                     "score":np.nan,
                     "status":"active",
                     "description_en":"Risk of their age",
                     "layer":4,
                     "node_type":"static",
                     "description_ja":"高齢である",
-                    "node_code_to":["50000010","50000011"]
+                    "node_code_to":[50000010,50000011]
                     },
-            "40000010":{
+            40000010:{
                     "score":np.nan,
                     "status":"active",
                     "description_en":"Similarity of pose with standing",
                     "layer":4,
                     "node_type":"dynamic",
                     "description_ja":"立ち上がろうとしている",
-                    "node_code_to":["50000100","50000101","50000102","50000103"]
+                    "node_code_to":[50000100,50000101,50000102,50000103]
                     },
-            "40000011":{
+            40000011:{
                     "score":np.nan,
                     "status":"active",
                     "description_en":"Similarity of pose with releasing brakes",
                     "layer":4,
                     "node_type":"dynamic",
                     "description_ja":"車椅子のブレーキを解除しようとしている",
-                    "node_code_to":["50000100","50000101","50000102","50000103"],
+                    "node_code_to":[50000100,50000101,50000102,50000103],
                     },
-            "40000012":{
+            40000012:{
                     "score":np.nan,
                     "status":"active",
                     "description_en":"Similarity of pose with moving wheelchair",
                     "layer":4,
                     "node_type":"dynamic",
                     "description_ja":"車椅子を動かそうとしている",
-                    "node_code_to":["50000100","50000101","50000102","50000103"],
+                    "node_code_to":[50000100,50000101,50000102,50000103],
                     },
-            "40000013":{
+            40000013:{
                     "score":np.nan,
                     "status":"active",
                     "description_en":"Similarity of pose with losing balance",
                     "layer":4,
                     "node_type":"dynamic",
                     "description_ja":"バランスを崩している",
-                    "node_code_to":["50000100","50000101","50000102","50000103"],
+                    "node_code_to":[50000100,50000101,50000102,50000103],
                     },
-            "40000014":{
+            40000014:{
                     "score":np.nan,
                     "status":"active",
                     "description_en":"Similarity of pose with raising hands",
                     "layer":4,
                     "node_type":"dynamic",
                     "description_ja":"手を挙げている",
-                    "node_code_to":["50000100","50000101","50000102","50000103"],
+                    "node_code_to":[50000100,50000101,50000102,50000103],
                     },
-            "40000015":{
+            40000015:{
                     "score":np.nan,
                     "status":"active",
                     "description_en":"Similarity of pose with coughing up",
                     "layer":4,
                     "node_type":"dynamic",
                     "description_ja":"せき込んでいる",
-                    "node_code_to":["50000100","50000101","50000102","50000103"],
+                    "node_code_to":[50000100,50000101,50000102,50000103],
                     },
-            "40000016":{
+            40000016:{
                     "score":np.nan,
                     "status":"active",
                     "description_en":"Similarity of pose with touching face",
                     "layer":4,
                     "node_type":"dynamic",
                     "description_ja":"顔を触っている",
-                    "node_code_to":["50000100","50000101","50000102","50000103"],
+                    "node_code_to":[50000100,50000101,50000102,50000103],
                     },
-            "40000100":{
+            40000100:{
                     "score":np.nan,
                     "status":"active",
                     "description_en":"Probability of ivPole's existance",
                     "layer":4,
                     "node_type":"static",
                     "description_ja":"点滴の近くにいる",
-                    "node_code_to":["50001000","50001001","50001002","50001003","60010000"],
+                    "node_code_to":[50001000,50001001,50001002,50001003,60010000],
                     },
-            "40000101":{
+            40000101:{
                     "score":np.nan,
                     "status":"active",
                     "description_en":"Probability of wheelchair's existance",
                     "layer":4,
                     "node_type":"static",
                     "description_ja":"車椅子に乗っている",
-                    "node_code_to":["50001000","50001001","50001002","50001003","60010000"],
+                    "node_code_to":[50001000,50001001,50001002,50001003,60010000],
                     },
-            "40000102":{
+            40000102:{
                     "score":np.nan,
                     "status":"active",
                     "description_en":"Distance from handrail",
                     "layer":4,
                     "node_type":"static",
                     "description_ja":"手すりから離れている",
-                    "node_code_to":["50001000","50001001","50001002","50001003","60010000"],
+                    "node_code_to":[50001000,50001001,50001002,50001003,60010000],
                     },
-            "40000110":{
+            40000110:{
                     "score":np.nan,
                     "status":"active",
                     "description_en":"Risk regarding absense of medical staff",
                     "layer":4,
                     "node_type":"dynamic",
                     "description_ja":"スタッフがいない",
-                    "node_code_to":["50001100","50001101","60010000","60010001"],
+                    "node_code_to":[50001100,50001101,60010000,60010001],
                     },
-            "40000111":{
+            40000111:{
                     "score":np.nan,
                     "status":"active",
                     "description_en":"Risk regarding absense of staff's eyes",
                     "layer":4,
                     "node_type":"dynamic",
                     "description_ja":"スタッフが見ていない",
-                    "node_code_to":["50001100","50001101","50001110","50001111","60010000","60010001"],
+                    "node_code_to":[50001100,50001101,50001110,50001111,60010000,60010001],
                     },
-            "50000000":{
+            50000000:{
                     "score":np.nan,
                     "status":"active",
                     "description_en":"Risk ratio",
@@ -216,7 +216,7 @@ class GraphManager():
                     "description_ja":"",
                     "node_code_to":[]
                     },
-            "50000001":{
+            50000001:{
                     "score":np.nan,
                     "status":"active",
                     "description_en":"Risk ratio",
@@ -225,7 +225,7 @@ class GraphManager():
                     "description_ja":"",
                     "node_code_to":[]
                     },
-            "50000010":{
+            50000010:{
                     "score":np.nan,
                     "status":"active",
                     "description_en":"Risk ratio",
@@ -234,7 +234,7 @@ class GraphManager():
                     "description_ja":"",
                     "node_code_to":[]
                     },
-            "50000011":{
+            50000011:{
                     "score":np.nan,
                     "status":"active",
                     "description_en":"Risk ratio",
@@ -243,7 +243,7 @@ class GraphManager():
                     "description_ja":"",
                     "node_code_to":[]
                     },
-            "50000100":{
+            50000100:{
                     "score":np.nan,
                     "status":"active",
                     "description_en":"Risk ratio",
@@ -252,7 +252,7 @@ class GraphManager():
                     "description_ja":"",
                     "node_code_to":[]
                     },
-            "50000101":{
+            50000101:{
                     "score":np.nan,
                     "status":"active",
                     "description_en":"Risk ratio",
@@ -261,7 +261,7 @@ class GraphManager():
                     "description_ja":"",
                     "node_code_to":[]
                     },
-            "50000102":{
+            50000102:{
                     "score":np.nan,
                     "status":"active",
                     "description_en":"Risk ratio",
@@ -270,7 +270,7 @@ class GraphManager():
                     "description_ja":"",
                     "node_code_to":[]
                     },
-            "50000103":{
+            50000103:{
                     "score":np.nan,
                     "status":"active",
                     "description_en":"Risk ratio",
@@ -279,7 +279,7 @@ class GraphManager():
                     "description_ja":"",
                     "node_code_to":[]
                     },
-            "50001000":{
+            50001000:{
                     "score":np.nan,
                     "status":"active",
                     "description_en":"Risk ratio",
@@ -288,7 +288,7 @@ class GraphManager():
                     "description_ja":"",
                     "node_code_to":[]
                     },
-            "50001001":{
+            50001001:{
                     "score":np.nan,
                     "status":"active",
                     "description_en":"Risk ratio",
@@ -297,7 +297,7 @@ class GraphManager():
                     "description_ja":"",
                     "node_code_to":[]
                     },
-            "50001002":{
+            50001002:{
                     "score":np.nan,
                     "status":"active",
                     "description_en":"Risk ratio",
@@ -306,7 +306,7 @@ class GraphManager():
                     "description_ja":"",
                     "node_code_to":[]
                     },
-            "50001003":{
+            50001003:{
                     "score":np.nan,
                     "status":"active",
                     "description_en":"Risk ratio",
@@ -315,7 +315,7 @@ class GraphManager():
                     "description_ja":"",
                     "node_code_to":[]
                     },
-            "50001010":{
+            50001010:{
                     "score":np.nan,
                     "status":"active",
                     "description_en":"Risk ratio",
@@ -324,7 +324,7 @@ class GraphManager():
                     "description_ja":"",
                     "node_code_to":[]
                     },
-            "50001011":{
+            50001011:{
                     "score":np.nan,
                     "status":"active",
                     "description_en":"Risk ratio",
@@ -333,7 +333,7 @@ class GraphManager():
                     "description_ja":"",
                     "node_code_to":[]
                     },
-            "50001012":{
+            50001012:{
                     "score":np.nan,
                     "status":"active",
                     "description_en":"Risk ratio",
@@ -342,7 +342,7 @@ class GraphManager():
                     "description_ja":"",
                     "node_code_to":[]
                     },
-            "50001013":{
+            50001013:{
                     "score":np.nan,
                     "status":"active",
                     "description_en":"Risk ratio",
@@ -351,7 +351,7 @@ class GraphManager():
                     "description_ja":"",
                     "node_code_to":[]
                     },
-            "50001020":{
+            50001020:{
                     "score":np.nan,
                     "status":"active",
                     "description_en":"Risk ratio",
@@ -360,7 +360,7 @@ class GraphManager():
                     "description_ja":"",
                     "node_code_to":[]
                     },
-            "50001021":{
+            50001021:{
                     "score":np.nan,
                     "status":"active",
                     "description_en":"Risk ratio",
@@ -369,7 +369,7 @@ class GraphManager():
                     "description_ja":"",
                     "node_code_to":[]
                     },
-            "50001022":{
+            50001022:{
                     "score":np.nan,
                     "status":"active",
                     "description_en":"Risk ratio",
@@ -378,7 +378,7 @@ class GraphManager():
                     "description_ja":"",
                     "node_code_to":[]
                     },
-            "50001023":{
+            50001023:{
                     "score":np.nan,
                     "status":"active",
                     "description_en":"Risk ratio",
@@ -387,7 +387,7 @@ class GraphManager():
                     "description_ja":"",
                     "node_code_to":[]
                     },
-            "50001100":{
+            50001100:{
                     "score":np.nan,
                     "status":"active",
                     "description_en":"Risk ratio",
@@ -396,7 +396,7 @@ class GraphManager():
                     "description_ja":"",
                     "node_code_to":[]
                     },
-            "50001101":{
+            50001101:{
                     "score":np.nan,
                     "status":"active",
                     "description_en":"Risk ratio",
@@ -405,7 +405,7 @@ class GraphManager():
                     "description_ja":"",
                     "node_code_to":[]
                     },
-            "50001110":{
+            50001110:{
                     "score":np.nan,
                     "status":"active",
                     "description_en":"Risk ratio",
@@ -414,7 +414,7 @@ class GraphManager():
                     "description_ja":"",
                     "node_code_to":[]
                     },
-            "50001111":{
+            50001111:{
                     "score":np.nan,
                     "status":"active",
                     "description_en":"Risk ratio",
@@ -423,7 +423,7 @@ class GraphManager():
                     "description_ja":"",
                     "node_code_to":[]
                     },
-            "60010000":{
+            60010000:{
                     "score":np.nan,
                     "status":"active",
                     "description_en":"Risk ratio",
@@ -432,7 +432,7 @@ class GraphManager():
                     "description_ja":"",
                     "node_code_to":[]
                     },
-            "60010001":{
+            60010001:{
                     "score":np.nan,
                     "status":"active",
                     "description_en":"Risk ratio",
@@ -441,7 +441,7 @@ class GraphManager():
                     "description_ja":"",
                     "node_code_to":[]
                     },
-            "60010002":{
+            60010002:{
                     "score":np.nan,
                     "status":"active",
                     "description_en":"Risk ratio",
@@ -450,7 +450,7 @@ class GraphManager():
                     "description_ja":"",
                     "node_code_to":[]
                     },
-            "70000000":{
+            70000000:{
                     "score":np.nan,
                     "status":"active",
                     "description_en":"Background differencing value",

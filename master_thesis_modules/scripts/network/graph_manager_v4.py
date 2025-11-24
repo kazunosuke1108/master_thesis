@@ -213,7 +213,7 @@ class GraphManager():
                     "description_en":"Risk ratio",
                     "layer":5,
                     "node_type":"static",
-                    "description_ja":"",
+                    "description_ja":"患者か否か (yes or no)",
                     "node_code_to":[]
                     },
             "50000001":{
@@ -222,7 +222,7 @@ class GraphManager():
                     "description_en":"Risk ratio",
                     "layer":5,
                     "node_type":"static",
-                    "description_ja":"",
+                    "description_ja":"回答に対するconfidence",
                     "node_code_to":[]
                     },
             "50000010":{
@@ -231,7 +231,7 @@ class GraphManager():
                     "description_en":"Risk ratio",
                     "layer":5,
                     "node_type":"static",
-                    "description_ja":"",
+                    "description_ja":"年齢層 (old, middle or young)",
                     "node_code_to":[]
                     },
             "50000011":{
@@ -240,7 +240,7 @@ class GraphManager():
                     "description_en":"Risk ratio",
                     "layer":5,
                     "node_type":"static",
-                    "description_ja":"",
+                    "description_ja":"回答に対するconfidence",
                     "node_code_to":[]
                     },
             "50000100":{
@@ -249,7 +249,7 @@ class GraphManager():
                     "description_en":"Risk ratio",
                     "layer":5,
                     "node_type":"static",
-                    "description_ja":"",
+                    "description_ja":"姿勢特徴量1",
                     "node_code_to":[]
                     },
             "50000101":{
@@ -258,7 +258,7 @@ class GraphManager():
                     "description_en":"Risk ratio",
                     "layer":5,
                     "node_type":"static",
-                    "description_ja":"",
+                    "description_ja":"姿勢特徴量2",
                     "node_code_to":[]
                     },
             "50000102":{
@@ -267,7 +267,7 @@ class GraphManager():
                     "description_en":"Risk ratio",
                     "layer":5,
                     "node_type":"static",
-                    "description_ja":"",
+                    "description_ja":"姿勢特徴量3",
                     "node_code_to":[]
                     },
             "50000103":{
@@ -276,7 +276,7 @@ class GraphManager():
                     "description_en":"Risk ratio",
                     "layer":5,
                     "node_type":"static",
-                    "description_ja":"",
+                    "description_ja":"姿勢特徴量4",
                     "node_code_to":[]
                     },
             "50001000":{
@@ -393,7 +393,7 @@ class GraphManager():
                     "description_en":"Risk ratio",
                     "layer":5,
                     "node_type":"static",
-                    "description_ja":"",
+                    "description_ja":"(多分)スタッフのX座標",
                     "node_code_to":[]
                     },
             "50001101":{
@@ -402,7 +402,7 @@ class GraphManager():
                     "description_en":"Risk ratio",
                     "layer":5,
                     "node_type":"static",
-                    "description_ja":"",
+                    "description_ja":"(多分)スタッフのY座標",
                     "node_code_to":[]
                     },
             "50001110":{
@@ -411,7 +411,7 @@ class GraphManager():
                     "description_en":"Risk ratio",
                     "layer":5,
                     "node_type":"static",
-                    "description_ja":"",
+                    "description_ja":"(多分)スタッフの向きベクトルのX成分",
                     "node_code_to":[]
                     },
             "50001111":{
@@ -420,7 +420,7 @@ class GraphManager():
                     "description_en":"Risk ratio",
                     "layer":5,
                     "node_type":"static",
-                    "description_ja":"",
+                    "description_ja":"(多分)スタッフの向きベクトルのY成分",
                     "node_code_to":[]
                     },
             "60010000":{
@@ -429,7 +429,7 @@ class GraphManager():
                     "description_en":"Risk ratio",
                     "layer":6,
                     "node_type":"static",
-                    "description_ja":"",
+                    "description_ja":"(多分)本人のX座標",
                     "node_code_to":[]
                     },
             "60010001":{
@@ -438,7 +438,7 @@ class GraphManager():
                     "description_en":"Risk ratio",
                     "layer":6,
                     "node_type":"static",
-                    "description_ja":"",
+                    "description_ja":"(多分)本人のY座標",
                     "node_code_to":[]
                     },
             "60010002":{
@@ -447,7 +447,7 @@ class GraphManager():
                     "description_en":"Risk ratio",
                     "layer":6,
                     "node_type":"static",
-                    "description_ja":"",
+                    "description_ja":"(多分)本人の背の高さ(zmax)",
                     "node_code_to":[]
                     },
             "70000000":{
@@ -456,7 +456,7 @@ class GraphManager():
                     "description_en":"Background differencing value",
                     "layer":6,
                     "node_type":"static",
-                    "description_ja":"",
+                    "description_ja":"背景差分値",
                     "node_code_to":[]
                     },
         }

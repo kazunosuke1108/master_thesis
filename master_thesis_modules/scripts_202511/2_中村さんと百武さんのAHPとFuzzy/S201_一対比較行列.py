@@ -49,7 +49,8 @@ for staff_name in data.columns:
     comparison_mtx_csv_path=f"/media/hayashide/MasterThesis/common/comparison_mtx_30000001_{staff_name}.csv"
     pd.DataFrame(A).to_csv(comparison_mtx_csv_path,index=False,header=False)
     print(CI)
-
+    print(weights)
+raise NotImplementedError
 # 外的・静的（物体）30000010
 criteria = [
     "点滴の近くにいること",
@@ -64,3 +65,4 @@ for staff_name in data.columns:
     comparison_mtx_csv_path=f"/media/hayashide/MasterThesis/common/comparison_mtx_30000010_{staff_name}.csv"
     pd.DataFrame(A).to_csv(comparison_mtx_csv_path,index=False,header=False)
     print(CI)
+    print(weights)

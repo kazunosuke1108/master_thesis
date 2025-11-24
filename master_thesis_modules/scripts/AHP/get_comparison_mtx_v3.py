@@ -78,7 +78,7 @@ class getConsistencyMtx(Manager):
         AHP_dict={}
         self.data_dir_dict=self.get_database_dir(trial_name=trial_name,strage=strage)
         
-        AHP_dict["30000001"]={}
+        AHP_dict[30000001]={}
         csv_path=self.data_dir_dict["common_dir_path"]+f"/comparison_mtx_30000001_{array_type}.csv"
         data=pd.read_csv(csv_path,header=None).values
         for i in range(data.shape[0]):
@@ -89,16 +89,16 @@ class getConsistencyMtx(Manager):
                 elif i>j:
                     data[i,j]=1/data[j,i]
         eigvals,eigvecs,max_eigval,weights,CI=self.evaluate_mtx(data)
-        AHP_dict["30000001"]["A"]=data
-        AHP_dict["30000001"]["CI"]=CI
-        AHP_dict["30000001"]["weights"]=weights
+        AHP_dict[30000001]["A"]=data
+        AHP_dict[30000001]["CI"]=CI
+        AHP_dict[30000001]["weights"]=weights
         data=pd.DataFrame(data)
         if save_mtx:
             data.to_csv(csv_path,index=False,header=False)
         print(weights)
         
         # 外的・静的（物体）30000010
-        AHP_dict["30000010"]={}
+        AHP_dict[30000010]={}
         csv_path=self.data_dir_dict["common_dir_path"]+f"/comparison_mtx_30000010_{array_type}.csv"
         data=pd.read_csv(csv_path,header=None).values
         for i in range(data.shape[0]):
@@ -109,9 +109,9 @@ class getConsistencyMtx(Manager):
                 elif i>j:
                     data[i,j]=1/data[j,i]
         eigvals,eigvecs,max_eigval,weights,CI=self.evaluate_mtx(data)
-        AHP_dict["30000010"]["A"]=data
-        AHP_dict["30000010"]["CI"]=CI
-        AHP_dict["30000010"]["weights"]=weights
+        AHP_dict[30000010]["A"]=data
+        AHP_dict[30000010]["CI"]=CI
+        AHP_dict[30000010]["weights"]=weights
         data=pd.DataFrame(data)
         if save_mtx:
             data.to_csv(csv_path,index=False,header=False)
@@ -122,10 +122,10 @@ class getConsistencyMtx(Manager):
 if __name__=="__main__":
     cls=getConsistencyMtx()
     AHP_dict=cls.get_all_comparison_mtx_and_weight(trial_name="",strage="local",save_mtx=True,array_type=3)
-    print(AHP_dict["30000001"])
-    print(AHP_dict["30000001"]["CI"])
-    print(AHP_dict["30000010"])
-    print(AHP_dict["30000010"]["CI"])
+    print(AHP_dict[30000001])
+    print(AHP_dict[30000001]["CI"])
+    print(AHP_dict[30000010])
+    print(AHP_dict[30000010]["CI"])
 
     # A=cls.get_comparison_mtx(criteria=["a","b","c"])
     # eigvals,eigvecs,max_eigval,weights,CI=cls.evaluate_mtx(A)

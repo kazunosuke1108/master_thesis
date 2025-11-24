@@ -816,7 +816,9 @@ if __name__=="__main__":
     # trial_name="20250121ChangeCriteriaBefore"
     # trial_name="20250203ComparePlot"
     # trial_name="20251116中村_DevFuzzyCustomize"
-    trial_name="20251116百武_DevFuzzyCustomize"
+    # trial_name="20251116百武_DevFuzzyCustomize"
+    # trial_name="20251122_postAnalysis3_中村"
+    trial_name="20251122_postAnalysis3_百武"
     strage="NASK"
     cls=Visualizer(trial_name=trial_name,strage=strage)
     # cls.visualize_graph(trial_name="20241229BuildSimulator",strage="NASK",name="A",show=True)
