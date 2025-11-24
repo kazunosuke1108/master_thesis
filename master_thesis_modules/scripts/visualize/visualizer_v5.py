@@ -492,8 +492,6 @@ class Visualizer(Manager):
             )
         return fig
     
-
-
     def draw_positions(self):
         csv_paths=[path for path in self.data_paths if (("data" in os.path.basename(path)) and ("_eval.csv" in os.path.basename(path)))]
         plot_data=[]
@@ -696,7 +694,7 @@ class Visualizer(Manager):
             print(export_label)
             for id_name in id_names:
                 # if int(export_label) in ["10000000","20000001"]:
-                w=40
+                w=3
                 try:
                     plt.plot(data_dict[id_name]["timestamp"],data_dict[id_name][export_label].rolling(w).mean(),"-o",linewidth=0.25,markersize=1,label=id_name)
                     # plt.title(export_label+f" window: {w}")
@@ -817,8 +815,8 @@ if __name__=="__main__":
     # trial_name="20250203ComparePlot"
     # trial_name="20251116中村_DevFuzzyCustomize"
     # trial_name="20251116百武_DevFuzzyCustomize"
-    # trial_name="20251122_postAnalysis3_中村"
-    trial_name="20251122_postAnalysis3_百武"
+    trial_name="20251122_postAnalysis3_中村"
+    # trial_name="20251122_postAnalysis3_百武"
     strage="NASK"
     cls=Visualizer(trial_name=trial_name,strage=strage)
     # cls.visualize_graph(trial_name="20241229BuildSimulator",strage="NASK",name="A",show=True)
