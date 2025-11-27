@@ -19,7 +19,7 @@ from scripts.entropy.entropy_weight_generator import EntropyWeightGenerator
 from scripts.pseudo_data.pseudo_data_generator import PseudoDataGenerator
 
 class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
-    def __init__(self,trial_name,data_dicts,strage="NASK",AHP_array_type=3,staff_name=""):
+    def __init__(self,trial_name,data_dicts,strage="NASK",AHP_array_type=3,staff_name_ahp="",staff_name_fuzzy=""):
         super().__init__()
         self.trial_name=trial_name
         self.strage=strage
@@ -28,7 +28,8 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
         # parameters
         self.spatial_normalization_param=np.sqrt(2)*6
         self.AHP_array_type=AHP_array_type
-        self.staff_name=staff_name
+        self.staff_name_ahp=staff_name_ahp
+        self.staff_name_fuzzy=staff_name_fuzzy
 
         self.data_dicts=data_dicts
         self.patients=list(self.data_dicts.keys())
@@ -72,7 +73,7 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
         self.AHP_dict=getConsistencyMtx().get_all_comparison_mtx_and_weight(trial_name="",strage=self.strage,array_type=self.AHP_array_type)
 
         # staffごとのFuzzy推論のカスタマイズ
-        TFN_csv_path=f"/media/hayashide/MasterThesis/common/TFN_{self.staff_name}.csv"
+        TFN_csv_path=f"/media/hayashide/MasterThesis/common/TFN_{self.staff_name_fuzzy}.csv"
         TFN_data = pd.read_csv(TFN_csv_path,names=["l","c","r"])
         self.define_custom_rules(TFN_data=TFN_data)
 
@@ -328,6 +329,9 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
         self.fuzzy_multiply()
         # 内的・動的
         self.AHP_weight_sum(input_node_codes=[40000010,40000011,40000012,40000013,40000014,40000015,40000016],output_node_code=30000001)
+        # self.AHP_weight_sum(input_node_codes=[40000010,40000011,40000012,40000013,40000014,40000015],output_node_code=30000001)
+        # self.AHP_weight_sum(input_node_codes=[40000010,40000011,40000012,40000013,40000014,],output_node_code=30000001)
+        # self.AHP_weight_sum(input_node_codes=[40000010,40000011,40000012,40000013,],output_node_code=30000001)
         # 外的・静的
         self.AHP_weight_sum(input_node_codes=[40000100,40000101,40000102],output_node_code=30000010)
         # 外的・動的
@@ -349,12 +353,13 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
         return self.data_dicts
 
 if __name__=="__main__":
-    staff_name="中村"
-    AHP_array_type=staff_name
-    trial_name=f"20251122_postAnalysis3_{staff_name}"
+    staff_name_ahp="中村"
+    staff_name_fuzzy="中村"
+    AHP_array_type=staff_name_ahp
+    trial_name=f"20251122_postAnalysis3_{staff_name_ahp[0]}{staff_name_fuzzy[1]}"
     strage="NASK"
     runtype="simulation"
     data_dicts=Manager().load_picklelog("/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/3_立ち上がり実験データのクレンジング/data_dicts.pickle")
-    cls=Master(trial_name,data_dicts=data_dicts,strage="NASK",AHP_array_type=AHP_array_type,staff_name=staff_name)
+    cls=Master(trial_name,data_dicts=data_dicts,strage="NASK",AHP_array_type=AHP_array_type,staff_name_ahp=staff_name_ahp,staff_name_fuzzy=staff_name_fuzzy)
     cls.evaluate()
     cls.save_session()
