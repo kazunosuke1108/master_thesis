@@ -225,21 +225,22 @@ class FuzzyReasoning():
         def high(x):
             y=x
             return y
-        # def middle(x):
-        #     if x<=0.5:
-        #         y=2*x
-        #         return y
-        #     elif x>0.5:
-        #         y=-2*x+2
-        #         return y
+        def middle(x):
+            # symmetric triangular membership centered at 0.5
+            if x<=0.5:
+                y=2*x
+                return y
+            elif x>0.5:
+                y=-2*x+2
+                return y
         def low(x):
             y=1-x
             return y
         
         if type=="high":
             return high(x)
-        # elif type=="middle":
-        #     return middle(x)
+        elif type=="middle":
+            return middle(x)
         elif type=="low":
             return low(x)
 
@@ -256,11 +257,12 @@ class FuzzyReasoning():
             else:
                 raise KeyError
             # raise KeyError
-        return (peak,height)
+        return peak
     
-    def calculate_fuzzy(self,input_nodes={40000110:0.5,40000111:0.5},output_node=30000011):
+    def calculate_fuzzy(self,input_nodes={40000110:0.5,40000111:0.5},output_node=30000011, t_norm='product', verbose=True):
         rule_id=output_node
         reasoning_result=0
+        sum_heights=0
         try:
             proposition_ids=self.reasoning_rule_dict[rule_id]
         except KeyError:
@@ -269,15 +271,28 @@ class FuzzyReasoning():
             proposition_id=int(proposition_id)
             height=1
             for condition in proposition_ids[proposition_id]["conditions"].keys():
-                print(input_nodes)
-                print(condition)
-                print(input_nodes[condition])
+                # print(input_nodes)
+                # print(condition)
+                # print(input_nodes[condition])
                 h=self.membership_func(x=input_nodes[condition],type=self.reasoning_rule_dict[rule_id][proposition_id]["conditions"][condition])
-                height=height*h
-            peak,height=self.triangle_func(height,result=self.reasoning_rule_dict[rule_id][proposition_id]["result"])
-            # ic(peak,height)
-            reasoning_result+=peak*height
-        return reasoning_result
+                if t_norm=='product':
+                    height=height*h
+                elif t_norm=='min':
+                    height=min(height,h)
+                else:
+                    # default to product if unknown
+                    height=height*h
+            peak = self.triangle_func(height,result=self.reasoning_rule_dict[rule_id][proposition_id]["result"])
+            if verbose:
+                print(peak,height)
+            reasoning_result += peak * height
+            sum_heights += height
+        if rule_id==10000000 and verbose:
+            print(dict(input_nodes),"->",reasoning_result)
+        # Normalize weighted average (if sum_heights == 0 return 0)
+        if sum_heights == 0:
+            return 0
+        return reasoning_result / sum_heights
 
     def main(self):
         # ans=self.calculate_fuzzy(input_nodes={40000110:0.5,40000111:0.5},output_node=30000011)
@@ -291,6 +306,12 @@ if __name__=="__main__":
     # cls.main()
     import pandas as pd
     staff_name="中村"
+    TFN_csv_path=f"/media/hayashide/MasterThesis/common/TFN_{staff_name}.csv"
+    TFN_data = pd.read_csv(TFN_csv_path,names=["l","c","r"])
+    cls.define_custom_rules(TFN_data)
+    cls.main()
+    print(TFN_data)
+    staff_name="百武"
     TFN_csv_path=f"/media/hayashide/MasterThesis/common/TFN_{staff_name}.csv"
     TFN_data = pd.read_csv(TFN_csv_path,names=["l","c","r"])
     cls.define_custom_rules(TFN_data)
