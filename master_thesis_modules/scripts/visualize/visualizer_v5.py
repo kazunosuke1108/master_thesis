@@ -693,8 +693,11 @@ class Visualizer(Manager):
         for export_label in export_labels:
             print(export_label)
             for id_name in id_names:
-                if int(id_name) in [42,43]:
-                    continue
+                try:
+                    if int(id_name) in [42,43]:
+                        continue
+                except ValueError:
+                    pass
                 # if int(export_label) in ["10000000","20000001"]:
                 w=6
                 try:
@@ -820,19 +823,26 @@ if __name__=="__main__":
     # trial_name="20251122_postAnalysis3_中村"
     # trial_name="20251122_postAnalysis3_中武"
     strage="NASK"
-    # cls.visualize_graph(trial_name="20241229BuildSimulator",strage="NASK",name="A",show=True)
-    trial_name="20251122_postAnalysis3_中村"
+
+    trial_name="20251116中村_DevFuzzyCustomize"
     cls=Visualizer(trial_name=trial_name,strage=strage)
     cls.plot_matplotlib()
-    trial_name="20251122_postAnalysis3_中武"
+    trial_name="20251116百武_DevFuzzyCustomize"
     cls=Visualizer(trial_name=trial_name,strage=strage)
     cls.plot_matplotlib()
-    trial_name="20251122_postAnalysis3_百村"
-    cls=Visualizer(trial_name=trial_name,strage=strage)
-    cls.plot_matplotlib()
-    trial_name="20251122_postAnalysis3_百武"
-    cls=Visualizer(trial_name=trial_name,strage=strage)
-    cls.plot_matplotlib()
+    
+    # trial_name="20251122_postAnalysis3_中村"
+    # cls=Visualizer(trial_name=trial_name,strage=strage)
+    # cls.plot_matplotlib()
+    # trial_name="20251122_postAnalysis3_中武"
+    # cls=Visualizer(trial_name=trial_name,strage=strage)
+    # cls.plot_matplotlib()
+    # trial_name="20251122_postAnalysis3_百村"
+    # cls=Visualizer(trial_name=trial_name,strage=strage)
+    # cls.plot_matplotlib()
+    # trial_name="20251122_postAnalysis3_百武"
+    # cls=Visualizer(trial_name=trial_name,strage=strage)
+    # cls.plot_matplotlib()
     # cls.plot_fps()
     # cls.draw_positions()
     # cls.draw_features()
