@@ -24,7 +24,7 @@ def benjamini_hochberg(p_values):
 
 def main():
     base = Path(__file__).resolve().parent
-    src = base / "results_fix_answer_evaluate.csv"
+    src = base / "output/results_fix_answer_evaluate.csv"
     df = pd.read_csv(src)
 
     flag_cols = df.columns[7:]

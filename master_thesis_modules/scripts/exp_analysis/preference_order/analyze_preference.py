@@ -17,6 +17,7 @@ from scripts.management.manager import Manager
 
 
 csv_path="C:/Users/hyper/kazu_ws/master_thesis/master_thesis_modules/scripts/exp_analysis/preference_order/preference.csv"
+csv_path="/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts/exp_analysis/preference_order/preference.csv"
 data=pd.read_csv(csv_path,header=0,index_col=0).T
 # print(data)
 # print(data["経験年数"].astype(float).mean())
@@ -90,7 +91,8 @@ for case_name in case_list:
         result_dict["wilcoxon"][case_name][comparison_pair[0]][comparison_pair[1]]["p値"]=np.round(p,4)
         result_dict["wilcoxon"][case_name][comparison_pair[0]][comparison_pair[1]]["有意差"]=p<alpha
         result_dict["wilcoxon"][case_name][comparison_pair[0]][comparison_pair[1]]["統計量"]=np.round(stat,4)
-        result_table_dict[case_name].loc[comparison_pair[0].split("_")[1],comparison_pair[1].split("_")[1]]=result_dict["wilcoxon"][case_name][comparison_pair[0]][comparison_pair[1]]["有意差"]
+        # result_table_dict[case_name].loc[comparison_pair[0].split("_")[1],comparison_pair[1].split("_")[1]]=result_dict["wilcoxon"][case_name][comparison_pair[0]][comparison_pair[1]]["有意差"]
+        result_table_dict[case_name].loc[comparison_pair[0].split("_")[1],comparison_pair[1].split("_")[1]]=["有" if result_dict["wilcoxon"][case_name][comparison_pair[0]][comparison_pair[1]]["有意差"] else "無"][0]+f'(p={result_dict["wilcoxon"][case_name][comparison_pair[0]][comparison_pair[1]]["p値"]})'
         
 
 pprint(result_dict)
@@ -98,4 +100,4 @@ pprint(result_dict)
 Manager().write_json(dict_data=Manager().convert_np_types(result_dict),json_path=os.path.split(csv_path)[0]+"/result.json")
 
 for case_name in case_list:
-    result_table_dict[case_name].to_csv(os.path.split(csv_path)[0]+f"/wilcoxon_{case_name}.csv")
+    result_table_dict[case_name].to_csv(os.path.split(csv_path)[0]+f"/wilcoxon_{case_name}_p.csv")
