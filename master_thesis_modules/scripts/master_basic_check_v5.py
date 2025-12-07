@@ -21,7 +21,7 @@ from scripts.entropy.entropy_weight_generator import EntropyWeightGenerator
 from scripts.pseudo_data.pseudo_data_generator import PseudoDataGenerator
 
 class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
-    def __init__(self,trial_name,strage,scenario_dict={},runtype="simulation",staff_name=""):
+    def __init__(self,trial_name,strage,scenario_dict={},runtype="simulation",staff_name_ahp="中村",staff_name_fuzzy="中村"):
         super().__init__()
         print("# Master開始 #")
         self.trial_name=trial_name
@@ -29,7 +29,8 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
         self.scenario_dict=scenario_dict
         self.runtype=runtype
         self.data_dir_dict=self.get_database_dir(self.trial_name,self.strage)
-        self.staff_name=staff_name
+        self.staff_name_ahp=staff_name_ahp
+        self.staff_name_fuzzy=staff_name_fuzzy
         
         print("# default graph 定義 #")
         default_graph=self.get_default_graph()
@@ -51,7 +52,7 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
             self.raw_csv_paths=sorted(glob(self.data_dir_dict["trial_dir_path"]+"/data_*_raw.csv"))
             self.patients=[os.path.basename(p)[len("data_"):-len("_raw.csv")] for p in self.raw_csv_paths]
         elif self.runtype=="basic_check":
-            self.patients=["A"]
+            self.patients=["A","B","C"]
         
         print("# 人数分のgraph 定義 #")
         self.graph_dicts={}
@@ -78,12 +79,23 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
                     self.data_dicts[patient].rename(columns=renew_dict,inplace=True)
         elif self.runtype=="basic_check":
             print("# basic checkのデータをロード中 #")
+            self.data_dicts={}
             # self.data_dicts=PseudoDataGenerator(trial_name=self.trial_name,strage=self.strage).get_basic_check_data(graph_dicts=default_graph,patients=self.patients)
             df=pd.read_csv(self.data_dir_dict["trial_dir_path"]+"/data_A_eval.csv",header=0)
             df_columns=[int(k) for k in df.keys() if k!="timestamp"]
             df_columns=["timestamp"]+df_columns
             df.columns=df_columns
-            self.data_dicts={"A":df}
+            self.data_dicts["A"]=df
+            df=pd.read_csv(self.data_dir_dict["trial_dir_path"]+"/data_B_eval.csv",header=0)
+            df_columns=[int(k) for k in df.keys() if k!="timestamp"]
+            df_columns=["timestamp"]+df_columns
+            df.columns=df_columns
+            self.data_dicts["B"]=df
+            df=pd.read_csv(self.data_dir_dict["trial_dir_path"]+"/data_C_eval.csv",header=0)
+            df_columns=[int(k) for k in df.keys() if k!="timestamp"]
+            df_columns=["timestamp"]+df_columns
+            df.columns=df_columns
+            self.data_dicts["C"]=df
             # raise NotImplementedError
 
         # data_dictsに不足した列がないか確認
@@ -94,7 +106,7 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
                 self.data_dicts[patient][col]=np.nan
 
         # staffごとのFuzzy推論のカスタマイズ
-        TFN_csv_path=f"/media/hayashide/MasterThesis/common/TFN_{self.staff_name}.csv"
+        TFN_csv_path=f"/media/hayashide/MasterThesis/common/TFN_{self.staff_name_fuzzy}.csv"
         TFN_data = pd.read_csv(TFN_csv_path,names=["l","c","r"])
         self.define_custom_rules(TFN_data=TFN_data)
 
@@ -132,10 +144,10 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
         }
 
         # AHP 一対比較行列の作成
-        if self.staff_name=="":
+        if self.staff_name_ahp=="":
             array_type=1
         else:
-            array_type=self.staff_name
+            array_type=self.staff_name_ahp
         self.AHP_dict=getConsistencyMtx().get_all_comparison_mtx_and_weight(trial_name=self.trial_name,strage=self.strage,array_type=array_type)
 
 
@@ -772,11 +784,11 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
         pass
 
 if __name__=="__main__":
-    staff_name="中村"
-    staff_name="百武"
-    trial_name=f"20251116{staff_name}_DevFuzzyCustomize"
+    staff_name_ahp="百武"
+    staff_name_fuzzy="中村"
+    trial_name=f"20251116{staff_name_ahp[0]}{staff_name_fuzzy[1]}_DevFuzzyCustomize"
     strage="NASK"
     runtype="basic_check"
-    cls=Master(trial_name,strage,runtype=runtype,staff_name=staff_name)
+    cls=Master(trial_name,strage,runtype=runtype,staff_name_ahp=staff_name_ahp,staff_name_fuzzy=staff_name_fuzzy)
     cls.main()
     cls.save_session()

@@ -830,6 +830,12 @@ if __name__=="__main__":
     trial_name="20251116百武_DevFuzzyCustomize"
     cls=Visualizer(trial_name=trial_name,strage=strage)
     cls.plot_matplotlib()
+    trial_name="20251116中武_DevFuzzyCustomize"
+    cls=Visualizer(trial_name=trial_name,strage=strage)
+    cls.plot_matplotlib()
+    trial_name="20251116百村_DevFuzzyCustomize"
+    cls=Visualizer(trial_name=trial_name,strage=strage)
+    cls.plot_matplotlib()
     
     # trial_name="20251122_postAnalysis3_中村"
     # cls=Visualizer(trial_name=trial_name,strage=strage)
