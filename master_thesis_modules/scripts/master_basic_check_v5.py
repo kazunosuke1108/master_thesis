@@ -784,11 +784,14 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
         pass
 
 if __name__=="__main__":
-    staff_name_ahp="百武"
-    staff_name_fuzzy="中村"
-    trial_name=f"20251116{staff_name_ahp[0]}{staff_name_fuzzy[1]}_DevFuzzyCustomize"
-    strage="NASK"
-    runtype="basic_check"
-    cls=Master(trial_name,strage,runtype=runtype,staff_name_ahp=staff_name_ahp,staff_name_fuzzy=staff_name_fuzzy)
-    cls.main()
-    cls.save_session()
+    # staff_name_ahp="百武"
+    # staff_name_fuzzy="中村"
+    staff_names = ["中村","百武"]
+    for staff_name_ahp in staff_names:
+        for staff_name_fuzzy in staff_names:
+            trial_name=f"20251116{staff_name_ahp[0]}{staff_name_fuzzy[1]}_DevFuzzyCustomize"
+            strage="NASK"
+            runtype="basic_check"
+            cls=Master(trial_name,strage,runtype=runtype,staff_name_ahp=staff_name_ahp,staff_name_fuzzy=staff_name_fuzzy)
+            cls.main()
+            cls.save_session()

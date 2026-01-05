@@ -52,19 +52,19 @@ class FuzzyReasoning():
             20000001:{
                 1:{
                     "conditions":{30000010:"high",30000011:"high"},
-                    "result":TFN_data.loc[4,"c"],
+                    "result":TFN_data.loc[5,"c"],
                 },
                 2:{
                     "conditions":{30000010:"high",30000011:"low"},
-                    "result":TFN_data.loc[5,"c"],
+                    "result":TFN_data.loc[4,"c"],
                 },
                 3:{
                     "conditions":{30000010:"low",30000011:"high"},
-                    "result":TFN_data.loc[6,"c"],
+                    "result":TFN_data.loc[7,"c"],
                 },
                 4:{
                     "conditions":{30000010:"low",30000011:"low"},
-                    "result":TFN_data.loc[7,"c"],
+                    "result":TFN_data.loc[6,"c"],
                 },
             },
             10000000:{
@@ -259,7 +259,7 @@ class FuzzyReasoning():
             # raise KeyError
         return peak
     
-    def calculate_fuzzy(self,input_nodes={40000110:0.5,40000111:0.5},output_node=30000011, t_norm='product', verbose=True):
+    def calculate_fuzzy(self,input_nodes={40000110:0.5,40000111:0.5},output_node=30000011, t_norm='product', verbose=False):
         rule_id=output_node
         reasoning_result=0
         sum_heights=0
@@ -296,8 +296,24 @@ class FuzzyReasoning():
 
     def main(self):
         # ans=self.calculate_fuzzy(input_nodes={40000110:0.5,40000111:0.5},output_node=30000011)
-        ans=self.calculate_fuzzy(input_nodes={30000000:0.5,30000001:0.5},output_node=20000000)
+        print("==================")
+        ans=self.calculate_fuzzy(input_nodes={30000010:0.1,30000011:0.1},output_node=20000001)
         print(ans)
+        ans=self.calculate_fuzzy(input_nodes={30000010:0.1,30000011:0.5},output_node=20000001)
+        print(ans)
+        ans=self.calculate_fuzzy(input_nodes={30000010:0.1,30000011:0.9},output_node=20000001)
+        print(ans)
+        ans=self.calculate_fuzzy(input_nodes={30000010:0.5,30000011:0.5},output_node=20000001)
+        print(ans)
+        ans=self.calculate_fuzzy(input_nodes={30000010:0.9,30000011:0.1},output_node=20000001)
+        print(ans)
+        ans=self.calculate_fuzzy(input_nodes={30000010:0.9,30000011:0.5},output_node=20000001)
+        print(ans)
+        ans=self.calculate_fuzzy(input_nodes={30000010:0.9,30000011:0.9},output_node=20000001)
+        print(ans)
+        pass
+
+    def debug_main(self,staff_name):
         pass
 
 

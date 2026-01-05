@@ -1,0 +1,165 @@
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (4,11,15,22) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (4,11,15,22) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (4,11,15,21) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (4,11,15,22) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (4,11,15,22) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_hmnpc2023e_20240827_000116.csv
+          timestamp  ...  hmnpc2023e_001_bbox_label
+23660  1.724686e+09  ...                          0
+23661  1.724686e+09  ...                          0
+23662  1.724686e+09  ...                     person
+23663  1.724686e+09  ...                     person
+23664  1.724686e+09  ...                          0
+23665  1.724686e+09  ...                     person
+23666  1.724686e+09  ...                          0
+23667  1.724686e+09  ...                          0
+23668  1.724686e+09  ...                          0
+23669  1.724686e+09  ...                          0
+23686  1.724686e+09  ...                     person
+23692  1.724686e+09  ...                     person
+23736  1.724686e+09  ...                     person
+23742  1.724686e+09  ...                     person
+23744  1.724686e+09  ...                     person
+23745  1.724686e+09  ...                     person
+
+[16 rows x 23 columns]
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_hmnpc2023e_20240827_003108.csv
+          timestamp  ...  hmnpc2023e_001_bbox_label
+25531  1.724688e+09  ...                          0
+25532  1.724688e+09  ...                          0
+25534  1.724688e+09  ...                          0
+25535  1.724688e+09  ...                          0
+25536  1.724688e+09  ...                          0
+...             ...  ...                        ...
+35768  1.724688e+09  ...                          0
+35769  1.724688e+09  ...                          0
+35770  1.724688e+09  ...                          0
+35771  1.724688e+09  ...                          0
+35772  1.724688e+09  ...                          0
+
+[3260 rows x 23 columns]
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_hmnpc2023e_20240827_010108.csv
+          timestamp  ...  hmnpc2023e_001_bbox_label
+109    1.724688e+09  ...                        NaN
+110    1.724688e+09  ...                        NaN
+111    1.724688e+09  ...                        NaN
+112    1.724688e+09  ...                        NaN
+113    1.724688e+09  ...                        NaN
+...             ...  ...                        ...
+27186  1.724689e+09  ...                          0
+27187  1.724689e+09  ...                          0
+27188  1.724689e+09  ...                          0
+27189  1.724689e+09  ...                          0
+27190  1.724689e+09  ...                          0
+
+[1418 rows x 23 columns]
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_hmnpc2023e_20240827_013108.csv
+         timestamp  ...  hmnpc2023e_001_bbox_label
+5835  1.724690e+09  ...                          0
+5836  1.724690e+09  ...                          0
+5837  1.724690e+09  ...                          0
+5838  1.724690e+09  ...                          0
+5839  1.724690e+09  ...                          0
+5840  1.724690e+09  ...                          0
+6009  1.724690e+09  ...                          0
+6010  1.724690e+09  ...                          0
+6011  1.724690e+09  ...                          0
+6012  1.724690e+09  ...                          0
+6019  1.724690e+09  ...                          0
+6020  1.724690e+09  ...                          0
+6021  1.724690e+09  ...                          0
+6022  1.724690e+09  ...                     person
+6024  1.724690e+09  ...                          0
+6025  1.724690e+09  ...                          0
+6026  1.724690e+09  ...                          0
+6027  1.724690e+09  ...                          0
+6028  1.724690e+09  ...                          0
+6029  1.724690e+09  ...                          0
+6030  1.724690e+09  ...                          0
+6031  1.724690e+09  ...                          0
+6032  1.724690e+09  ...                          0
+6033  1.724690e+09  ...                          0
+6034  1.724690e+09  ...                          0
+6035  1.724690e+09  ...                          0
+6036  1.724690e+09  ...                          0
+6037  1.724690e+09  ...                          0
+6038  1.724690e+09  ...                          0
+6039  1.724690e+09  ...                          0
+
+[30 rows x 22 columns]
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_hmnpc2023e_20240827_020108.csv
+          timestamp  ...  hmnpc2023e_001_bbox_label
+5217   1.724692e+09  ...                        NaN
+5218   1.724692e+09  ...                        NaN
+5219   1.724692e+09  ...                        NaN
+5220   1.724692e+09  ...                        NaN
+5221   1.724692e+09  ...                        NaN
+...             ...  ...                        ...
+35911  1.724693e+09  ...                     person
+35912  1.724693e+09  ...                     person
+35913  1.724693e+09  ...                     person
+35914  1.724693e+09  ...                     person
+35915  1.724693e+09  ...                     person
+
+[2688 rows x 23 columns]
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_hmnpc2023e_20240827_023108.csv
+          timestamp  ...  hmnpc2023e_001_bbox_label
+0      1.724693e+09  ...                     person
+1      1.724693e+09  ...                     person
+2      1.724693e+09  ...                     person
+3      1.724693e+09  ...                          0
+4      1.724693e+09  ...                          0
+...             ...  ...                        ...
+25386  1.724695e+09  ...                          0
+25387  1.724695e+09  ...                          0
+25388  1.724695e+09  ...                          0
+25389  1.724695e+09  ...                     person
+25390  1.724695e+09  ...                          0
+
+[805 rows x 23 columns]
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_hmnpc2023e_20240827_030108.csv
+          timestamp  ...  hmnpc2023e_001_bbox_label
+4151   1.724695e+09  ...                          0
+4152   1.724695e+09  ...                          0
+4156   1.724695e+09  ...                          0
+4157   1.724695e+09  ...                          0
+4158   1.724695e+09  ...                          0
+...             ...  ...                        ...
+32167  1.724697e+09  ...                          0
+32173  1.724697e+09  ...                          0
+32174  1.724697e+09  ...                          0
+32176  1.724697e+09  ...                          0
+32184  1.724697e+09  ...                          0
+
+[2538 rows x 23 columns]
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_hmnpc2023e_20240827_033108.csv
+Traceback (most recent call last):
+  File "/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py", line 28, in <module>
+    data=pd.read_csv(csv_path,header=0)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hayashide/anaconda3/lib/python3.11/site-packages/pandas/io/parsers/readers.py", line 948, in read_csv
+    return _read(filepath_or_buffer, kwds)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hayashide/anaconda3/lib/python3.11/site-packages/pandas/io/parsers/readers.py", line 611, in _read
+    parser = TextFileReader(filepath_or_buffer, **kwds)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hayashide/anaconda3/lib/python3.11/site-packages/pandas/io/parsers/readers.py", line 1448, in __init__
+    self._engine = self._make_engine(f, self.engine)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hayashide/anaconda3/lib/python3.11/site-packages/pandas/io/parsers/readers.py", line 1723, in _make_engine
+    return mapping[engine](f, **self.options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hayashide/anaconda3/lib/python3.11/site-packages/pandas/io/parsers/c_parser_wrapper.py", line 93, in __init__
+    self._reader = parsers.TextReader(src, **kwds)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "parsers.pyx", line 579, in pandas._libs.parsers.TextReader.__cinit__
+  File "parsers.pyx", line 668, in pandas._libs.parsers.TextReader._get_header
+  File "parsers.pyx", line 879, in pandas._libs.parsers.TextReader._tokenize_rows
+  File "parsers.pyx", line 890, in pandas._libs.parsers.TextReader._check_tokenize_status
+  File "parsers.pyx", line 2058, in pandas._libs.parsers.raise_parser_error
+pandas.errors.ParserError: Error tokenizing data. C error: Calling read(nbytes) on source failed. Try engine='python'.

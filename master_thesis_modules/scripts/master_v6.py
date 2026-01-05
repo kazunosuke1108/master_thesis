@@ -136,7 +136,7 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
                 self.data_dicts[patient][risk]=list(map(get_similarity,[risk for i in range(len(self.data_dicts[patient]))],self.data_dicts[patient].iterrows()))
                 self.data_dicts[patient][risk]=self.activation_func(self.data_dicts[patient][risk])
             # 立ち座りを上書き
-            self.data_dicts[patient][40000010]=stand_sit(self.data_dicts[patient])
+            # self.data_dicts[patient][40000010]=stand_sit(self.data_dicts[patient])
             
     def object_risk(self):
         for patient in self.data_dicts.keys():

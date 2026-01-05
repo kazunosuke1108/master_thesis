@@ -393,8 +393,8 @@ class Visualizer(Manager):
             cell_y = (map_height - y) * map_config["resolution"] + map_config["origin"][1]
             return cell_x, cell_y
 
-        map_img=Image.open(self.data_dir_dict["mobilesensing_dir_path"]+"/common"+"/map/map2d.pgm")
-        map_config=self.load_yaml(self.data_dir_dict["mobilesensing_dir_path"]+"/common"+"/map/map2d.yaml")
+        map_img=Image.open(self.data_dir_dict["database_dir_path"].replace("MasterThesis","MobileSensing")+"/common"+"/map/map2d.pgm")
+        map_config=self.load_yaml(self.data_dir_dict["database_dir_path"].replace("MasterThesis","MobileSensing")+"/common"+"/map/map2d.yaml")
         map_initial_x, map_initial_y = cell_to_xy(0, map_img.height, map_config, map_img.height)
         map_end_x, map_end_y = cell_to_xy(map_img.width, 0, map_config, map_img.height)
 
@@ -414,7 +414,7 @@ class Visualizer(Manager):
                 )
             )
         else:
-            map_img=Image.open(self.data_dir_dict["mobilesensing_dir_path"]+"/common"+"/map/map2d.png").convert("RGB")
+            map_img=Image.open(self.data_dir_dict["database_dir_path"].replace("MasterThesis","MobileSensing")+"/common"+"/map/map2d.png").convert("RGB")
             map_img=ImageOps.flip(map_img)
             map_img_np=np.array(map_img)
 
@@ -510,6 +510,48 @@ class Visualizer(Manager):
         fig=self.plot_map(fig,dimension="3D")
         fig.write_html(self.data_dir_dict["trial_dir_path"]+"/positions.html")
         fig.show()
+        pass
+
+    def draw_positions2(self,data_list,labels=None):
+        def plot_points(data,name,plot_data):
+            print(name)
+            trace=go.Scatter3d(
+                x=data[name+"_x"], # nameの_x
+                y=data[name+"_y"], # nameの_y
+                z=data["timestamp"]-data["timestamp"].values[0],
+                mode="markers",
+                marker=dict(size=3), # マーカーのサイズは小さめ
+                marker_color="blue",
+                name=str(name),
+            )
+            plot_data.append(trace)
+            return plot_data
+
+        if labels is None:
+            labels=[f"{i:02d}" for i in range(len(data_list))]
+
+        for label,data in zip(labels,data_list):
+            if len(data)==0:
+                continue
+            plot_data=[]
+            names=[k[:-len("_x")] for k in data.columns if "_x" in k]
+            for name in names:
+                plot_data=plot_points(data,name,plot_data)
+            fig=go.Figure(data=plot_data)
+            fig.update_layout(
+                    scene_aspectmode='manual',
+                    scene_aspectratio=dict(x=5, y=5, z=3),
+                )
+            fig=self.plot_map(fig,dimension="3D")
+            fig.write_html(self.data_dir_dict["trial_dir_path"]+f"/positions_{label}.html")
+            # 真上からの視点でpng保存
+            camera = dict(
+                eye=dict(x=0, y=0, z=5)  # カメラの視点の位置（x, y, z）
+            )
+            fig.update_layout(
+                scene_camera=camera,  # カメラの視点を設定
+            )
+            fig.write_image(self.data_dir_dict["trial_dir_path"]+f"/positions_{label}_topview.png",format='png', engine="auto",width=1920,height=1080)
         pass
 
     def draw_features(self):
@@ -824,18 +866,18 @@ if __name__=="__main__":
     # trial_name="20251122_postAnalysis3_中武"
     strage="NASK"
 
-    trial_name="20251116中村_DevFuzzyCustomize"
-    cls=Visualizer(trial_name=trial_name,strage=strage)
-    cls.plot_matplotlib()
-    trial_name="20251116百武_DevFuzzyCustomize"
-    cls=Visualizer(trial_name=trial_name,strage=strage)
-    cls.plot_matplotlib()
-    trial_name="20251116中武_DevFuzzyCustomize"
-    cls=Visualizer(trial_name=trial_name,strage=strage)
-    cls.plot_matplotlib()
-    trial_name="20251116百村_DevFuzzyCustomize"
-    cls=Visualizer(trial_name=trial_name,strage=strage)
-    cls.plot_matplotlib()
+    # trial_name="20251116中村_DevFuzzyCustomize"
+    # cls=Visualizer(trial_name=trial_name,strage=strage)
+    # cls.plot_matplotlib()
+    # trial_name="20251116百武_DevFuzzyCustomize"
+    # cls=Visualizer(trial_name=trial_name,strage=strage)
+    # cls.plot_matplotlib()
+    # trial_name="20251116中武_DevFuzzyCustomize"
+    # cls=Visualizer(trial_name=trial_name,strage=strage)
+    # cls.plot_matplotlib()
+    # trial_name="20251116百村_DevFuzzyCustomize"
+    # cls=Visualizer(trial_name=trial_name,strage=strage)
+    # cls.plot_matplotlib()
     
     # trial_name="20251122_postAnalysis3_中村"
     # cls=Visualizer(trial_name=trial_name,strage=strage)
@@ -849,6 +891,23 @@ if __name__=="__main__":
     # trial_name="20251122_postAnalysis3_百武"
     # cls=Visualizer(trial_name=trial_name,strage=strage)
     # cls.plot_matplotlib()
+    
+    
+    trial_name="20251211_MasterThesisData"
+    cls=Visualizer(trial_name=trial_name,strage=strage)
+    cls.plot_matplotlib()
+    trial_name="20251211_MasterThesisData_中村"
+    cls=Visualizer(trial_name=trial_name,strage=strage)
+    cls.plot_matplotlib()
+    trial_name="20251211_MasterThesisData_中武"
+    cls=Visualizer(trial_name=trial_name,strage=strage)
+    cls.plot_matplotlib()
+    trial_name="20251211_MasterThesisData_百村"
+    cls=Visualizer(trial_name=trial_name,strage=strage)
+    cls.plot_matplotlib()
+    trial_name="20251211_MasterThesisData_百武"
+    cls=Visualizer(trial_name=trial_name,strage=strage)
+    cls.plot_matplotlib()
     # cls.plot_fps()
     # cls.draw_positions()
     # cls.draw_features()
