@@ -28,7 +28,6 @@ for csv_path in csv_paths:
     data=pd.read_csv(csv_path,header=0)
     # _x, _yで終わる列が全てNaNの行を削除
     data=data.dropna(subset=[col for col in data.columns if col.endswith(("_x","_y"))],how="all")
-    print(data)
     basename=os.path.basename(csv_path)[:-4].split("_")
     date_str=basename[-2]
     hour_str=basename[-1][:2]

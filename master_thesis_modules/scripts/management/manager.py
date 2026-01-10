@@ -206,7 +206,8 @@ class Manager():
         for idx,image in enumerate(image_paths):
             img=cv2.imread(image)
             video.write(img)
-            print(f"now processing: {os.path.basename(image)} {idx}/{len(image_paths)}")
+            if idx%100==0:
+                print(f"now processing: {os.path.basename(image)} {idx}/{len(image_paths)}")
         video.release()
 
     # def putText_japanese(img, text, point, size, color):

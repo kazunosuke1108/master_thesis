@@ -1,0 +1,1293 @@
+nohup: 入力を無視します
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (4,11,15,22) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (4,11,15,22) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (4,11,15,21) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (4,11,15,22) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (4,11,15,22) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (4,11,15,22) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (4,11,15,22) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (15,22,26,33) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (15,22) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (4,11,15,22,26,33,37,43) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (15,22,26,33) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (26,33) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (4,11,15,22,26,33) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (15,22,26,33,37,44,48,55) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (37,44) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (37,44,48,55,59,66) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (26,33,37,44,48,55,59,66) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (26,33,37,44) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (26,33,37,44,48,55,59,66,70,77) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (26,33,37,44,48,55,59,66) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (37,44,48,55) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (26,33,37,44,48,55) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (26,33,37,44) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (15,22,26,33,37,44) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (37,44,48,55,59,66,70,77) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (48,55,59,66) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (48,55,59,66,70,77) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (37,44) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (15,22,26,33,37,44,48,55) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (26,33,37,44) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (37,44) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (37,44) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (15,22,26,33,37,44) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (26,33,37,44,48,55) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (26,33,37,44,48,55) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (26,33) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (26,33,37,44) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (26,33) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (26,33,37,44,48,55) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (26,32,36,42) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (4,11,15,22) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (15,22,26,33) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (4,11,15,22,26,33) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (4,11,15,22) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (4,11,15,22,26,33) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (4,11,15,22,26,33) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (4,11,15,22) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (4,11,15,22,26,33,37,44) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (4,10,14,21) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (26,33,37,43) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (26,33,37,44) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (4,11,26,33) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (26,33,37,44) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (37,44) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (26,33,37,44,48,55) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (48,55) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (37,44,48,55,59,65) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (37,44,48,55,59,66) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (37,44,48,55) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (37,44,48,55) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (37,44) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (15,22,26,33,37,44) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (37,44,48,55) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (37,44,48,55) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (26,33,37,44,48,55) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (37,44,48,55,59,66,70,77) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_hmnpc2023e_20240827_000116.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_hmnpc2023e_20240827_003108.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_hmnpc2023e_20240827_010108.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_hmnpc2023e_20240827_013108.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_hmnpc2023e_20240827_020108.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_hmnpc2023e_20240827_023108.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_hmnpc2023e_20240827_030108.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_hmnpc2023e_20240827_033108.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_hmnpc2023e_20240827_040108.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_hmnpc2023e_20240827_043108.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_hmnpc2023e_20240827_050108.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_hmnpc2023e_20240827_053108.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_hmnpc2023e_20240827_060108.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_hmnpc2023e_20240827_063108.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_hmnpc2023e_20240827_070108.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_hmnpc2023e_20240827_073108.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_hmnpc2023e_20240827_080108.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_hmnpc2023e_20240827_083108.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_hmnpc2023e_20240827_090108.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_hmnpc2023e_20240827_093108.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_hmnpc2023e_20240827_100108.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_hmnpc2023e_20240827_103108.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_hmnpc2023e_20240827_110108.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_hmnpc2023e_20240827_113108.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_hmnpc2023e_20240827_120108.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_hmnpc2023e_20240827_123108.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_hmnpc2023e_20240827_130108.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_hmnpc2023e_20240827_133108.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_hmnpc2023e_20240827_140108.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_hmnpc2023e_20240827_143108.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_hmnpc2023e_20240827_150108.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_hmnpc2023e_20240827_153108.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_hmnpc2023e_20240827_160108.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_hmnpc2023e_20240827_163108.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_hmnpc2023e_20240827_170108.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_hmnpc2023e_20240827_173108.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_hmnpc2023e_20240827_180108.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_hmnpc2023e_20240827_183108.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_hmnpc2023e_20240827_190108.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_hmnpc2023e_20240827_193108.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_hmnpc2023e_20240827_200108.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_hmnpc2023e_20240827_203108.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_hmnpc2023e_20240827_210108.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_hmnpc2023e_20240827_213108.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_hmnpc2023e_20240827_220108.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_hmnpc2023e_20240827_223108.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_hmnpc2023e_20240827_230108.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_hmnpc2023e_20240827_233108.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytjs2022c_20240827_002822.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytjs2022c_20240827_005822.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytjs2022c_20240827_012822.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytjs2022c_20240827_015822.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytjs2022c_20240827_022822.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytjs2022c_20240827_025822.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytjs2022c_20240827_032822.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytjs2022c_20240827_035822.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytjs2022c_20240827_042822.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytjs2022c_20240827_045822.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytjs2022c_20240827_052822.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytjs2022c_20240827_055822.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytjs2022c_20240827_062822.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytjs2022c_20240827_065822.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytjs2022c_20240827_072822.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytjs2022c_20240827_075822.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytjs2022c_20240827_082822.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytjs2022c_20240827_085822.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytjs2022c_20240827_092822.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytjs2022c_20240827_095822.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytjs2022c_20240827_102822.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytjs2022c_20240827_105822.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytjs2022c_20240827_112822.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytjs2022c_20240827_115822.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytjs2022c_20240827_122822.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytjs2022c_20240827_125822.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytjs2022c_20240827_132822.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytjs2022c_20240827_135822.csv
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (37,44,48,55,59,66,70,76) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (26,33,37,44,48,55,59,66,70,77) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (26,33,37,44) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (26,33,37,44) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (26,33,37,44,48,55) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (15,22,26,33) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (26,33,37,44) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (26,33,37,44,48,55) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (37,43) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (15,22) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (15,22) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (4,11,15,22) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (4,11,15,22,26,33) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (15,22) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (4,11,15,22) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (15,22) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (15,22,26,33) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (4,11,15,22) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (4,11,15,22,26,33) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (15,22,26,33) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (4,11,37,44) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (15,22) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (15,22,26,33,37,44) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (15,22,26,33,37,44) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (15,22) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (15,22) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (15,22,26,33,37,44,48,55,59,66) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (4,11,15,22,26,33,37,44,48,55) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (26,33) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (15,22,26,33) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (15,22,26,33) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (26,33,37,44) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (37,44) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (37,44) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (59,66,70,77) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (15,22,26,33,37,44,48,55,59,66) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (37,44,48,55,59,66,70,77) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (48,55) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (48,55,59,66,70,77,81,88) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (59,66,70,77,81,88,92,99) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (37,44,48,55,59,66,70,77,81,88) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (37,44,48,55,59,66,70,77) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (15,22,26,33,37,44,48,55,59,66) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (37,44) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (15,22,26,33,37,44,48,55) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (48,55) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (37,44,48,55,59,66,70,77) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (26,33,37,44,48,55) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (37,44,48,55,59,66) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (4,11) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (15,22) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (4,11,15,22,26,33,37,44,48,55) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (4,11,15,22) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (4,11,15,21) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (15,22,26,33) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (4,11,15,22,26,33) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (4,11,70,77,81,88) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (4,11,15,22,70,77,81,88) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytjs2022c_20240827_142822.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytjs2022c_20240827_145822.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytjs2022c_20240827_152822.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytjs2022c_20240827_155822.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytjs2022c_20240827_162822.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytjs2022c_20240827_165822.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytjs2022c_20240827_172822.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytjs2022c_20240827_175822.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytjs2022c_20240827_182822.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytjs2022c_20240827_185822.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytjs2022c_20240827_192822.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytjs2022c_20240827_195822.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytjs2022c_20240827_202822.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytjs2022c_20240827_205822.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytjs2022c_20240827_212822.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytjs2022c_20240827_215822.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytjs2022c_20240827_222822.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytjs2022c_20240827_222824.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytjs2022c_20240827_225822.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytjs2022c_20240827_232822.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytjs2022c_20240827_235822.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2021f_20240823_164714.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2021f_20240823_164718.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2021f_20240827_001714.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2021f_20240827_004714.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2021f_20240827_011714.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2021f_20240827_014714.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2021f_20240827_021714.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2021f_20240827_024714.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2021f_20240827_031714.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2021f_20240827_034714.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2021f_20240827_041714.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2021f_20240827_044714.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2021f_20240827_051714.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2021f_20240827_054714.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2021f_20240827_061714.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2021f_20240827_064714.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2021f_20240827_071714.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2021f_20240827_074714.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2021f_20240827_081714.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2021f_20240827_084714.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2021f_20240827_091714.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2021f_20240827_094714.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2021f_20240827_101714.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2021f_20240827_104714.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2021f_20240827_111714.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2021f_20240827_114714.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2021f_20240827_121714.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2021f_20240827_124714.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2021f_20240827_131714.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2021f_20240827_134714.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2021f_20240827_141714.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2021f_20240827_144714.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2021f_20240827_151714.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2021f_20240827_154714.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2021f_20240827_161714.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2021f_20240827_164714.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2021f_20240827_171714.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2021f_20240827_174714.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2021f_20240827_181714.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2021f_20240827_184714.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2021f_20240827_191714.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2021f_20240827_194714.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2021f_20240827_201714.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2021f_20240827_204714.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2021f_20240827_211714.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2021f_20240827_214714.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2021f_20240827_221714.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2021f_20240827_224714.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2021f_20240827_231714.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2021f_20240827_234714.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2021h_20240827_000654.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2021h_20240827_000709.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2021h_20240827_003654.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2021h_20240827_013654.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2021h_20240827_020654.csv
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (81,88) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (4,11,15,22,26,33,37,44,48,55,59,66,70,77) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (4,11,15,22,26,33,48,55,59,66,70,77,81,88) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (4,11,81,88,92,99,103,110,114,121) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (92,99,103,110) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (81,88,92,99) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (70,77,81,88,92,99) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (92,99,103,110) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (103,110) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (81,88,92,99,103,110,114,121,125,132,136,143,147,154,158,165,169,176) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (114,121,125,132,136,143,147,154) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (136,143,147,154,158,165,169,176,180,187,191,198,202,209,213,220) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (180,187,191,198,202,209,213,220) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (180,187,191,198,202,209,213,220) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (114,121,125,132,136,143,147,154,158,165,169,176,180,187,191,198,202,209,213,220) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (136,143,147,154,158,165,169,176,180,187,191,198,202,209) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (114,121,125,132,136,143,147,154,158,165,169,176,180,187) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (103,110,114,121,125,132,136,143,147,154,158,165,169,176,180,187) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (169,176,180,187,191,198,202,209,213,220) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (136,143,147,154,158,165,169,176) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (136,143,147,154,158,165,169,176,180,187,191,198,202,209,213,220) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (158,165,169,176,180,187,191,198,202,209,213,220) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (158,165,169,176,180,187,191,198,202,209,213,220) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (169,176,180,187,191,198,202,209,213,220) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (180,187,191,198,202,209,213,220) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (191,198,202,209,213,220) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (169,176,180,187,191,198,202,209,213,220) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (158,165,169,176,180,187,191,198,202,209) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (158,165,169,176,180,187,191,198,202,209,213,220) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (125,132,136,143,147,154,158,165,169,176,180,187,191,198,202,209) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (103,110,114,121,125,132,136,143,147,154,158,165,169,176) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (136,143,147,154,158,165,169,176,180,187) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (37,44,48,55,59,66,70,77,81,88,92,99,103,110,114,121,125,132,136,143,147,154) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (103,110,114,121,125,132,136,143) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (92,99,103,110,114,121) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (4,11,15,22,26,33,37,44,59,66,92,99) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (81,88,92,99) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (4,11,70,77,81,88,92,99) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (4,11,15,22,26,33,37,44,48,55,59,66,70,77,81,88) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (4,11,70,77,81,88,92,99,103,110,114,121,125,132,136,143) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (4,11,81,88,92,99,103,110,114,121,125,132) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (4,11,70,77,81,88,92,99,103,110,114,121,125,132) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (4,11,15,22,26,33,59,66,70,77,81,88,92,99) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (4,11,59,66,70,77,81,88,92,99) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (4,11,48,55,59,66,70,77,81,88) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (70,77,81,87) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (4,11,15,22,26,33,37,44,48,55,59,66,70,77) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (4,11,15,22,26,33,37,44,48,55,59,66,70,77) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (4,11,15,22,26,33,37,44,48,55,59,66,70,77,81,88) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (4,11,15,22,26,33,37,44,48,55,59,66,70,77) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (15,22,26,33) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (15,22,26,32) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (4,11,15,22,26,32) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (26,33) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (15,22) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (15,22) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (4,11,15,22) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (26,33) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (26,33) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (37,44) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (4,11,15,22,26,33,37,43) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (37,44) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (48,55) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (37,44) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (48,55,59,66,70,77,81,88) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (48,55,59,66) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (48,55) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (48,55,59,66) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (48,55,59,66,70,77) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (48,55,59,66,70,77) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (26,33,37,44,48,55,59,66) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (26,33,37,44) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2021h_20240827_023654.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2021h_20240827_030654.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2021h_20240827_033654.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2021h_20240827_040654.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2021h_20240827_043654.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2021h_20240827_050654.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2021h_20240827_053654.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2021h_20240827_060654.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2021h_20240827_063654.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2021h_20240827_070654.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2021h_20240827_073654.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2021h_20240827_080654.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2021h_20240827_083654.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2021h_20240827_090654.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2021h_20240827_093655.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2021h_20240827_100654.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2021h_20240827_103654.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2021h_20240827_110654.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2021h_20240827_113654.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2021h_20240827_120654.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2021h_20240827_123654.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2021h_20240827_130655.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2021h_20240827_133654.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2021h_20240827_140655.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2021h_20240827_143654.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2021h_20240827_150655.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2021h_20240827_153654.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2021h_20240827_160654.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2021h_20240827_163654.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2021h_20240827_170654.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2021h_20240827_173654.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2021h_20240827_180654.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2021h_20240827_183654.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2021h_20240827_190654.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2021h_20240827_193654.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2021h_20240827_200654.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2021h_20240827_203654.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2021h_20240827_210654.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2021h_20240827_213654.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2021h_20240827_220654.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2021h_20240827_223654.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2021h_20240827_230654.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2021h_20240827_233654.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2021h_20240830_000654.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2021h_20240830_003654.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2021h_20240830_010654.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2021h_20240830_013654.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2021h_20240830_020654.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2021h_20240830_023654.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2021h_20240830_030654.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2022a_20240827_001615.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2022a_20240827_004615.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2022a_20240827_011615.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2022a_20240827_014615.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2022a_20240827_021615.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2022a_20240827_024615.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2022a_20240827_031615.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2022a_20240827_034615.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2022a_20240827_041615.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2022a_20240827_044615.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2022a_20240827_051615.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2022a_20240827_054615.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2022a_20240827_061616.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2022a_20240827_064615.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2022a_20240827_071615.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2022a_20240827_074615.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2022a_20240827_081615.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2022a_20240827_084615.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2022a_20240827_091615.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2022a_20240827_094615.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2022a_20240827_101615.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2022a_20240827_104615.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2022a_20240827_111615.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2022a_20240827_114615.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2022a_20240827_121615.csv
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (37,44,48,55,59,66,70,77) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (48,55,59,66,70,77) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (48,55,59,66,70,77,81,88) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (48,55,59,66) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (37,44,48,55) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (48,55) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (26,33,37,44,48,55) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (26,33,37,44,48,55) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (26,32) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (4,11,15,22,26,33) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (37,44,48,55) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (48,55) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (26,33,37,44,48,55,59,66) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (37,44) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (4,11,15,22,26,33) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (4,11,26,33) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (4,11,15,22,26,33,37,44) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (26,33) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (4,11,15,22,26,33) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (4,11,15,22) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (26,33,37,44) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (4,11,15,22) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (4,11,15,22,26,33,37,44,48,55,59,66) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (4,11,15,22,26,33,37,44,48,55,59,66) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (15,22,37,44,48,55,59,66) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (59,66) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (4,11,15,22,26,33,37,44,59,66) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (4,11,15,22,26,33,37,44,48,55,59,66,70,77) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (4,11,15,22,26,33,37,44,48,55,59,66) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (4,11,15,22,26,33,37,44,48,55,59,66) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (70,77,81,88,92,99) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (59,66,70,77,81,87,91,97) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (4,11,59,66,70,77,81,88) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (4,11,15,22,26,33,37,44,48,55,59,66,70,77,81,88,92,99,103,110) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (4,11,15,22,59,66,70,77,81,88,92,99,103,110,114,121,125,131) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (4,11,92,99,103,110,114,121,125,132,136,143,147,154,158,165,169,176) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (125,132,136,143,147,154,158,165,169,176,180,187,191,198) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (158,165,169,176,180,187,191,198) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (114,121,125,132,136,143,147,154,158,165,169,176,180,187,191,198,202,209,213,220) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (125,132,136,143,147,154,158,165,169,176,180,187) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (136,143,147,154,158,165,169,176,180,187,191,198,202,209,213,220) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (136,143,147,154,158,165,169,176,180,187) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (125,132,136,143,147,154,158,165,169,176,180,187) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (136,143,147,154,158,165,169,176) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (158,165,169,176,180,187,191,198,202,209,213,220) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (147,154,158,165,169,176,180,187,191,198,202,209,213,220) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (147,154,158,165,169,176,180,187,191,198) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (114,121,125,132,136,143,147,154,158,165,169,176,180,187) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (92,99,103,110,114,121,125,132,136,143,147,154) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (136,143,147,154,158,165,169,176,180,187) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (136,143,147,154,158,165,169,176,180,187) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (125,132,136,143,147,154,158,165,169,176) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (125,132,136,143,147,154,158,165,169,176) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (114,121,125,132,136,143,147,154,158,165,169,176,180,187) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (136,143,147,154,158,165,169,176,180,187,191,198) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (136,143,147,154,158,165) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (147,154,158,165,169,176,180,187,191,198,202,209) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (136,143,147,154,158,165,169,176) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (92,99,103,110,114,121,125,132,136,143) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (92,99,103,110,114,121,125,132,136,143,147,154,158,165) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (70,77,81,88,92,99,103,110,114,121,125,132,136,143) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (70,77,81,88,92,99) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (26,33,37,44,48,55,70,77,81,88) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (59,66,81,88,92,99,103,110) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (70,77,81,88) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (70,77,81,88) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (4,11,15,22,26,33,37,44,48,55,59,66,70,77,81,88) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (4,11,15,22,26,33,37,44,48,55,59,66,70,77) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (70,77) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (4,11,15,22,26,33,37,44,48,55,59,66,70,77) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (4,11,48,55,59,66,70,77,81,88,92,99,103,110,114,121,125,132) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (4,11,15,22,26,33,37,44,48,55,59,66,70,77,81,88) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (4,11,15,22,26,33,37,44,48,55,59,66,70,77,81,88,92,99) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (4,11,15,22,26,33,37,44,48,55,59,66,70,77,81,88) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2022a_20240827_124615.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2022a_20240827_131615.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2022a_20240827_134615.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2022a_20240827_141615.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2022a_20240827_144615.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2022a_20240827_151615.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2022a_20240827_154615.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2022a_20240827_161615.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2022a_20240827_164615.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2022a_20240827_171615.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2022a_20240827_174615.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2022a_20240827_181615.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2022a_20240827_184615.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2022a_20240827_191615.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2022a_20240827_194615.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2022a_20240827_201615.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2022a_20240827_204615.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2022a_20240827_211615.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2022a_20240827_214615.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2022a_20240827_221615.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2022a_20240827_224615.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2022a_20240827_231615.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2022a_20240827_234615.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2022b_20240827_002255.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2022b_20240827_005255.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2022b_20240827_012255.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2022b_20240827_015255.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2022b_20240827_022255.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2022b_20240827_025255.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2022b_20240827_032255.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2022b_20240827_035255.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2022b_20240827_042255.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2022b_20240827_045255.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2022b_20240827_052255.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2022b_20240827_055255.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2022b_20240827_062255.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2022b_20240827_065255.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2022b_20240827_072255.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2022b_20240827_075255.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2022b_20240827_082256.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2022b_20240827_085255.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2022b_20240827_092255.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2022b_20240827_095255.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2022b_20240827_102255.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2022b_20240827_105255.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2022b_20240827_112255.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2022b_20240827_115255.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2022b_20240827_122255.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2022b_20240827_125255.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2022b_20240827_132255.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2022b_20240827_135255.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2022b_20240827_142255.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2022b_20240827_145255.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2022b_20240827_152255.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2022b_20240827_155255.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2022b_20240827_162255.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2022b_20240827_165255.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2022b_20240827_172255.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2022b_20240827_175255.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2022b_20240827_182255.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2022b_20240827_185255.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2022b_20240827_192255.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2022b_20240827_195255.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2022b_20240827_202255.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2022b_20240827_205255.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2022b_20240827_212255.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2022b_20240827_215255.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2022b_20240827_222255.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2022b_20240827_225255.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2022b_20240827_232255.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2022b_20240827_235255.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2022b_20240830_002255.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2022b_20240830_005255.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2022b_20240830_012255.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2022b_20240830_015255.csv
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (4,11,15,22,26,33,37,44,81,88) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (48,55,81,88,92,99) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py:28: DtypeWarning: Columns (4,11,15,22,26,33,37,44,48,55,59,66) have mixed types. Specify dtype option on import or set low_memory=False.
+  data=pd.read_csv(csv_path,header=0)
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2022b_20240830_022255.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2022b_20240830_025255.csv
+/media/hayashide/MobileSensing/Nagasaki20240827/csv/raw/Nagasaki20240827_raw_ytnpc2022b_20240830_032255.csv
+/home/hayashide/kazu_ws/master_thesis/master_thesis_modules
+{'mobilesensing_dir_path': '/media/hayashide/MobileSensing/20260105_test', 'module_dir_path': '/home/hayashide/kazu_ws/master_thesis/master_thesis_modules', 'database_dir_path': '/media/hayashide/MasterThesis', 'trial_dir_path': '/media/hayashide/MasterThesis/20260105_test', 'common_dir_path': '/media/hayashide/MasterThesis/common'}
+hmnpc2023e_000
+hmnpc2023e_001
+ytjs2022c_000
+ytjs2022c_001
+ytjs2022c_002
+ytnpc2021f_000
+ytnpc2021f_001
+ytnpc2021f_002
+ytnpc2021h_000
+ytnpc2021h_001
+ytnpc2021h_002
+ytnpc2021h_003
+ytnpc2021h_004
+ytnpc2021h_005
+ytnpc2021h_006
+ytnpc2022a_000
+ytnpc2022a_001
+ytnpc2022a_002
+ytnpc2022b_000
+ytnpc2022b_001
+ytnpc2022b_002
+ytnpc2022b_003
+ytnpc2022b_004
+ytnpc2022b_005
+hmnpc2023e_000
+hmnpc2023e_001
+ytjs2022c_000
+ytjs2022c_001
+ytjs2022c_002
+ytnpc2021f_000
+ytnpc2021f_001
+ytnpc2021f_002
+ytnpc2021h_000
+ytnpc2021h_001
+ytnpc2021h_002
+ytnpc2021h_003
+ytnpc2021h_004
+ytnpc2021h_005
+ytnpc2021h_006
+ytnpc2021h_007
+ytnpc2022a_000
+ytnpc2022a_001
+ytnpc2022a_002
+ytnpc2022b_000
+ytnpc2022b_001
+ytnpc2022b_002
+ytnpc2022b_003
+ytnpc2022b_004
+ytnpc2022b_005
+hmnpc2023e_000
+hmnpc2023e_001
+ytjs2022c_000
+ytjs2022c_001
+ytjs2022c_002
+ytnpc2021f_000
+ytnpc2021f_001
+ytnpc2021f_002
+ytnpc2021f_003
+ytnpc2021h_000
+ytnpc2021h_001
+ytnpc2021h_002
+ytnpc2021h_003
+ytnpc2021h_004
+ytnpc2021h_005
+ytnpc2021h_006
+ytnpc2021h_007
+ytnpc2022a_000
+ytnpc2022a_001
+ytnpc2022a_002
+ytnpc2022b_000
+ytnpc2022b_001
+ytnpc2022b_002
+ytnpc2022b_003
+ytnpc2022b_004
+ytnpc2022b_005
+ytnpc2022b_006
+hmnpc2023e_000
+hmnpc2023e_001
+ytjs2022c_000
+ytjs2022c_001
+ytjs2022c_002
+ytjs2022c_003
+ytnpc2021f_000
+ytnpc2021f_001
+ytnpc2021f_002
+ytnpc2021f_003
+ytnpc2021h_000
+ytnpc2021h_001
+ytnpc2021h_002
+ytnpc2021h_003
+ytnpc2021h_004
+ytnpc2021h_005
+ytnpc2021h_006
+ytnpc2021h_007
+ytnpc2022a_000
+ytnpc2022a_001
+ytnpc2022b_000
+ytnpc2022b_001
+ytnpc2022b_002
+ytnpc2022b_003
+ytnpc2022b_004
+ytnpc2022b_005
+hmnpc2023e_000
+hmnpc2023e_001
+ytjs2022c_000
+ytjs2022c_001
+ytjs2022c_002
+ytjs2022c_003
+ytnpc2021f_000
+ytnpc2021f_001
+ytnpc2021f_002
+ytnpc2021f_003
+ytnpc2021h_000
+ytnpc2021h_001
+ytnpc2021h_002
+ytnpc2021h_003
+ytnpc2021h_004
+ytnpc2021h_005
+ytnpc2021h_006
+ytnpc2021h_007
+ytnpc2021h_008
+ytnpc2021h_009
+ytnpc2021h_010
+ytnpc2022a_000
+ytnpc2022a_001
+ytnpc2022a_002
+ytnpc2022b_000
+ytnpc2022b_001
+ytnpc2022b_002
+ytnpc2022b_003
+ytnpc2022b_004
+ytnpc2022b_005
+ytnpc2022b_006
+ytnpc2022b_007
+ytnpc2022b_008
+hmnpc2023e_000
+hmnpc2023e_001
+hmnpc2023e_002
+ytjs2022c_000
+ytjs2022c_001
+ytjs2022c_002
+ytjs2022c_003
+ytnpc2021f_000
+ytnpc2021f_001
+ytnpc2021f_002
+ytnpc2021f_003
+ytnpc2021f_004
+ytnpc2021f_005
+ytnpc2021h_000
+ytnpc2021h_001
+ytnpc2021h_002
+ytnpc2021h_003
+ytnpc2021h_004
+ytnpc2021h_005
+ytnpc2021h_006
+ytnpc2021h_007
+ytnpc2021h_008
+ytnpc2022a_000
+ytnpc2022a_001
+ytnpc2022a_002
+ytnpc2022a_003
+ytnpc2022b_000
+ytnpc2022b_001
+ytnpc2022b_002
+ytnpc2022b_003
+ytnpc2022b_004
+ytnpc2022b_005
+ytnpc2022b_006
+ytnpc2022b_007
+ytnpc2022b_008
+ytnpc2022b_010
+hmnpc2023e_000
+hmnpc2023e_001
+hmnpc2023e_002
+hmnpc2023e_003
+ytjs2022c_000
+ytjs2022c_001
+ytjs2022c_002
+ytjs2022c_003
+ytnpc2021f_000
+ytnpc2021f_001
+ytnpc2021f_002
+ytnpc2021f_003
+ytnpc2021f_004
+ytnpc2021h_000
+ytnpc2021h_001
+ytnpc2021h_002
+ytnpc2021h_003
+ytnpc2021h_004
+ytnpc2021h_005
+ytnpc2021h_006
+ytnpc2021h_007
+ytnpc2021h_008
+ytnpc2021h_009
+ytnpc2022a_000
+ytnpc2022a_001
+ytnpc2022a_002
+ytnpc2022a_003
+ytnpc2022b_000
+ytnpc2022b_001
+ytnpc2022b_002
+ytnpc2022b_003
+ytnpc2022b_004
+ytnpc2022b_005
+ytnpc2022b_006
+ytnpc2022b_007
+ytnpc2022b_008
+ytnpc2022b_009
+ytnpc2022b_010
+ytnpc2022b_011
+ytnpc2022b_012
+ytnpc2022b_013
+ytnpc2022b_014
+ytnpc2022b_015
+hmnpc2023e_000
+hmnpc2023e_001
+hmnpc2023e_002
+ytjs2022c_000
+ytjs2022c_001
+ytjs2022c_002
+ytjs2022c_003
+ytjs2022c_004
+ytnpc2021f_000
+ytnpc2021f_001
+ytnpc2021f_002
+ytnpc2021h_000
+ytnpc2021h_001
+ytnpc2021h_002
+ytnpc2021h_003
+ytnpc2021h_004
+ytnpc2021h_005
+ytnpc2021h_006
+ytnpc2021h_007
+ytnpc2021h_008
+ytnpc2021h_009
+ytnpc2021h_010
+ytnpc2021h_011
+ytnpc2021h_012
+ytnpc2021h_013
+ytnpc2021h_014
+ytnpc2021h_015
+ytnpc2022a_000
+ytnpc2022a_001
+ytnpc2022a_002
+ytnpc2022a_003
+ytnpc2022a_004
+ytnpc2022b_000
+ytnpc2022b_001
+ytnpc2022b_002
+ytnpc2022b_003
+ytnpc2022b_004
+ytnpc2022b_005
+ytnpc2022b_006
+ytnpc2022b_007
+ytnpc2022b_008
+ytnpc2022b_009
+ytnpc2022b_010
+ytnpc2022b_011
+ytnpc2022b_012
+ytnpc2022b_013
+ytnpc2022b_014
+ytnpc2022b_015
+ytnpc2022b_016
+ytnpc2022b_017
+hmnpc2023e_000
+hmnpc2023e_001
+hmnpc2023e_002
+hmnpc2023e_003
+hmnpc2023e_004
+ytjs2022c_000
+ytjs2022c_001
+ytjs2022c_002
+ytjs2022c_003
+ytjs2022c_004
+ytjs2022c_005
+ytnpc2021f_000
+ytnpc2021f_001
+ytnpc2021f_002
+ytnpc2021f_003
+ytnpc2021h_000
+ytnpc2021h_001
+ytnpc2021h_002
+ytnpc2021h_003
+ytnpc2021h_004
+ytnpc2021h_005
+ytnpc2021h_006
+ytnpc2021h_007
+ytnpc2021h_008
+ytnpc2021h_009
+ytnpc2021h_010
+ytnpc2021h_011
+ytnpc2021h_012
+ytnpc2021h_013
+ytnpc2021h_014
+ytnpc2021h_015
+ytnpc2021h_016
+ytnpc2021h_017
+ytnpc2021h_018
+ytnpc2021h_019
+ytnpc2022a_000
+ytnpc2022a_001
+ytnpc2022a_002
+ytnpc2022a_003
+ytnpc2022a_004
+ytnpc2022a_005
+ytnpc2022a_006
+ytnpc2022a_007
+ytnpc2022b_000
+ytnpc2022b_001
+ytnpc2022b_002
+ytnpc2022b_003
+ytnpc2022b_004
+ytnpc2022b_005
+ytnpc2022b_006
+ytnpc2022b_007
+ytnpc2022b_008
+ytnpc2022b_009
+ytnpc2022b_010
+ytnpc2022b_011
+ytnpc2022b_012
+ytnpc2022b_013
+ytnpc2022b_014
+ytnpc2022b_015
+ytnpc2022b_016
+ytnpc2022b_017
+ytnpc2022b_018
+ytnpc2022b_019
+Traceback (most recent call last):
+  File "/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/5_1日の人流データをざっくり/1日の人流データをざっくり把握する.py", line 46, in <module>
+    visualizer.draw_positions2(data_list=data_list,labels=hour_labels)
+  File "/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts/visualize/visualizer_v5.py", line 554, in draw_positions2
+    scene_camera=camera,  # カメラの視点を設定
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hayashide/anaconda3/lib/python3.11/site-packages/plotly/basedatatypes.py", line 3829, in write_image
+    return pio.write_image(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hayashide/anaconda3/lib/python3.11/site-packages/plotly/io/_kaleido.py", line 267, in write_image
+    img_data = to_image(
+               ^^^^^^^^^
+  File "/home/hayashide/anaconda3/lib/python3.11/site-packages/plotly/io/_kaleido.py", line 144, in to_image
+    img_bytes = scope.transform(
+                ^^^^^^^^^^^^^^^^
+  File "/home/hayashide/anaconda3/lib/python3.11/site-packages/kaleido/scopes/plotly.py", line 153, in transform
+    response = self._perform_transform(
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hayashide/anaconda3/lib/python3.11/site-packages/kaleido/scopes/base.py", line 316, in _perform_transform
+    raise ValueError(message)
+ValueError: Transform failed. Error stream:
+
+tcmalloc: large alloc 1073741824 bytes == 0x39968b682000 @  0x5930141fd2ba 0x593015aa5d1f 0x593015a9de19 0x593015a9ec4f 0x593015a9df24 0x593015a9eb39 0x593015a9df12 0x593015a9ec4f 0x593015a9df24 0x593015a9eb39 0x593015a9df12 0x593015a9eb39 0x593015a9df12 0x593015a9dcb7 0x593015aa286c 0x593015a30320 0x593015a77093 0x593015a76e6a 0x593015a249c2 0x593015a9fde3 0x593015a6f172 0x5930181fb758 0x593015e8cbb8 0x593016992b76 0x5930169c0665 0x5930169bdfe7 0x59301633d306 0x59301634ecf6 0x59301634e9ea 0x59301630cbba 0x59301634f59b
+[0106/224501.639400:FATAL:v8_initializer.cc(96)] 
+#0 0x593016379d79 base::debug::CollectStackTrace()
+#1 0x5930162f7633 base::debug::StackTrace::StackTrace()
+#2 0x59301630715f logging::LogMessage::~LogMessage()
+#3 0x5930182cfb8f blink::ReportFatalErrorInMainThread()
+#4 0x5930153cfe38 v8::V8::ToLocalEmpty()
+#5 0x593015a3f45f v8_inspector::toV8String()
+#6 0x593015a31226 v8_inspector::InjectedScript::resolveCallArgument()
+#7 0x593015a77093 v8_inspector::(anonymous namespace)::innerCallFunctionOn()
+#8 0x593015a76e6a v8_inspector::V8RuntimeAgentImpl::callFunctionOn()
+#9 0x593015a249c2 v8_inspector::protocol::Runtime::DomainDispatcherImpl::callFunctionOn()
+#10 0x593015a9fde3 v8_crdtp::UberDispatcher::DispatchResult::Run()
+#11 0x593015a6f172 v8_inspector::V8InspectorSessionImpl::dispatchProtocolMessage()
+#12 0x5930181fb758 blink::DevToolsSession::DispatchProtocolCommandImpl()
+#13 0x593015e8cbb8 blink::mojom::blink::DevToolsSessionStubDispatch::Accept()
+#14 0x593016992b76 mojo::InterfaceEndpointClient::HandleValidatedMessage()
+#15 0x5930169c0665 IPC::(anonymous namespace)::ChannelAssociatedGroupController::AcceptOnProxyThread()
+#16 0x5930169bdfe7 base::internal::Invoker<>::RunOnce()
+#17 0x59301633d306 base::TaskAnnotator::RunTask()
+#18 0x59301634ecf6 base::sequence_manager::internal::ThreadControllerWithMessagePumpImpl::DoWorkImpl()
+#19 0x59301634e9ea base::sequence_manager::internal::ThreadControllerWithMessagePumpImpl::DoWork()
+#20 0x59301630cbba base::MessagePumpDefault::Run()
+#21 0x59301634f59b base::sequence_manager::internal::ThreadControllerWithMessagePumpImpl::Run()
+#22 0x5930163289bd base::RunLoop::Run()
+#23 0x59301959f596 content::RendererMain()
+#24 0x59301605fbd9 content::RunZygote()
+#25 0x593016060b64 content::ContentMainRunnerImpl::Run()
+#26 0x59301605e374 content::RunContentProcess()
+#27 0x59301605ecfc content::ContentMain()
+#28 0x5930160b0182 headless::(anonymous namespace)::RunContentMain()
+#29 0x5930160affbb headless::RunChildProcessIfNeeded()
+#30 0x5930140cef09 main
+#31 0x7a2270429d90 (/usr/lib/x86_64-linux-gnu/libc.so.6+0x29d8f)
+#32 0x7a2270429e40 __libc_start_main
+#33 0x5930140c83ea _start
+Task trace:
+#0 0x5930169bd9b9 IPC::(anonymous namespace)::ChannelAssociatedGroupController::Accept()
+
+Received signal 6
+#0 0x593016379d79 base::debug::CollectStackTrace()
+#1 0x5930162f7633 base::debug::StackTrace::StackTrace()
+#2 0x59301637995b base::debug::(anonymous namespace)::StackDumpSignalHandler()
+#3 0x7a2270442520 (/usr/lib/x86_64-linux-gnu/libc.so.6+0x4251f)
+#4 0x7a22704969fc pthread_kill
+#5 0x7a2270442476 raise
+#6 0x7a22704287f3 abort
+#7 0x5930163788f5 base::debug::BreakDebugger()
+#8 0x5930163075b2 logging::LogMessage::~LogMessage()
+#9 0x5930182cfb8f blink::ReportFatalErrorInMainThread()
+#10 0x5930153cfe38 v8::V8::ToLocalEmpty()
+#11 0x593015a3f45f v8_inspector::toV8String()
+#12 0x593015a31226 v8_inspector::InjectedScript::resolveCallArgument()
+#13 0x593015a77093 v8_inspector::(anonymous namespace)::innerCallFunctionOn()
+#14 0x593015a76e6a v8_inspector::V8RuntimeAgentImpl::callFunctionOn()
+#15 0x593015a249c2 v8_inspector::protocol::Runtime::DomainDispatcherImpl::callFunctionOn()
+#16 0x593015a9fde3 v8_crdtp::UberDispatcher::DispatchResult::Run()
+#17 0x593015a6f172 v8_inspector::V8InspectorSessionImpl::dispatchProtocolMessage()
+#18 0x5930181fb758 blink::DevToolsSession::DispatchProtocolCommandImpl()
+#19 0x593015e8cbb8 blink::mojom::blink::DevToolsSessionStubDispatch::Accept()
+#20 0x593016992b76 mojo::InterfaceEndpointClient::HandleValidatedMessage()
+#21 0x5930169c0665 IPC::(anonymous namespace)::ChannelAssociatedGroupController::AcceptOnProxyThread()
+#22 0x5930169bdfe7 base::internal::Invoker<>::RunOnce()
+#23 0x59301633d306 base::TaskAnnotator::RunTask()
+#24 0x59301634ecf6 base::sequence_manager::internal::ThreadControllerWithMessagePumpImpl::DoWorkImpl()
+#25 0x59301634e9ea base::sequence_manager::internal::ThreadControllerWithMessagePumpImpl::DoWork()
+#26 0x59301630cbba base::MessagePumpDefault::Run()
+#27 0x59301634f59b base::sequence_manager::internal::ThreadControllerWithMessagePumpImpl::Run()
+#28 0x5930163289bd base::RunLoop::Run()
+#29 0x59301959f596 content::RendererMain()
+#30 0x59301605fbd9 content::RunZygote()
+#31 0x593016060b64 content::ContentMainRunnerImpl::Run()
+#32 0x59301605e374 content::RunContentProcess()
+#33 0x59301605ecfc content::ContentMain()
+#34 0x5930160b0182 headless::(anonymous namespace)::RunContentMain()
+#35 0x5930160affbb headless::RunChildProcessIfNeeded()
+#36 0x5930140cef09 main
+#37 0x7a2270429d90 (/usr/lib/x86_64-linux-gnu/libc.so.6+0x29d8f)
+#38 0x7a2270429e40 __libc_start_main
+#39 0x5930140c83ea _start
+  r8: 00007ffdbfc4a050  r9: 0000000000000000 r10: 0000000000000008 r11: 0000000000000246
+ r12: 0000000000000006 r13: 0000000000000016 r14: 00007ffdbfc4b250 r15: 00007ffdbfc4b258
+  di: 0000000000085de8  si: 0000000000085de8  bp: 0000000000085de8  bx: 00007a22707b8840
+  dx: 0000000000000006  ax: 0000000000000000  cx: 00007a22704969fc  sp: 00007ffdbfc49f80
+  ip: 00007a22704969fc efl: 0000000000000246 cgf: 002b000000000033 erf: 0000000000000000
+ trp: 0000000000000000 msk: 0000000000000000 cr2: 0000000000000000
+[end of stack trace]
+Calling _exit(1). Core file will not be generated.
+/home/hayashide/anaconda3/bin/KaleidoApp/kaleido: 6 行: 548298 Hangup                  ./bin/kaleido --no-sandbox --allow-file-access-from-files --disable-breakpad $@
+

@@ -512,7 +512,7 @@ class Visualizer(Manager):
         fig.show()
         pass
 
-    def draw_positions2(self,data_list,labels=None):
+    def draw_positions2(self,data_list,labels=None,max_points=1000):
         def plot_points(data,name,plot_data):
             print(name)
             trace=go.Scatter3d(
@@ -533,6 +533,8 @@ class Visualizer(Manager):
         for label,data in zip(labels,data_list):
             if len(data)==0:
                 continue
+            if len(data)>max_points:
+                data=data.sample(n=max_points,random_state=None).sort_values("timestamp")
             plot_data=[]
             names=[k[:-len("_x")] for k in data.columns if "_x" in k]
             for name in names:
@@ -543,7 +545,7 @@ class Visualizer(Manager):
                     scene_aspectratio=dict(x=5, y=5, z=3),
                 )
             fig=self.plot_map(fig,dimension="3D")
-            fig.write_html(self.data_dir_dict["trial_dir_path"]+f"/positions_{label}.html")
+            fig.write_html(self.data_dir_dict["trial_dir_path"]+f"/positions_{label}_{max_points}.html")
             # 真上からの視点でpng保存
             camera = dict(
                 eye=dict(x=0, y=0, z=5)  # カメラの視点の位置（x, y, z）
@@ -551,7 +553,7 @@ class Visualizer(Manager):
             fig.update_layout(
                 scene_camera=camera,  # カメラの視点を設定
             )
-            fig.write_image(self.data_dir_dict["trial_dir_path"]+f"/positions_{label}_topview.png",format='png', engine="auto",width=1920,height=1080)
+            fig.write_image(self.data_dir_dict["trial_dir_path"]+f"/positions_{label}_{max_points}_topview.png",format='png', engine="auto",width=1920,height=1080)
         pass
 
     def draw_features(self):
