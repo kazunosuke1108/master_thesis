@@ -70,6 +70,7 @@ def main():
     visualizer_parent = Visualizer(trial_name="20260110_findEvent", strage="NASK")
     trial_dir_path = visualizer_parent.data_dir_dict["trial_dir_path"]
     os.makedirs(trial_dir_path, exist_ok=True)
+    raise NotImplementedError
 
     # プロセス数を抑える（CPU全開は事故りやすい）
     max_workers = min(8, cpu_count())  # 例: 上限6。好みで4〜8推奨

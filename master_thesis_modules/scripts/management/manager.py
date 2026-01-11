@@ -210,6 +210,30 @@ class Manager():
                 print(f"now processing: {os.path.basename(image)} {idx}/{len(image_paths)}")
         video.release()
 
+    def jpg2mp4_basename(self,image_paths,mp4_path,size=(0,0),fps=30.0):
+        import cv2
+        # get size of the image
+        img=cv2.imread(image_paths[0])
+        new_size = (600, 400)
+        if size[0]==0:
+            # size=(img.shape[1],img.shape[0])
+            size=new_size
+        fourcc = cv2.VideoWriter_fourcc('m', 'p', '4', 'v')
+        print("mp4_path",mp4_path)
+        print("fps",fps)
+        print("size",size)
+        video = cv2.VideoWriter(mp4_path,fourcc,fps,size)#(mp4_path,fourcc, fps, size)
+        for idx,image in enumerate(image_paths):
+            img=cv2.imread(image)
+            # imageのbasenameを画像の左上に描画
+            img=cv2.putText(img,os.path.basename(image), (0, 50), cv2.FONT_HERSHEY_PLAIN, 1, (255, 255, 255), 2, cv2.LINE_AA)
+            # cv2を用いてサイズを変更
+            img=cv2.resize(img,new_size)
+            video.write(img)
+            if idx%100==0:
+                print(f"now processing: {os.path.basename(image)} {idx}/{len(image_paths)}")
+        video.release()
+
     # def putText_japanese(img, text, point, size, color):
     #     #Notoフォントとする
     #     font = ImageFont.truetype('/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc', size)
