@@ -393,8 +393,10 @@ class Visualizer(Manager):
             cell_y = (map_height - y) * map_config["resolution"] + map_config["origin"][1]
             return cell_x, cell_y
 
-        map_img=Image.open(self.data_dir_dict["database_dir_path"].replace("MasterThesis","MobileSensing")+"/common"+"/map/map2d.pgm")
-        map_config=self.load_yaml(self.data_dir_dict["database_dir_path"].replace("MasterThesis","MobileSensing")+"/common"+"/map/map2d.yaml")
+        # map_img=Image.open(self.data_dir_dict["database_dir_path"].replace("MasterThesis","MobileSensing")+"/common"+"/map/map2d.pgm")
+        # map_config=self.load_yaml(self.data_dir_dict["database_dir_path"].replace("MasterThesis","MobileSensing")+"/common"+"/map/map2d.yaml")
+        map_img=Image.open(self.data_dir_dict["database_dir_path"].replace("MasterThesis_database","MobileSensing")+"/common"+"/map/map2d.pgm")
+        map_config=self.load_yaml(self.data_dir_dict["database_dir_path"].replace("MasterThesis_database","MobileSensing")+"/common"+"/map/map2d.yaml")
         map_initial_x, map_initial_y = cell_to_xy(0, map_img.height, map_config, map_img.height)
         map_end_x, map_end_y = cell_to_xy(map_img.width, 0, map_config, map_img.height)
 
