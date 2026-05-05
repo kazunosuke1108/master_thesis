@@ -14,6 +14,9 @@ if str(MODULE_DIR) not in sys.path:
 
 from scripts.fuzzy.fuzzy_reasoning_v5 import FuzzyReasoning
 from scripts.master_v5 import Master
+from scripts.notification.rank_utils import get_risk_rank_by_patient
+from scripts.preprocess.staff_watch import assign_staff_watch_features
+from scripts.preprocess.preprocess_objects_snapshot import PreprocessObject
 from scripts.visualize.visualizer_v5 import Visualizer
 
 
@@ -72,6 +75,23 @@ def test_standing_feature_increases_internal_and_total_risk():
     )
 
     assert standing_total > safe_total
+
+
+def test_pose_similarity_uses_50000100_when_zmax_is_missing():
+    df = pd.DataFrame(
+        {
+            "timestamp": [0.0, 1.0],
+            50000100: [0.2, 0.9],
+            50000101: [0.0, 0.0],
+            50000102: [0.0, 0.0],
+            50000103: [0.2, 0.9],
+        }
+    )
+    master = make_master_without_init({"A": df})
+
+    master.pose_similarity()
+
+    assert master.data_dicts["A"][40000010].tolist() == [0.2, 0.9]
 
 
 def test_staff_distance_and_watch_loss_raise_external_risk():
@@ -142,10 +162,6 @@ def test_plot_matplotlib_uses_internal_risk_value_without_inversion():
     assert "1 - data_dict" not in source
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="master_v5.staff_risk overwrites the full 40000111 column with the last row",
-)
 def test_master_staff_watch_risk_changes_by_timestamp():
     df = pd.DataFrame(
         {
@@ -166,38 +182,84 @@ def test_master_staff_watch_risk_changes_by_timestamp():
     assert master.data_dicts["A"].loc[1, 40000111] > 0.9
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="Current rank assignment zips patients with argsort indices instead of inverse ranks",
-)
 def test_notification_rank_assignment_maps_each_patient_to_own_rank():
     patients = ["A", "B", "C"]
     risks = np.array([0.2, 0.9, 0.5])
 
-    argsort_indices = (-risks).argsort()
-    current_assignment = {
-        patient: rank for patient, rank in zip(patients, argsort_indices)
-    }
+    current_assignment = get_risk_rank_by_patient(patients, risks)
 
     assert current_assignment == {"A": 2, "B": 0, "C": 1}
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="Real-data object preprocessing stores existence probability in fields consumed as xy coordinates",
-)
 def test_object_features_are_coordinates_before_master_distance_risk():
     data_dict = {
         "60010000": -8.0,
         "60010001": 12.0,
-        "50001000": 1.0,
-        "50001001": 1.0,
-        "50001010": 1.0,
-        "50001011": 1.0,
-        "50001020": -8.0,
-        "50001021": 9.0,
     }
-    iv_pole_xy = np.array([data_dict["50001000"], data_dict["50001001"]])
-    patient_xy = np.array([data_dict["60010000"], data_dict["60010001"]])
+    structure_dict = {
+        "ivPole": [np.array([-8.0, 11.0])],
+        "wheelchair": [np.array([-7.0, 12.0])],
+        "handrail": {"xrange": [-10.0, -4.0], "yrange": [9.0, 15.0]},
+    }
+    processed = PreprocessObject().object_snapshot(data_dict, structure_dict)
 
-    assert np.linalg.norm(iv_pole_xy - patient_xy) < 3.0
+    assert processed["50001000"] == -8.0
+    assert processed["50001001"] == 11.0
+    assert processed["50001010"] == -7.0
+    assert processed["50001011"] == 12.0
+    assert processed["50001020"] == -10.0
+    assert processed["50001021"] == 12.0
+    assert 0.0 <= processed["50001002"] <= 1.0
+    assert 0.0 <= processed["50001012"] <= 1.0
+
+
+def test_master_object_risk_uses_coordinates_with_high_risk_direction():
+    df = pd.DataFrame(
+        {
+            "timestamp": [0.0],
+            60010000: [0.0],
+            60010001: [0.0],
+            50001000: [0.5],
+            50001001: [0.0],
+            50001010: [0.0],
+            50001011: [0.5],
+            50001020: [6.0],
+            50001021: [0.0],
+        }
+    )
+    master = make_master_without_init({"A": df})
+
+    master.object_risk()
+
+    assert master.data_dicts["A"].loc[0, 40000100] > 0.9
+    assert master.data_dicts["A"].loc[0, 40000101] > 0.9
+    assert master.data_dicts["A"].loc[0, 40000102] > 0.6
+
+
+def test_staff_watch_features_use_closest_staff_and_previous_position():
+    data_dicts = {
+        "A": {"50000000": "yes", "60010000": 0.0, "60010001": 0.0},
+        "S1": {"50000000": "no", "60010000": 1.0, "60010001": 0.0},
+        "S2": {"50000000": "no", "60010000": 5.0, "60010001": 0.0},
+    }
+    previous = {"S1_x": 0.5, "S1_y": 0.0, "S2_x": 5.0, "S2_y": 0.0}
+    structure = {"staff_station": {"pos": [9.0, 9.0], "direction": [0.0, 0.1]}}
+
+    processed = assign_staff_watch_features(data_dicts, previous, structure)
+
+    assert processed["A"]["50001100"] == 1.0
+    assert processed["A"]["50001101"] == 0.0
+    assert processed["A"]["50001110"] == 0.5
+    assert processed["A"]["50001111"] == 0.0
+
+
+def test_staff_watch_features_fall_back_to_station_without_staff():
+    data_dicts = {"A": {"50000000": "yes", "60010000": 0.0, "60010001": 0.0}}
+    structure = {"staff_station": {"pos": [9.0, 8.0], "direction": [0.0, 0.1]}}
+
+    processed = assign_staff_watch_features(data_dicts, {}, structure)
+
+    assert processed["A"]["50001100"] == 9.0
+    assert processed["A"]["50001101"] == 8.0
+    assert processed["A"]["50001110"] == 0.0
+    assert processed["A"]["50001111"] == 0.1

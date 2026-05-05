@@ -17,6 +17,7 @@ from scripts.AHP.get_comparison_mtx_v3 import getConsistencyMtx
 from scripts.fuzzy.fuzzy_reasoning_v5 import FuzzyReasoning
 from scripts.entropy.entropy_weight_generator import EntropyWeightGenerator
 from scripts.pseudo_data.pseudo_data_generator import PseudoDataGenerator
+from scripts.risk.schema import EVALUATION_STEPS
 
 class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
     def __init__(self,trial_name,data_dicts,strage="NASK",AHP_array_type=3,staff_name_ahp="",staff_name_fuzzy=""):
@@ -127,8 +128,10 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
             # similarity=self.activation_func(similarity)
             return similarity
         def stand_sit(data_dict):
-            zmax=data_dict[60010002]
-            return 1/(1+np.exp(-5*(zmax-1)))
+            if 60010002 in data_dict:
+                zmax=data_dict[60010002]
+                return 1/(1+np.exp(-5*(zmax-1)))
+            return data_dict[50000100]
         
         for patient in self.data_dicts.keys():
             for risk in self.risky_motion_dict.keys():
@@ -165,7 +168,10 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
         def direction_risk(patient_x,patient_y,staff_x,staff_y,staff_vx,staff_vy):
             relative_pos=np.array([patient_x-staff_x,patient_y-staff_y])
             relative_vel=np.array([staff_vx,staff_vy])
-            cos_theta=np.dot(relative_pos,relative_vel)/(np.linalg.norm(relative_pos)*np.linalg.norm(relative_vel))
+            norm_product=np.linalg.norm(relative_pos)*np.linalg.norm(relative_vel)
+            if norm_product==0 or not np.isfinite(norm_product):
+                return np.nan
+            cos_theta=np.dot(relative_pos,relative_vel)/norm_product
             val=1-(cos_theta/2+0.5)
             # if cos_theta>1:
             #     val=0
@@ -183,7 +189,7 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
             self.data_dicts[patient][40000110]=self.activation_func(self.data_dicts[patient][40000110])
             # 向きリスク
             for i in range(len(self.data_dicts[patient])):
-                self.data_dicts[patient][40000111]=direction_risk(
+                self.data_dicts[patient].loc[i,40000111]=direction_risk(
                                                             self.data_dicts[patient].loc[i,60010000],
                                                             self.data_dicts[patient].loc[i,60010001],
                                                             self.data_dicts[patient].loc[i,50001100],
@@ -314,6 +320,13 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
             self.data_dicts[patient].to_csv(self.data_dir_dict["trial_dir_path"]+"/data_"+patient+"_eval.csv",index=False)
     
     def evaluate(self):
+        """Evaluate canonical thesis risk pipeline.
+
+        The execution order and node contracts are documented in
+        scripts.risk.schema.EVALUATION_STEPS. This method intentionally keeps
+        the historical side-effect based implementation for compatibility.
+        """
+        self.evaluation_steps=EVALUATION_STEPS
         # raise NotImplementedError
         # print("# 5 -> 4層推論 #")
         # 内的・静的
