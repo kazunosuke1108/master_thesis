@@ -156,6 +156,38 @@ docker/                                 # Docker 実行補助
 
 `master_v5.py` の `risky_motion_dict` は、この 4 次元ベクトルに対する危険動作テンプレートを持ちます。各リスクは、テンプレートとの差分平均から類似度を計算し、`similarity ** 4` で強調されます。ただし、立ち上がり `40000010` は `60010002` がある場合に高さベースのシグモイド値で上書きされます。
 
+## 新規MVP: risk_core / scenario_sim
+
+`master_v5.py` を直接置き換えず、読みやすいリスク評価コアとシナリオ実行基盤を `master_thesis_modules/risk_core/` と `master_thesis_modules/scenario_sim/` に追加しています。
+
+主な入口は次の通りです。
+
+```bash
+python -m master_thesis_modules.scenario_sim.runner.run_scenario \
+  --scenario master_thesis_modules/scenario_sim/scenarios/reach_object_context_demo.yaml
+```
+
+このMVPでは、YAML内に `40000010` などのノード番号を書かず、`action_label`, `position`, `iv_pole`, `wheelchair`, `handrail`, `staff` のような意味名から `FeatureFrame` を生成します。`RiskEngine` は `FeatureFrame` を受け取り、第4層リスク、簡易上位リスク、`total_risk`、説明文を返します。
+
+動作リスク `40000010`-`40000016` は、`master_v5.py` の `risky_motion_dict` と `pose_similarity()` を踏襲しています。
+
+```text
+similarity = 1 - mean(abs(reference_pose - observed_pose))
+risk = similarity ** 4
+```
+
+`40000010` は `height_max` がある場合、既存実装と同じく次の式で上書きします。
+
+```text
+risk = 1 / (1 + exp(-5 * (height_max - 1)))
+```
+
+テストは次で実行できます。
+
+```bash
+pytest tests/risk_core tests/scenario_sim
+```
+
 ### 周辺物体リスク
 
 物体リスクは人物座標と最近傍物体座標のユークリッド距離から計算します。正規化係数は `sqrt(2) * 6` です。
@@ -240,6 +272,70 @@ pytest -q -rx \
 ```
 
 特に `test_risk_direction_regression.py` は、リスク値の向き、スタッフ見守りリスク、物体座標の扱い、順位付けを確認します。
+
+新構成のテストは次で実行できます。
+
+```bash
+pytest tests/risk_core tests/scenario_sim tests/real_data
+```
+
+## 新構成の実行例
+
+修論4.5相当の時系列シミュレーション:
+
+```bash
+python -m master_thesis_modules.scenario_sim.runner.run_thesis_simulation \
+  --scenario master_thesis_modules/scenario_sim/scenarios/thesis_4_5_multi_patient_action_demo.yaml \
+  --model spatial_context \
+  --output outputs/thesis_4_5_new
+```
+
+比較モデル実行:
+
+```bash
+python -m master_thesis_modules.scenario_sim.runner.compare_models \
+  --scenario master_thesis_modules/scenario_sim/scenarios/reach_object_context_demo.yaml \
+  --models action_only action_attribute spatial_context \
+  --output outputs/reach_context_comparison
+```
+
+旧 `master_v5.py` の `staff_names = ["中村", "百武"]` ループに相当する、AHP/Fuzzyプロファイル総当たり:
+
+```bash
+python -m master_thesis_modules.scenario_sim.runner.run_profile_sweep \
+  --scenario master_thesis_modules/scenario_sim/scenarios/thesis_4_5_multi_patient_action_demo.yaml \
+  --staff-names 中村 百武 \
+  --common-dir master_thesis_modules/database/common \
+  --output outputs/thesis_4_5_profile_sweep \
+  --visualize
+```
+
+計算済みのプロファイル総当たり結果だけを可視化する場合:
+
+```bash
+python -m master_thesis_modules.scenario_sim.runner.visualize_profile_sweep \
+  --input outputs/thesis_4_5_profile_sweep
+```
+
+実データ評価:
+
+```bash
+python -m master_thesis_modules.real_data.runner.run_real_data_eval \
+  --input /path/to/data_dicts.pickle \
+  --output outputs/real_data_eval_new
+```
+
+新旧比較:
+
+```bash
+python -m master_thesis_modules.real_data.runner.compare_real_data_with_legacy \
+  --new outputs/real_data_eval_new \
+  --legacy /path/to/legacy_eval_csv_dir \
+  --output outputs/real_data_compare
+```
+
+`run_thesis_simulation` は `risk_timeseries.csv`, `ranking.csv`,
+`notification_log.csv`, `explanations.json` と、対応するPNG可視化を出力します。
 
 ## レガシーファイルの扱い
 

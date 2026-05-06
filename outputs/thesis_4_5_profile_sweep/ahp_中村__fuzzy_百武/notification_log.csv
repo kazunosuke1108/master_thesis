@@ -1,0 +1,2 @@
+timestamp,target_patient_id,total_risk,rank,reason,message,notification_type
+2.0,B,0.5393382307310898,1,Bさんは、立ち上がり動作の兆候が強い、車椅子付近にいる、および点滴付近にいるため危険度が高く評価されました。,Bさんは、立ち上がり動作の兆候が強い、車椅子付近にいる、および点滴付近にいるため危険度が高く評価されました。,notice
