@@ -940,7 +940,23 @@ if __name__=="__main__":
     # cls=Visualizer(trial_name=trial_name,strage=strage)
     # cls.plot_matplotlib()
     
-    
+    trial_name="20260506_Simで動作確認"
+    cls=Visualizer(trial_name=trial_name,strage=strage)
+    cls.plot_matplotlib()
+    trial_name="20260506_Simで動作確認_中村"
+    cls=Visualizer(trial_name=trial_name,strage=strage)
+    cls.plot_matplotlib()
+    trial_name="20260506_Simで動作確認_中武"
+    cls=Visualizer(trial_name=trial_name,strage=strage)
+    cls.plot_matplotlib()
+    trial_name="20260506_Simで動作確認_百村"
+    cls=Visualizer(trial_name=trial_name,strage=strage)
+    cls.plot_matplotlib()
+    trial_name="20260506_Simで動作確認_百武"
+    cls=Visualizer(trial_name=trial_name,strage=strage)
+    cls.plot_matplotlib()
+    sys.exit(0)
+
     trial_name="20251211_MasterThesisData"
     cls=Visualizer(trial_name=trial_name,strage=strage)
     cls.plot_matplotlib()
