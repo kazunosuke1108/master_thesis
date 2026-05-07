@@ -1,5 +1,3 @@
-import math
-
 from master_thesis_modules.risk_core.factors.staff_risk import (
     staff_distance_risk,
     staff_not_watching_risk,
@@ -32,11 +30,11 @@ def test_staff_watch_loss_high_when_moving_away():
     ) == 1.0
 
 
-def test_zero_velocity_matches_legacy_nan():
+def test_zero_velocity_uses_neutral_watch_risk():
     value = staff_not_watching_risk(
         Position2D(1, 0),
         Position2D(0, 0),
         Velocity2D(0, 0),
     )
 
-    assert math.isnan(value)
+    assert value == 0.5

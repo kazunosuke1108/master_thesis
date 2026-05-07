@@ -43,10 +43,6 @@ class ActionRiskCalculator:
                 height_max,
                 self.height_config,
             )
-        # else:
-        #     # master_v5 overwrites the stand-up similarity with the observed
-        #     # standing degree when no height signal is available.
-        #     risks[ids.STANDING_RISK] = pose_features.standing_degree
         return {node_id: clip01(value) for node_id, value in risks.items()}
 
 

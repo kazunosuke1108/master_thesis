@@ -42,8 +42,8 @@ staff:
 events:
   # Generic scenario_sim runners use these semantic events. run_profile_sweep
   # detects this scenario_name and uses the exact master_v5-compatible 20Hz
-  # pseudo-data generator instead, so legacy profile-sweep regression remains
-  # numerically comparable on data_*_eval.csv.
+  # pseudo-data generator instead. Risk calculation still uses the current
+  # risk_core logic, so output can intentionally differ from master_v5.py.
   - time_s: 2.0
     event_type: set_action
     target_id: B

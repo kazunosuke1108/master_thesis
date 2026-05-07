@@ -104,7 +104,7 @@ docker/                                 # Docker 実行補助
 | `40000110` | スタッフが近くにいない | `50001100`, `50001101`, `60010000`, `60010001` | 遠いほど高い |
 | `40000111` | スタッフが見ていない | `50001100`, `50001101`, `50001110`, `50001111`, `60010000`, `60010001` | スタッフ移動方向が対象から外れるほど高い |
 
-`40000010` は `60010002` が存在する場合、対象者高さ最大値からシグモイドで立ち上がり度を計算します。`60010002` がない場合は `50000100` をそのまま使います。
+`master_v5.py` の `40000010` は `60010002` が存在する場合、対象者高さ最大値からシグモイドで立ち上がり度を計算し、`60010002` がない場合は `50000100` をそのまま使います。`risk_core` では、`60010002` がない場合も他の動作リスクと同じく 4 次元姿勢テンプレート類似度で評価します。
 
 ### 第5層: 入力特徴量
 
@@ -154,7 +154,7 @@ docker/                                 # Docker 実行補助
 [立位度, 体幹傾き, 手首特徴, 足首特徴]
 ```
 
-`master_v5.py` の `risky_motion_dict` は、この 4 次元ベクトルに対する危険動作テンプレートを持ちます。各リスクは、テンプレートとの差分平均から類似度を計算し、`similarity ** 4` で強調されます。ただし、立ち上がり `40000010` は `60010002` がある場合に高さベースのシグモイド値で上書きされます。
+`master_v5.py` の `risky_motion_dict` は、この 4 次元ベクトルに対する危険動作テンプレートを持ちます。各リスクは、テンプレートとの差分平均から類似度を計算し、`similarity ** 4` で強調されます。ただし、`master_v5.py` の立ち上がり `40000010` は `60010002` がある場合に高さベースのシグモイド値で、ない場合に `50000100` で上書きされます。`risk_core` は `60010002` がある場合だけ高さベースのシグモイド値を使い、ない場合はテンプレート類似度を維持します。
 
 ## 新規MVP: risk_core / scenario_sim
 
@@ -168,6 +168,8 @@ python -m master_thesis_modules.scenario_sim.runner.run_scenario \
 ```
 
 このMVPでは、YAML内に `40000010` などのノード番号を書かず、`action_label`, `position`, `iv_pole`, `wheelchair`, `handrail`, `staff` のような意味名から `FeatureFrame` を生成します。`RiskEngine` は `FeatureFrame` を受け取り、第4層リスク、簡易上位リスク、`total_risk`、説明文を返します。
+
+生成AIにシミュレーションシナリオを作らせる場合の YAML フォーマット、許可される `action_label`、イベント種別、作成ルールは `master_thesis_modules/scenario_sim/README.md` の「シナリオYAML仕様」にまとめています。
 
 動作リスク `40000010`-`40000016` は、`master_v5.py` の `risky_motion_dict` と `pose_similarity()` を踏襲しています。
 
@@ -219,7 +221,7 @@ cos_theta = dot(patient - staff, staff_velocity) / (|patient - staff| * |staff_v
 risk = 1 - (cos_theta / 2 + 0.5)
 ```
 
-スタッフが対象者へ向かうほど低リスク、対象者から外れる方向に動くほど高リスクになります。スタッフが検出されない場合、`preprocess/staff_watch.py` は施設構造の `staff_station` 座標と `direction` を代替値として入れます。
+スタッフが対象者へ向かうほど低リスク、対象者から外れる方向に動くほど高リスクになります。`risk_core` ではスタッフ位置がない場合は最大リスク `1.0`、スタッフ速度がない/ゼロで方向を定義できない場合は中立値 `0.5` とします。スタッフが検出されない場合、`preprocess/staff_watch.py` は施設構造の `staff_station` 座標と `direction` を代替値として入れます。
 
 ## Fuzzy 推論と個人差
 
@@ -299,7 +301,7 @@ python -m master_thesis_modules.scenario_sim.runner.compare_models \
   --output outputs/reach_context_comparison
 ```
 
-旧 `master_v5.py` の `staff_names = ["中村", "百武"]` ループに相当する、AHP/Fuzzyプロファイル総当たり:
+旧 `master_v5.py` の `staff_names = ["中村", "百武"]` ループに相当する、AHP/Fuzzyプロファイル総当たり。入力シナリオは旧シミュレーションに合わせますが、`risk_core` の立ち上がりリスクとスタッフ速度ゼロ時の扱いは現行ロジックを優先するため、旧CSVと完全一致しない場合があります。
 
 ```bash
 python -m master_thesis_modules.scenario_sim.runner.run_profile_sweep \
