@@ -1,0 +1,17 @@
+scenario_name: staff_nearby_suppression_demo
+time_s: 0.0
+patients:
+  - id: A
+    is_patient_label: yes
+    age_group_label: old
+    position: {x: 2.0, y: 2.0}
+    action_label: reach_table
+objects:
+  - id: handrail
+    type: handrail
+    position: {x: 2.1, y: 2.0}
+staff:
+  - id: staff_near
+    position: {x: 2.2, y: 2.0}
+    velocity: {vx: -0.1, vy: 0.0}
+

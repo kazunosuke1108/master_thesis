@@ -1,0 +1,31 @@
+scenario_name: priority_reversal_by_context_demo
+time_s: 0.0
+patients:
+  - id: A
+    is_patient_label: yes
+    age_group_label: old
+    position: {x: 1.0, y: 1.0}
+    action_label: reach_table
+  - id: B
+    is_patient_label: yes
+    age_group_label: middle
+    position: {x: 5.0, y: 5.0}
+    action_label: reach_iv_pole
+objects:
+  - id: iv_near_b
+    type: iv_pole
+    position: {x: 5.1, y: 5.0}
+  - id: handrail_near_a
+    type: handrail
+    position: {x: 1.0, y: 1.2}
+  - id: handrail_far_b
+    type: handrail
+    position: {x: 0.1, y: 0.1}
+staff:
+  - id: staff_near_a
+    position: {x: 1.2, y: 1.0}
+    velocity: {vx: -0.1, vy: 0.0}
+  - id: staff_far_b
+    position: {x: 0.5, y: 0.5}
+    velocity: {vx: -0.1, vy: -0.1}
+
