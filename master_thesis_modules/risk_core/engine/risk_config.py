@@ -18,8 +18,8 @@ class RiskConfig:
     ahp_profile_name: str | None = None
     fuzzy_profile_name: str | None = None
     fuzzy_rule_results: dict[int, tuple[str | float, ...]] = field(default_factory=dict)
-    internal_static_weight: float = 0.15
-    internal_dynamic_weight: float = 0.85
+    internal_static_weight: float = 0.1
+    internal_dynamic_weight: float = 0.9
     internal_weight: float = 0.45
     external_weight: float = 0.55
     action_weights: dict[int, float] = field(

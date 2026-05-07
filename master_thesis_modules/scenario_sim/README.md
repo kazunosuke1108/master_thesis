@@ -26,7 +26,7 @@ python -m master_thesis_modules.scenario_sim.runner.compare_models \
 
 ## AHP / Fuzzy プロファイル総当たり
 
-旧 `master_v5.py` の `staff_names = ["中村", "百武"]` ループに相当する実行は、`run_profile_sweep` で行います。
+旧 `master_v5.py` の `staff_names = ["中村", "百武"]` ループに相当する実行は、`run_profile_sweep` で行います。`thesis_4_5_multi_patient_action_demo` は旧 `master_v5.py` の既定シミュレーション入力（20Hz、姿勢・スタッフ軌道の補間、物体配置）を互換生成します。
 
 ```bash
 python -m master_thesis_modules.scenario_sim.runner.run_profile_sweep \
@@ -48,6 +48,15 @@ outputs/thesis_4_5_profile_sweep/
 ```
 
 各ディレクトリには、評価済みCSV、順位、通知ログ、説明文が保存されます。
+
+旧出力との一致確認は次のように行えます。
+
+```bash
+python -m master_thesis_modules.scenario_sim.runner.compare_profile_sweep_with_legacy \
+  --legacy-dir /media/hayashide/MasterThesis/20260506_Simで動作確認_中村 \
+  --renovated-dir outputs/thesis_4_5_profile_sweep/ahp_中村__fuzzy_中村 \
+  --output-csv outputs/thesis_4_5_profile_sweep/compare_中村.csv
+```
 
 既に計算済みの `run_profile_sweep` 出力を後から可視化する場合は、次を実行します。
 

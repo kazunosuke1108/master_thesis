@@ -40,9 +40,10 @@ staff:
     position: {x: 5.0, y: 5.0}
     velocity: {vx: 0.0, vy: 0.0}
 events:
-  # The exact thesis 4.5 timestamps are not fully encoded in master_v5.py.
-  # This MVP follows the same intent: B stands up, staff approaches B, then C
-  # becomes risky near an IV pole while staff attention is away.
+  # Generic scenario_sim runners use these semantic events. run_profile_sweep
+  # detects this scenario_name and uses the exact master_v5-compatible 20Hz
+  # pseudo-data generator instead, so legacy profile-sweep regression remains
+  # numerically comparable on data_*_eval.csv.
   - time_s: 2.0
     event_type: set_action
     target_id: B
@@ -70,4 +71,3 @@ events:
     event_type: set_action
     target_id: A
     action_label: lose_balance
-

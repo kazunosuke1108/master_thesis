@@ -8,9 +8,15 @@ from pathlib import Path
 from master_thesis_modules.risk_core.engine.batch_risk_engine import BatchRiskEngine
 from master_thesis_modules.risk_core.engine.profile_config import make_profile_risk_config
 from master_thesis_modules.risk_core.engine.risk_engine import RiskEngine
-from master_thesis_modules.risk_core.features.dataframe_adapter import results_to_dataframe
+from master_thesis_modules.risk_core.features.dataframe_adapter import (
+    data_dicts_to_feature_sequences,
+    results_to_dataframe,
+)
 from master_thesis_modules.scenario_sim.encoder.dataframe_builder import (
     ScenarioDataFrameBuilder,
+)
+from master_thesis_modules.scenario_sim.encoder.master_v5_compat import (
+    build_master_v5_default_source_dataframes,
 )
 from master_thesis_modules.scenario_sim.encoder.scenario_loader import ScenarioLoader
 from master_thesis_modules.scenario_sim.runner._outputs import (
@@ -30,8 +36,13 @@ def run_profile_sweep(
     model: str = "spatial_context",
 ) -> list[Path]:
     world_state = ScenarioLoader().load(scenario)
-    sequences = ScenarioDataFrameBuilder().build_sequences(world_state)
-    source_dataframes = build_source_dataframes(sequences)
+    use_master_v5_source = world_state.scenario_name == "thesis_4_5_multi_patient_action_demo"
+    if use_master_v5_source:
+        source_dataframes = build_master_v5_default_source_dataframes()
+        sequences = data_dicts_to_feature_sequences(source_dataframes)
+    else:
+        sequences = ScenarioDataFrameBuilder().build_sequences(world_state)
+        source_dataframes = build_source_dataframes(sequences)
     output = Path(output)
     written_dirs = []
 
@@ -52,6 +63,11 @@ def run_profile_sweep(
                 )
                 for person_id in sequences
             }
+            if use_master_v5_source:
+                evaluated_dataframes = {
+                    person_id: dataframe.drop(columns=["explanation"], errors="ignore")
+                    for person_id, dataframe in evaluated_dataframes.items()
+                }
             run_dir = output / f"ahp_{staff_name_ahp}__fuzzy_{staff_name_fuzzy}"
             save_evaluation_outputs(
                 run_dir,

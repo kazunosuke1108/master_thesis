@@ -14,6 +14,7 @@ from master_thesis_modules.risk_core.schema import node_ids as ids
 
 
 DEFAULT_COMMON_DIR = Path("master_thesis_modules/database/common")
+LEGACY_COMMON_DIR = Path("/media/hayashide/MasterThesis/common")
 DEFAULT_FUZZY_QUESTIONNAIRE_PATH = Path(
     "master_thesis_modules/scripts_202511/2_中村さんと百武さんのAHPとFuzzy/questionaire_1b.csv"
 )
@@ -35,8 +36,14 @@ def make_profile_risk_config(
     object_weights = base.object_weights
 
     if ahp_profile_name:
-        action_csv = common_dir / f"comparison_mtx_30000001_{ahp_profile_name}.csv"
-        object_csv = common_dir / f"comparison_mtx_30000010_{ahp_profile_name}.csv"
+        action_csv = _resolve_common_file(
+            common_dir,
+            f"comparison_mtx_30000001_{ahp_profile_name}.csv",
+        )
+        object_csv = _resolve_common_file(
+            common_dir,
+            f"comparison_mtx_30000010_{ahp_profile_name}.csv",
+        )
         if action_csv.exists():
             action_weights = dict(
                 zip(ids.ACTION_RISK_NODES, load_ahp_weights_from_matrix_csv(action_csv))
@@ -48,7 +55,7 @@ def make_profile_risk_config(
 
     fuzzy_rule_results = {}
     if fuzzy_profile_name:
-        tfn_csv = common_dir / f"TFN_{fuzzy_profile_name}.csv"
+        tfn_csv = _resolve_common_file(common_dir, f"TFN_{fuzzy_profile_name}.csv")
         if tfn_csv.exists():
             fuzzy_rule_results = _fuzzy_rule_results_from_tfn_csv(tfn_csv)
         else:
@@ -67,6 +74,16 @@ def make_profile_risk_config(
         action_weights=action_weights,
         object_weights=object_weights,
     )
+
+
+def _resolve_common_file(common_dir: Path, filename: str) -> Path:
+    path = common_dir / filename
+    if path.exists():
+        return path
+    legacy_path = LEGACY_COMMON_DIR / filename
+    if legacy_path.exists():
+        return legacy_path
+    return path
 
 
 def _fuzzy_rule_results_from_tfn_csv(path: Path) -> dict[int, tuple[float, ...]]:

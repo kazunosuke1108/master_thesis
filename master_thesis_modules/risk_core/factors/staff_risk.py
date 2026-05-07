@@ -28,8 +28,10 @@ def staff_not_watching_risk(
     staff_position: Position2D | None,
     staff_velocity: Velocity2D | None,
 ) -> float:
-    if staff_position is None or staff_velocity is None:
+    if staff_position is None:
         return 1.0
+    if staff_velocity is None:
+        return math.nan
 
     relative_x = patient_position.x - staff_position.x
     relative_y = patient_position.y - staff_position.y
@@ -37,9 +39,7 @@ def staff_not_watching_risk(
     velocity_norm = staff_velocity.norm
     norm_product = relative_norm * velocity_norm
     if norm_product == 0.0 or not math.isfinite(norm_product):
-        # master_v5 returned NaN here. The new core uses neutral risk to keep
-        # batch evaluation finite while making this behavior explicit.
-        return 0.5
+        return math.nan
 
     cos_theta = (
         relative_x * staff_velocity.vx + relative_y * staff_velocity.vy

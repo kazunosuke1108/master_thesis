@@ -1,5 +1,7 @@
 """MVP risk engine that evaluates one FeatureFrame at a time."""
 
+import math
+
 from master_thesis_modules.risk_core.aggregators.fuzzy import LegacyLikeFuzzyAggregator
 from master_thesis_modules.risk_core.aggregators.weighted_sum import WeightedSumAggregator
 from master_thesis_modules.risk_core.engine.risk_config import RiskConfig
@@ -10,10 +12,6 @@ from master_thesis_modules.risk_core.explanation.explanation_generator import (
 from master_thesis_modules.risk_core.factors.action_risk import (
     ActionRiskCalculator,
     HeightStandingRiskConfig,
-)
-from master_thesis_modules.risk_core.factors.attribution_risk import (
-    age_attribute_risk,
-    patient_attribute_risk,
 )
 from master_thesis_modules.risk_core.factors.common import clip01
 from master_thesis_modules.risk_core.factors.object_risk import ObjectRiskCalculator
@@ -61,15 +59,12 @@ class RiskEngine:
                 for node_id in factor_risks
             }
 
-        patient_risk = patient_attribute_risk(
-            frame.is_patient_label,
-            frame.is_patient_confidence,
-        )
-        age_risk = age_attribute_risk(frame.age_group_label, frame.age_confidence)
+        patient_risk = patient_attribute_tfn(frame.is_patient_label)
+        age_risk = age_attribute_tfn(frame.age_group_label)
         if self.config.model_type == "action_only":
-            patient_risk = 0.0
-            age_risk = 0.0
-        internal_static = clip01((patient_risk + age_risk) / 2.0)
+            patient_risk = (0.0, 0.0, 0.0)
+            age_risk = (0.0, 0.0, 0.0)
+        internal_static = legacy_fuzzy_multiply(patient_risk, age_risk)
         internal_dynamic = WeightedSumAggregator(
             self.config.action_weights
         ).aggregate({node_id: factor_risks[node_id] for node_id in ids.ACTION_RISK_NODES})
@@ -144,3 +139,38 @@ class RiskEngine:
             total_risk=total,
             explanation=explanation,
         )
+
+
+def patient_attribute_tfn(label: str) -> tuple[float, float, float]:
+    if label == "yes":
+        return (0.4, 0.7, 1.0)
+    if label == "no":
+        return (0.0, 0.3, 0.6)
+    return (math.nan, math.nan, math.nan)
+
+
+def age_attribute_tfn(label: str) -> tuple[float, float, float]:
+    if label == "young":
+        return (0.0, 0.25, 0.5)
+    if label == "middle":
+        return (0.25, 0.5, 0.75)
+    if label == "old":
+        return (0.5, 0.75, 1.0)
+    return (math.nan, math.nan, math.nan)
+
+
+def legacy_fuzzy_multiply(
+    first: tuple[float, float, float],
+    second: tuple[float, float, float],
+) -> float:
+    if not all(math.isfinite(value) for value in (*first, *second)):
+        return 0.0
+    left, right = (first, second) if first[1] < second[1] else (second, first)
+    denominator = (right[1] - right[0]) + (left[2] - left[1])
+    if denominator == 0.0:
+        return 0.0
+    x_cross = (
+        left[2] * (right[1] - right[0])
+        + right[0] * (left[2] - left[1])
+    ) / denominator
+    return clip01((left[2] + right[0] + x_cross) / 3.0)

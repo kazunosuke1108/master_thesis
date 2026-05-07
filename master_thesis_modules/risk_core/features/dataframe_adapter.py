@@ -53,12 +53,18 @@ def results_to_dataframe(
 ) -> pd.DataFrame:
     output = normalize_legacy_columns(source_dataframe)
     for result in results:
+        for node_id, value in {**result.factor_risks, **result.upper_risks}.items():
+            if node_id not in output.columns:
+                output[node_id] = None if isinstance(value, tuple) else pd.NA
+            elif isinstance(value, tuple) and output[node_id].dtype != "object":
+                output[node_id] = output[node_id].astype("object")
+    for result in results:
         row_index = _find_row_index(output, result.time_s)
         for node_id, value in result.factor_risks.items():
-            output.loc[row_index, node_id] = value
+            output.at[row_index, node_id] = value
         for node_id, value in result.upper_risks.items():
-            output.loc[row_index, node_id] = value
-        output.loc[row_index, "explanation"] = result.explanation
+            output.at[row_index, node_id] = value
+        output.at[row_index, "explanation"] = result.explanation
     return output
 
 
@@ -159,4 +165,3 @@ def _label(value: Any) -> str:
     except TypeError:
         pass
     return str(value)
-
