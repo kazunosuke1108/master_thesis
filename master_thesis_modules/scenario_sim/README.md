@@ -347,6 +347,8 @@ python -m master_thesis_modules.scenario_sim.runner.visualize_profile_sweep \
 - `visualization/profile_total_risk_grid.png`
 - `visualization/profile_top_risk_comparison.png`
 - `visualization/profile_notification_counts.png`
+- `visualization/scenario_storyboard.png`
+- `visualization/scenario_storyboard_snapshots.csv`
 
 ## 対応イベント
 

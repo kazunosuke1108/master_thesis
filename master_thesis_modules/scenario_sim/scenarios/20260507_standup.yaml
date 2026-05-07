@@ -38,7 +38,7 @@ objects:
 staff:
   - id: NS
     position: {x: 5.0, y: 5.0}
-    velocity: {vx: 0.0, vy: 0.0}
+    velocity: {vx: -0.1, vy: -0.1}
 events:
   # Generic scenario_sim runners use these semantic events. run_profile_sweep
   # detects this scenario_name and uses the exact master_v5-compatible 20Hz

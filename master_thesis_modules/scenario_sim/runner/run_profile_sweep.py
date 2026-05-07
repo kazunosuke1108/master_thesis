@@ -26,6 +26,9 @@ from master_thesis_modules.scenario_sim.runner._outputs import (
 from master_thesis_modules.scenario_sim.visualization.plot_profile_sweep import (
     visualize_profile_sweep,
 )
+from master_thesis_modules.scenario_sim.visualization.plot_scenario_storyboard import (
+    visualize_scenario_storyboard,
+)
 
 
 def run_profile_sweep(
@@ -102,7 +105,16 @@ def main() -> None:
     for path in written_dirs:
         print(path)
     if args.visualize:
-        for name, path in visualize_profile_sweep(args.output).items():
+        visualization_paths = visualize_profile_sweep(args.output)
+        visualization_dir = Path(args.output) / "visualization"
+        visualization_paths.update(
+            visualize_scenario_storyboard(
+                ScenarioLoader().load(args.scenario),
+                visualization_dir / "scenario_storyboard.png",
+                visualization_dir / "scenario_storyboard_snapshots.csv",
+            )
+        )
+        for name, path in visualization_paths.items():
             print(f"{name}: {path}")
 
 
