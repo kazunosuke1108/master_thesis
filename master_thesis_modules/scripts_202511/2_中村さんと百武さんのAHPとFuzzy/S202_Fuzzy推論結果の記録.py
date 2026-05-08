@@ -33,4 +33,6 @@ for staff_name in data.columns:
         TFN_data.loc[i,:]=[data.loc[i,staff_name]-TFN_WIDTH,data.loc[i,staff_name],data.loc[i,staff_name]+TFN_WIDTH]
     TFN_csv_path=f"/media/hayashide/MasterThesis/common/TFN_{staff_name}.csv"
     TFN_data.to_csv(TFN_csv_path,index=False,header=False)
+    TFN_csv_path=f"/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/database/common/TFN_{staff_name}.csv"
+    TFN_data.to_csv(TFN_csv_path,index=False,header=False)
     print(TFN_data)

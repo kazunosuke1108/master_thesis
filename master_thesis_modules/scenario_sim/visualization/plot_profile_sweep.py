@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
+import ast
 import math
 import re
 
@@ -48,6 +49,7 @@ def visualize_profile_sweep(
         "profile_ranking_summary": output_dir / "profile_ranking_summary.csv",
         "profile_plot_labels": output_dir / "profile_plot_labels.csv",
         "profile_total_risk_grid": output_dir / "profile_total_risk_grid.png",
+        "profile_hierarchy_timeseries_dir": output_dir,
         "profile_top_risk_comparison": output_dir / "profile_top_risk_comparison.png",
         "profile_notification_counts": output_dir / "profile_notification_counts.png",
     }
@@ -55,6 +57,7 @@ def visualize_profile_sweep(
     build_ranking_summary(runs).to_csv(paths["profile_ranking_summary"], index=False)
     build_profile_label_table(runs).to_csv(paths["profile_plot_labels"], index=False)
     plot_total_risk_grid(runs, paths["profile_total_risk_grid"])
+    plot_hierarchy_timeseries_by_profile(runs, output_dir)
     plot_top_risk_comparison(runs, paths["profile_top_risk_comparison"])
     plot_notification_counts(runs, paths["profile_notification_counts"])
     return paths
@@ -191,6 +194,65 @@ def plot_total_risk_grid(runs: list[ProfileRun], output_png: str | Path) -> Path
     return output_png
 
 
+def plot_hierarchy_timeseries_by_profile(
+    runs: list[ProfileRun],
+    output_dir: str | Path,
+) -> list[Path]:
+    """Plot all available hierarchy nodes and raw features for each profile."""
+
+    output_dir = Path(output_dir)
+    output_paths = []
+    for run_index, run in enumerate(runs, start=1):
+        profile_label = _profile_label(run_index)
+        plot_df = _load_hierarchy_plot_data(run)
+        plot_items = _hierarchy_plot_items(plot_df)
+        if not plot_items:
+            continue
+
+        cols = 4
+        rows = math.ceil(len(plot_items) / cols)
+        fig, axes = plt.subplots(
+            rows,
+            cols,
+            figsize=(5.0 * cols, 2.9 * rows),
+            sharex=True,
+        )
+        axes_list = list(axes.ravel()) if hasattr(axes, "ravel") else [axes]
+        for ax, item in zip(axes_list, plot_items):
+            column = item["column"]
+            for patient_id, patient_data in plot_df.groupby("patient_id"):
+                patient_data = patient_data.sort_values("timestamp")
+                ax.plot(
+                    patient_data["timestamp"],
+                    patient_data[column],
+                    marker="o",
+                    linewidth=1.2,
+                    markersize=2.4,
+                    label=str(patient_id),
+                )
+            ax.set_title(item["title"], fontsize=9)
+            ax.grid(True, alpha=0.3)
+            if item.get("ylim_0_1"):
+                ax.set_ylim(-0.03, 1.03)
+        for ax in axes_list[len(plot_items) :]:
+            ax.axis("off")
+        for ax in axes_list[-cols:]:
+            ax.set_xlabel("Time [s]")
+        handles, labels = axes_list[0].get_legend_handles_labels()
+        fig.legend(handles, labels, loc="upper center", ncol=max(1, len(labels)))
+        fig.suptitle(
+            f"{profile_label}: hierarchy and feature time series",
+            y=0.995,
+            fontsize=14,
+        )
+        fig.tight_layout(rect=(0, 0, 1, 0.975))
+        output_png = output_dir / f"{profile_label}_hierarchy_timeseries.png"
+        fig.savefig(output_png, dpi=180)
+        plt.close(fig)
+        output_paths.append(output_png)
+    return output_paths
+
+
 def plot_top_risk_comparison(runs: list[ProfileRun], output_png: str | Path) -> Path:
     output_png = Path(output_png)
     fig, ax = plt.subplots(figsize=(9, 4.8))
@@ -213,6 +275,139 @@ def plot_top_risk_comparison(runs: list[ProfileRun], output_png: str | Path) -> 
     fig.savefig(output_png, dpi=180)
     plt.close(fig)
     return output_png
+
+
+def _load_hierarchy_plot_data(run: ProfileRun) -> pd.DataFrame:
+    risk_data = run.risk_timeseries.copy()
+    for column in risk_data.columns:
+        if column in {"patient_id", "timestamp", "explanation"}:
+            continue
+        risk_data[column] = risk_data[column].map(_to_plot_value)
+
+    raw_frames = []
+    for path in sorted(run.path.glob("data_*_eval.csv")):
+        raw_frame = pd.read_csv(path)
+        if "person_id" in raw_frame.columns:
+            raw_frame = raw_frame.rename(columns={"person_id": "patient_id"})
+        raw_frames.append(raw_frame)
+    if not raw_frames:
+        return risk_data
+
+    raw_data = pd.concat(raw_frames, ignore_index=True)
+    raw_columns = [
+        column
+        for column in RAW_FEATURE_COLUMNS
+        if column in raw_data.columns and column not in risk_data.columns
+    ]
+    raw_data = raw_data[["patient_id", "timestamp", *raw_columns]]
+    merged = risk_data.merge(raw_data, on=["patient_id", "timestamp"], how="left")
+    for column in raw_columns:
+        merged[column] = pd.to_numeric(merged[column], errors="coerce")
+    return merged
+
+
+def _to_plot_value(value: object) -> float:
+    if isinstance(value, str):
+        text = value.strip()
+        if text.startswith("(") and text.endswith(")"):
+            try:
+                values = ast.literal_eval(text)
+            except (SyntaxError, ValueError):
+                return float("nan")
+            if isinstance(values, tuple) and values:
+                return float(sum(values) / len(values))
+        try:
+            return float(text)
+        except ValueError:
+            return float("nan")
+    return float(value)
+
+
+RAW_FEATURE_COLUMNS = (
+    "standing_degree",
+    "trunk_tilt",
+    "wrist_distance_from_hip",
+    "ankle_spread",
+    "x",
+    "y",
+    "height_max",
+)
+
+
+PLOT_NODE_GROUPS = (
+    (
+        "L1",
+        (
+            ("10000000", "total_risk"),
+        ),
+    ),
+    (
+        "L2",
+        (
+            ("20000000", "internal_risk"),
+            ("20000001", "external_risk"),
+        ),
+    ),
+    (
+        "L3",
+        (
+            ("30000000", "internal_static"),
+            ("30000001", "internal_dynamic"),
+            ("30000010", "external_static"),
+            ("30000011", "external_dynamic"),
+        ),
+    ),
+    (
+        "L4",
+        (
+            ("40000000", "patient_attr"),
+            ("40000001", "age_attr"),
+            ("40000010", "stand_up"),
+            ("40000011", "brake_release"),
+            ("40000012", "move_wheelchair"),
+            ("40000013", "lose_balance"),
+            ("40000014", "hand_movement"),
+            ("40000015", "coughing"),
+            ("40000016", "touch_face"),
+            ("40000100", "near_iv_pole"),
+            ("40000101", "near_wheelchair"),
+            ("40000102", "far_handrail"),
+            ("40000110", "staff_distance"),
+            ("40000111", "staff_watch_loss"),
+        ),
+    ),
+    (
+        "L6/raw",
+        (
+            ("standing_degree", "standing_degree"),
+            ("trunk_tilt", "trunk_tilt"),
+            ("wrist_distance_from_hip", "wrist_from_hip"),
+            ("ankle_spread", "ankle_spread"),
+            ("x", "person_x"),
+            ("y", "person_y"),
+            ("height_max", "height_max"),
+        ),
+    ),
+)
+
+
+def _hierarchy_plot_items(plot_df: pd.DataFrame) -> list[dict[str, object]]:
+    items = []
+    for layer, group_items in PLOT_NODE_GROUPS:
+        for column, name in group_items:
+            if column not in plot_df.columns:
+                continue
+            if plot_df[column].notna().sum() == 0:
+                continue
+            title = f"{layer} {column}: {name}" if column.isdigit() else f"{layer}: {name}"
+            items.append(
+                {
+                    "column": column,
+                    "title": title,
+                    "ylim_0_1": column not in {"x", "y", "height_max"},
+                }
+            )
+    return items
 
 
 def plot_notification_counts(runs: list[ProfileRun], output_png: str | Path) -> Path:
