@@ -195,14 +195,15 @@ python -m master_thesis_modules.scenario_sim.runner.visualize_profile_sweep \
 ```bash
 python -m master_thesis_modules.real_data.runner.run_real_data_eval \
   --input /path/to/data_dicts.pickle \
-  --output outputs/real_data_eval_new
+  --output outputs/real_data_eval_new \
+  --visualize
 ```
 
 旧出力との比較:
 
 ```bash
 python -m master_thesis_modules.real_data.runner.compare_real_data_with_legacy \
-  --new outputs/real_data_eval_new \
+  --new outputs/real_data_eval_new/ahp_中村__fuzzy_中村 \
   --legacy /path/to/legacy_eval_csv_dir \
   --output outputs/real_data_compare
 ```

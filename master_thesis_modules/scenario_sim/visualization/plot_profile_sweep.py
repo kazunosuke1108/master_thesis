@@ -289,6 +289,8 @@ def _load_hierarchy_plot_data(run: ProfileRun) -> pd.DataFrame:
         raw_frame = pd.read_csv(path)
         if "person_id" in raw_frame.columns:
             raw_frame = raw_frame.rename(columns={"person_id": "patient_id"})
+        elif "patient_id" not in raw_frame.columns:
+            raw_frame.insert(0, "patient_id", _patient_id_from_eval_csv(path))
         raw_frames.append(raw_frame)
     if not raw_frames:
         return risk_data
@@ -304,6 +306,15 @@ def _load_hierarchy_plot_data(run: ProfileRun) -> pd.DataFrame:
     for column in raw_columns:
         merged[column] = pd.to_numeric(merged[column], errors="coerce")
     return merged
+
+
+def _patient_id_from_eval_csv(path: Path) -> str:
+    name = path.name
+    prefix = "data_"
+    suffix = "_eval.csv"
+    if name.startswith(prefix) and name.endswith(suffix):
+        return name[len(prefix) : -len(suffix)]
+    return path.stem
 
 
 def _to_plot_value(value: object) -> float:
