@@ -37,6 +37,7 @@ def run_profile_sweep(
     staff_names: list[str],
     common_dir: str | Path = "master_thesis_modules/database/common",
     model: str = "spatial_context",
+    action_aggregation: str = "weighted_sum",
 ) -> list[Path]:
     world_state = ScenarioLoader().load(scenario)
     use_master_v5_source = world_state.scenario_name == "thesis_4_5_multi_patient_action_demo"
@@ -56,6 +57,7 @@ def run_profile_sweep(
                 fuzzy_profile_name=staff_name_fuzzy,
                 common_dir=common_dir,
                 model_type=model,
+                action_aggregation=action_aggregation,
             )
             batch_engine = BatchRiskEngine(RiskEngine(config))
             results = batch_engine.evaluate(sequences)
@@ -90,6 +92,12 @@ def main() -> None:
     parser.add_argument("--common-dir", default="master_thesis_modules/database/common")
     parser.add_argument("--model", default="spatial_context")
     parser.add_argument(
+        "--action-aggregation",
+        choices=["weighted_sum", "weighted_max"],
+        default="weighted_sum",
+        help="30000001の動作リスク集約方法。weighted_sumは従来のAHP重み和、weighted_maxはmax_j(w_j * r_j)",
+    )
+    parser.add_argument(
         "--visualize",
         action="store_true",
         help="profile sweepの集計図と要約CSVも作成する",
@@ -101,6 +109,7 @@ def main() -> None:
         staff_names=args.staff_names,
         common_dir=args.common_dir,
         model=args.model,
+        action_aggregation=args.action_aggregation,
     )
     for path in written_dirs:
         print(path)

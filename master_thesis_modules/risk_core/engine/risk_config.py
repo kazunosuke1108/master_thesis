@@ -15,6 +15,7 @@ class RiskConfig:
     height_sigmoid_gain: float = 5.0
     height_sigmoid_center: float = 1.0
     use_legacy_like_fuzzy: bool = True
+    action_aggregation: str = "weighted_sum"
     ahp_profile_name: str | None = None
     fuzzy_profile_name: str | None = None
     fuzzy_rule_results: dict[int, tuple[str | float, ...]] = field(default_factory=dict)

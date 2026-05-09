@@ -25,10 +25,12 @@ def make_profile_risk_config(
     fuzzy_profile_name: str | None = None,
     common_dir: str | Path = DEFAULT_COMMON_DIR,
     model_type: str = "spatial_context",
+    action_aggregation: str = "weighted_sum",
 ) -> RiskConfig:
     common_dir = Path(common_dir)
     base = RiskConfig(
         model_type=model_type,
+        action_aggregation=action_aggregation,
         ahp_profile_name=ahp_profile_name,
         fuzzy_profile_name=fuzzy_profile_name,
     )
@@ -68,6 +70,7 @@ def make_profile_risk_config(
 
     return RiskConfig(
         model_type=model_type,
+        action_aggregation=action_aggregation,
         ahp_profile_name=ahp_profile_name,
         fuzzy_profile_name=fuzzy_profile_name,
         fuzzy_rule_results=fuzzy_rule_results,

@@ -21,3 +21,21 @@ class WeightedSumAggregator:
         if total_weight == 0.0:
             return 0.0
         return clip01(sum(weighted_values) / total_weight)
+
+
+class WeightedMaxAggregator:
+    def __init__(self, weights: dict[int, float] | None = None) -> None:
+        self.weights = weights or {}
+
+    def aggregate(self, values: dict[int, float], default_weight: float = 1.0) -> float:
+        if not values:
+            return 0.0
+        weighted_values = []
+        for node_id, value in values.items():
+            weight = self.weights.get(node_id, default_weight)
+            if weight <= 0.0:
+                continue
+            weighted_values.append(value * weight)
+        if not weighted_values:
+            return 0.0
+        return clip01(max(weighted_values))

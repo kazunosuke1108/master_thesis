@@ -3,7 +3,10 @@
 import math
 
 from master_thesis_modules.risk_core.aggregators.fuzzy import LegacyLikeFuzzyAggregator
-from master_thesis_modules.risk_core.aggregators.weighted_sum import WeightedSumAggregator
+from master_thesis_modules.risk_core.aggregators.weighted_sum import (
+    WeightedMaxAggregator,
+    WeightedSumAggregator,
+)
 from master_thesis_modules.risk_core.engine.risk_config import RiskConfig
 from master_thesis_modules.risk_core.engine.risk_result import RiskResult
 from master_thesis_modules.risk_core.explanation.explanation_generator import (
@@ -65,9 +68,8 @@ class RiskEngine:
             patient_risk = (0.0, 0.0, 0.0)
             age_risk = (0.0, 0.0, 0.0)
         internal_static = legacy_fuzzy_multiply(patient_risk, age_risk)
-        internal_dynamic = WeightedSumAggregator(
-            self.config.action_weights
-        ).aggregate({node_id: factor_risks[node_id] for node_id in ids.ACTION_RISK_NODES})
+        action_inputs = {node_id: factor_risks[node_id] for node_id in ids.ACTION_RISK_NODES}
+        internal_dynamic = self._aggregate_action_risks(action_inputs)
         external_static = WeightedSumAggregator(
             self.config.object_weights
         ).aggregate({node_id: factor_risks[node_id] for node_id in ids.OBJECT_RISK_NODES})
@@ -139,6 +141,13 @@ class RiskEngine:
             total_risk=total,
             explanation=explanation,
         )
+
+    def _aggregate_action_risks(self, action_inputs: dict[int, float]) -> float:
+        if self.config.action_aggregation == "weighted_sum":
+            return WeightedSumAggregator(self.config.action_weights).aggregate(action_inputs)
+        if self.config.action_aggregation == "weighted_max":
+            return WeightedMaxAggregator(self.config.action_weights).aggregate(action_inputs)
+        raise ValueError(f"Unknown action_aggregation: {self.config.action_aggregation}")
 
 
 def patient_attribute_tfn(label: str) -> tuple[float, float, float]:
