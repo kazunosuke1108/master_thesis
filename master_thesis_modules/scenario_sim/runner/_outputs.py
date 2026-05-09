@@ -42,10 +42,15 @@ def save_evaluation_outputs(
     long_df = evaluated_dataframes_to_long_dataframe(evaluated_dataframes)
     long_df.to_csv(output_dir / "risk_timeseries.csv", index=False)
 
-    ranking_df = build_ranking_dataframe(results_by_person)
+    rankable_lookup = build_rankable_patient_lookup(evaluated_dataframes)
+    ranking_df = build_ranking_dataframe(results_by_person, rankable_lookup)
     ranking_df.to_csv(output_dir / "ranking.csv", index=False)
 
-    notification_history = build_notification_history(results_by_person, staff_count)
+    notification_history = build_notification_history(
+        results_by_person,
+        staff_count,
+        rankable_lookup,
+    )
     notification_history.save_csv(output_dir / "notification_log.csv")
 
     explanations = build_explanations(results_by_person)
@@ -60,7 +65,10 @@ def save_evaluation_outputs(
     }
 
 
-def build_ranking_dataframe(results_by_person: dict[str, list[RiskResult]]) -> pd.DataFrame:
+def build_ranking_dataframe(
+    results_by_person: dict[str, list[RiskResult]],
+    rankable_lookup: dict[tuple[str, float], bool] | None = None,
+) -> pd.DataFrame:
     by_time: dict[float, list[RiskResult]] = {}
     for results in results_by_person.values():
         for result in results:
@@ -68,7 +76,10 @@ def build_ranking_dataframe(results_by_person: dict[str, list[RiskResult]]) -> p
 
     rows = []
     for timestamp, results in sorted(by_time.items()):
-        ranked = sorted(results, key=lambda result: result.total_risk, reverse=True)
+        eligible_results = [
+            result for result in results if _is_rankable_result(result, rankable_lookup)
+        ]
+        ranked = sorted(eligible_results, key=lambda result: result.total_risk, reverse=True)
         for rank, result in enumerate(ranked, start=1):
             rows.append(
                 {
@@ -84,6 +95,7 @@ def build_ranking_dataframe(results_by_person: dict[str, list[RiskResult]]) -> p
 def build_notification_history(
     results_by_person: dict[str, list[RiskResult]],
     staff_count: int = 1,
+    rankable_lookup: dict[tuple[str, float], bool] | None = None,
 ) -> NotificationHistory:
     policy = NotificationPolicy()
     history = NotificationHistory()
@@ -92,7 +104,12 @@ def build_notification_history(
         for result in results:
             by_time.setdefault(result.time_s, []).append(result)
     for timestamp, results in sorted(by_time.items()):
-        history.append_many(policy.evaluate_timestep(timestamp, results, staff_count=staff_count))
+        eligible_results = [
+            result for result in results if _is_rankable_result(result, rankable_lookup)
+        ]
+        history.append_many(
+            policy.evaluate_timestep(timestamp, eligible_results, staff_count=staff_count)
+        )
     return history
 
 
@@ -110,3 +127,42 @@ def build_explanations(results_by_person: dict[str, list[RiskResult]]) -> list[d
             )
     return rows
 
+
+def build_rankable_patient_lookup(
+    evaluated_dataframes: dict[str, pd.DataFrame],
+) -> dict[tuple[str, float], bool]:
+    lookup = {}
+    for person_id, dataframe in evaluated_dataframes.items():
+        for _, row in dataframe.iterrows():
+            timestamp = float(row.get("timestamp", 0.0))
+            label = _patient_label_from_row(row)
+            lookup[(str(person_id), timestamp)] = _is_rankable_patient_label(label)
+    return lookup
+
+
+def _is_rankable_result(
+    result: RiskResult,
+    rankable_lookup: dict[tuple[str, float], bool] | None,
+) -> bool:
+    if rankable_lookup is None:
+        return True
+    return rankable_lookup.get((str(result.person_id), float(result.time_s)), True)
+
+
+def _patient_label_from_row(row: pd.Series) -> object:
+    if ids.IS_PATIENT in row:
+        return row.get(ids.IS_PATIENT)
+    if str(ids.IS_PATIENT) in row:
+        return row.get(str(ids.IS_PATIENT))
+    if "is_patient_label" in row:
+        return row.get("is_patient_label")
+    return "yes"
+
+
+def _is_rankable_patient_label(label: object) -> bool:
+    if label is True:
+        return True
+    if label is False:
+        return False
+    text = str(label).strip().lower()
+    return text not in {"no", "false", "0", "staff"}

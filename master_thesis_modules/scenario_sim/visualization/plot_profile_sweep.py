@@ -76,7 +76,7 @@ def load_profile_runs(sweep_dir: str | Path) -> list[ProfileRun]:
         if not risk_path.exists() or not ranking_path.exists():
             continue
         notification_log = (
-            pd.read_csv(notification_path)
+            pd.read_csv(notification_path, dtype={"target_patient_id": str})
             if notification_path.exists()
             else pd.DataFrame(
                 columns=[
@@ -96,8 +96,8 @@ def load_profile_runs(sweep_dir: str | Path) -> list[ProfileRun]:
                 ahp_profile=match.group("ahp"),
                 fuzzy_profile=match.group("fuzzy"),
                 path=run_dir,
-                risk_timeseries=pd.read_csv(risk_path),
-                ranking=pd.read_csv(ranking_path),
+                risk_timeseries=pd.read_csv(risk_path, dtype={"patient_id": str}),
+                ranking=pd.read_csv(ranking_path, dtype={"patient_id": str}),
                 notification_log=notification_log,
             )
         )
@@ -171,12 +171,15 @@ def plot_total_risk_grid(runs: list[ProfileRun], output_png: str | Path) -> Path
     for run_index, (ax, run) in enumerate(zip(axes_list, runs), start=1):
         for patient_id, patient_data in run.risk_timeseries.groupby("patient_id"):
             patient_data = patient_data.sort_values("timestamp")
+            style = _patient_line_style(patient_data)
             ax.plot(
                 patient_data["timestamp"],
                 patient_data["10000000"],
                 marker="o",
-                linewidth=1.4,
-                markersize=3,
+                linestyle=style["linestyle"],
+                linewidth=style["linewidth"],
+                markersize=style["markersize"],
+                alpha=style["alpha"],
                 label=str(patient_id),
             )
         ax.set_title(_profile_label(run_index))
@@ -222,12 +225,15 @@ def plot_hierarchy_timeseries_by_profile(
             column = item["column"]
             for patient_id, patient_data in plot_df.groupby("patient_id"):
                 patient_data = patient_data.sort_values("timestamp")
+                style = _patient_line_style(patient_data)
                 ax.plot(
                     patient_data["timestamp"],
                     patient_data[column],
                     marker="o",
-                    linewidth=1.2,
-                    markersize=2.4,
+                    linestyle=style["linestyle"],
+                    linewidth=style["linewidth"],
+                    markersize=style["markersize"],
+                    alpha=style["alpha"],
                     label=str(patient_id),
                 )
             ax.set_title(item["title"], fontsize=9)
@@ -332,6 +338,41 @@ def _to_plot_value(value: object) -> float:
         except ValueError:
             return float("nan")
     return float(value)
+
+
+def _patient_line_style(patient_data: pd.DataFrame) -> dict[str, object]:
+    if _is_staff_like_series(patient_data):
+        return {
+            "linestyle": "--",
+            "linewidth": 0.8,
+            "markersize": 1.8,
+            "alpha": 0.55,
+        }
+    return {
+        "linestyle": "-",
+        "linewidth": 1.4,
+        "markersize": 3.0,
+        "alpha": 1.0,
+    }
+
+
+def _is_staff_like_series(patient_data: pd.DataFrame) -> bool:
+    if "is_rankable_patient" in patient_data.columns:
+        values = patient_data["is_rankable_patient"].dropna()
+        if not values.empty:
+            return not values.map(_to_bool).mode().iloc[0]
+    if "is_patient_label" in patient_data.columns:
+        values = patient_data["is_patient_label"].dropna()
+        if not values.empty:
+            return values.astype(str).str.strip().str.lower().eq("no").mean() >= 0.5
+    return False
+
+
+def _to_bool(value: object) -> bool:
+    if isinstance(value, bool):
+        return value
+    text = str(value).strip().lower()
+    return text not in {"false", "0", "no", "staff"}
 
 
 RAW_FEATURE_COLUMNS = (

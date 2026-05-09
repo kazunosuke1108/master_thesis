@@ -76,6 +76,10 @@ def evaluated_dataframes_to_long_dataframe(
         data = normalize_legacy_columns(dataframe)
         for _, row in data.iterrows():
             record = {"patient_id": person_id, "timestamp": row["timestamp"]}
+            patient_label = _patient_label_from_row(row)
+            if patient_label is not None:
+                record["is_patient_label"] = patient_label
+                record["is_rankable_patient"] = _is_rankable_patient_label(patient_label)
             for node_id in ids.EVALUATED_OUTPUT_NODES:
                 if node_id in row:
                     record[str(node_id)] = row[node_id]
@@ -165,3 +169,17 @@ def _label(value: Any) -> str:
     except TypeError:
         pass
     return str(value)
+
+
+def _patient_label_from_row(row: pd.Series) -> str | None:
+    if ids.IS_PATIENT in row:
+        return _label(row.get(ids.IS_PATIENT))
+    if str(ids.IS_PATIENT) in row:
+        return _label(row.get(str(ids.IS_PATIENT)))
+    if "is_patient_label" in row:
+        return _label(row.get("is_patient_label"))
+    return None
+
+
+def _is_rankable_patient_label(label: str) -> bool:
+    return label.strip().lower() not in {"no", "false", "0", "staff"}

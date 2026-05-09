@@ -27,7 +27,7 @@ RELEASING_BRAKES = RiskyMotionTemplate(
 MOVING_WHEELCHAIR = RiskyMotionTemplate(
     "moveWheelchair",
     ids.WHEELCHAIR_MOVE_RISK,
-    PoseFeatures(0.0, 0.5, 0.5, 0.5),
+    PoseFeatures(0.0, 0.0, 0.5, 0.5),
 )
 LOSING_BALANCE = RiskyMotionTemplate(
     "loseBalance",
