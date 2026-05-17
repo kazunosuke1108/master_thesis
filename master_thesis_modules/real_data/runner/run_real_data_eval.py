@@ -26,6 +26,7 @@ def run_real_data_eval(
     common_dir: str | Path = "master_thesis_modules/database/common",
     model: str = "spatial_context",
     staff_count: int = 1,
+    action_aggregation: str = "weighted_sum",
 ) -> list[Path]:
     data_dicts = load_trial_input(input_path)
     sequences = data_dicts_to_feature_sequences(data_dicts)
@@ -39,6 +40,7 @@ def run_real_data_eval(
                 fuzzy_profile_name=staff_name_fuzzy,
                 common_dir=common_dir,
                 model_type=model,
+                action_aggregation=action_aggregation,
             )
             engine = BatchRiskEngine(RiskEngine(config))
             results = engine.evaluate(sequences)
@@ -69,6 +71,12 @@ def main() -> None:
     parser.add_argument("--model", default="spatial_context")
     parser.add_argument("--staff-count", type=int, default=1)
     parser.add_argument(
+        "--action-aggregation",
+        choices=["weighted_sum", "weighted_max"],
+        default="weighted_sum",
+        help="30000001の動作リスク集約方法。weighted_sumは従来のAHP重み和、weighted_maxはmax_j(w_j * r_j)",
+    )
+    parser.add_argument(
         "--visualize",
         action="store_true",
         help="profile sweepの集計図と要約CSVも作成する",
@@ -81,6 +89,7 @@ def main() -> None:
         common_dir=args.common_dir,
         model=args.model,
         staff_count=args.staff_count,
+        action_aggregation=args.action_aggregation,
     )
     for path in written_dirs:
         print(path)
