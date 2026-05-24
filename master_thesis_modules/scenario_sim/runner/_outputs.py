@@ -14,6 +14,9 @@ from master_thesis_modules.risk_core.features.dataframe_adapter import (
 from master_thesis_modules.risk_core.notification.notification_history import (
     NotificationHistory,
 )
+from master_thesis_modules.risk_core.notification.legacy_message import (
+    LegacyNotificationMessageGenerator,
+)
 from master_thesis_modules.risk_core.notification.notification_policy import (
     NotificationPolicy,
 )
@@ -32,6 +35,7 @@ def save_evaluation_outputs(
     evaluated_dataframes: dict[str, pd.DataFrame],
     results_by_person: dict[str, list[RiskResult]],
     staff_count: int = 1,
+    notification_message_style: str = "current",
 ) -> dict[str, Path]:
     output_dir = Path(output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -50,6 +54,7 @@ def save_evaluation_outputs(
         results_by_person,
         staff_count,
         rankable_lookup,
+        message_style=notification_message_style,
     )
     notification_history.save_csv(output_dir / "notification_log.csv")
 
@@ -96,9 +101,15 @@ def build_notification_history(
     results_by_person: dict[str, list[RiskResult]],
     staff_count: int = 1,
     rankable_lookup: dict[tuple[str, float], bool] | None = None,
+    message_style: str = "current",
 ) -> NotificationHistory:
+    if message_style not in {"current", "legacy"}:
+        raise ValueError(f"Unknown notification message style: {message_style}")
     policy = NotificationPolicy()
     history = NotificationHistory()
+    legacy_message_generator = (
+        LegacyNotificationMessageGenerator() if message_style == "legacy" else None
+    )
     by_time: dict[float, list[RiskResult]] = {}
     for results in results_by_person.values():
         for result in results:
@@ -107,10 +118,57 @@ def build_notification_history(
         eligible_results = [
             result for result in results if _is_rankable_result(result, rankable_lookup)
         ]
-        history.append_many(
-            policy.evaluate_timestep(timestamp, eligible_results, staff_count=staff_count)
+        notifications = policy.evaluate_timestep(
+            timestamp,
+            eligible_results,
+            staff_count=staff_count,
         )
+        if legacy_message_generator is not None:
+            notifications = [
+                _with_legacy_message(
+                    notification,
+                    results_by_person,
+                    legacy_message_generator,
+                )
+                for notification in notifications
+            ]
+        history.append_many(notifications)
     return history
+
+
+def _with_legacy_message(
+    notification,
+    results_by_person: dict[str, list[RiskResult]],
+    legacy_message_generator: LegacyNotificationMessageGenerator,
+):
+    from dataclasses import replace
+
+    if notification.notification_type == "help":
+        message = "デイルームで複数の患者さんの対応が必要です．デイルームに来てください．"
+        return replace(notification, explanation=message, message=message)
+    if notification.notification_type != "notice":
+        return notification
+    result = _find_result(
+        results_by_person,
+        notification.person_id,
+        notification.timestamp,
+    )
+    if result is None:
+        return notification
+
+    message = legacy_message_generator.generate_notice(result, results_by_person)
+    return replace(notification, explanation=message, message=message)
+
+
+def _find_result(
+    results_by_person: dict[str, list[RiskResult]],
+    person_id: str,
+    timestamp: float,
+) -> RiskResult | None:
+    for result in results_by_person.get(str(person_id), []):
+        if float(result.time_s) == float(timestamp):
+            return result
+    return None
 
 
 def build_explanations(results_by_person: dict[str, list[RiskResult]]) -> list[dict[str, object]]:

@@ -27,6 +27,7 @@ def run_real_data_eval(
     model: str = "spatial_context",
     staff_count: int = 1,
     action_aggregation: str = "weighted_sum",
+    notification_message_style: str = "current",
 ) -> list[Path]:
     data_dicts = load_trial_input(input_path)
     sequences = data_dicts_to_feature_sequences(data_dicts)
@@ -57,6 +58,7 @@ def run_real_data_eval(
                 evaluated,
                 results,
                 staff_count=staff_count,
+                notification_message_style=notification_message_style,
             )
             written_dirs.append(run_dir)
     return written_dirs
@@ -77,6 +79,12 @@ def main() -> None:
         help="30000001の動作リスク集約方法。weighted_sumは従来のAHP重み和、weighted_maxはmax_j(w_j * r_j)",
     )
     parser.add_argument(
+        "--notification-message-style",
+        choices=["current", "legacy"],
+        default="current",
+        help="notification_log.csvの通知文面。legacyはnotification_generator_v5.py互換の文面にする",
+    )
+    parser.add_argument(
         "--visualize",
         action="store_true",
         help="profile sweepの集計図と要約CSVも作成する",
@@ -90,6 +98,7 @@ def main() -> None:
         model=args.model,
         staff_count=args.staff_count,
         action_aggregation=args.action_aggregation,
+        notification_message_style=args.notification_message_style,
     )
     for path in written_dirs:
         print(path)

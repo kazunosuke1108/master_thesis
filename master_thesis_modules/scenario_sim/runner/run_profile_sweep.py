@@ -38,6 +38,7 @@ def run_profile_sweep(
     common_dir: str | Path = "master_thesis_modules/database/common",
     model: str = "spatial_context",
     action_aggregation: str = "weighted_sum",
+    notification_message_style: str = "current",
 ) -> list[Path]:
     world_state = ScenarioLoader().load(scenario)
     use_master_v5_source = world_state.scenario_name == "thesis_4_5_multi_patient_action_demo"
@@ -79,6 +80,7 @@ def run_profile_sweep(
                 evaluated_dataframes,
                 results,
                 staff_count=len(world_state.staff),
+                notification_message_style=notification_message_style,
             )
             written_dirs.append(run_dir)
     return written_dirs
@@ -98,6 +100,12 @@ def main() -> None:
         help="30000001の動作リスク集約方法。weighted_sumは従来のAHP重み和、weighted_maxはmax_j(w_j * r_j)",
     )
     parser.add_argument(
+        "--notification-message-style",
+        choices=["current", "legacy"],
+        default="current",
+        help="notification_log.csvの通知文面。legacyはnotification_generator_v5.py互換の文面にする",
+    )
+    parser.add_argument(
         "--visualize",
         action="store_true",
         help="profile sweepの集計図と要約CSVも作成する",
@@ -110,6 +118,7 @@ def main() -> None:
         common_dir=args.common_dir,
         model=args.model,
         action_aggregation=args.action_aggregation,
+        notification_message_style=args.notification_message_style,
     )
     for path in written_dirs:
         print(path)
