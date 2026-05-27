@@ -28,6 +28,8 @@ else:
 from scripts.management.manager import Manager
 from scripts.master_v4 import Master
 from scripts.network.graph_manager_v4 import GraphManager
+from scripts.notification.rank_utils import get_risk_rank_by_patient
+from scripts.preprocess.staff_watch import assign_staff_watch_features
 # from scripts.preprocess.preprocess_blip_snapshot import PreprocessBlip
 from scripts.preprocess.preprocess_zokusei_snapshot import PreprocessZokusei
 from scripts.preprocess.preprocess_yolo_snapshot import PreprocessYolo
@@ -276,7 +278,7 @@ class RealtimeEvaluator(Manager,GraphManager):
             data_dicts[patient]=cls_zokusei.zokusei_snapshot(data_dict=data_dicts[patient],rgb_img=self.elp_img,t=t,b=b,l=l,r=r,)#(data_dicts[patient],self.elp_img,t,b,l,r,self.fps_control_dicts[patient])
             ## 動作
             self.logger.info(f"YOLO開始 Time: {np.round(time.time()-self.start,4)}")
-            data_dicts[patient],success_flag,description=cls_yolo.yolo_snapshot(data_dicts[patient],self.elp_img,t,b,l,r,self.yolo_debug,debug_dir_path=self.data_dir_dict["mobilesensing_dir_path"]+"/jpg/yolo",patient=patient,timestamp=self.timestamp)
+            data_dicts[patient],success_flag,description=cls_yolo.yolo_snapshot(data_dicts[patient],self.elp_img,t,b,l,r,self.yolo_debug,debug_dir_path=self.data_dir_dict["mobilesensing_dir_path"]+"/jpg/yolo",patient=patient,timestamp=self.timestamp,df_eval=self.df_eval)
             if not success_flag:
                 self.logger.info(f"姿勢推定が不正のため削除 {patient}（{description}）")
                 # self.patients.remove(patient)
@@ -291,34 +293,10 @@ class RealtimeEvaluator(Manager,GraphManager):
                 if self.fps_control_dicts[patient][k]==False:
                     data_dicts[patient][k]=self.df_eval.loc[self.df_eval.index[-1], f"{patient}_{k}"]
 
-        ## 見守り状況
-        def get_relative_distance(data_dicts,p,s,):
-            d=np.linalg.norm(np.array([data_dicts[p]["60010000"],data_dicts[p]["60010001"]])-np.array([data_dicts[s]["60010000"],data_dicts[s]["60010001"]]))
-            return d
-
         self.patients=list(data_dicts.keys())
 
         self.logger.info(f"見守り関連開始 Time: {np.round(time.time()-self.start,4)}")
-        # スタッフがいるかどうかを判定
-        staff=[patient for patient in self.patients if data_dicts[patient]["50000000"]=="no"]
-        if len(staff)>0:
-            # print(staff)
-            # いる
-            for patient in self.patients:
-                distances=[get_relative_distance(data_dicts,patient,s) for s in staff]
-                closest_staff=staff[np.array(distances).argmin()]
-                data_dicts[patient]["50001100"]=data_dicts[closest_staff]["60010000"]
-                data_dicts[patient]["50001101"]=data_dicts[closest_staff]["60010001"]
-                data_dicts[patient]["50001110"]=data_dicts[closest_staff]["60010000"]-self.json_previous_data[closest_staff+"_x"]
-                data_dicts[patient]["50001111"]=data_dicts[closest_staff]["60010001"]-self.json_previous_data[closest_staff+"_y"]
-
-        else:
-            # いない
-            for patient in self.patients:
-                data_dicts[patient]["50001100"]=self.structure_dict["staff_station"]["pos"][0]
-                data_dicts[patient]["50001101"]=self.structure_dict["staff_station"]["pos"][1]
-                data_dicts[patient]["50001110"]=self.structure_dict["staff_station"]["direction"][0]
-                data_dicts[patient]["50001111"]=self.structure_dict["staff_station"]["direction"][1]
+        data_dicts=assign_staff_watch_features(data_dicts,self.json_previous_data,self.structure_dict)
         
         return data_dicts
     
@@ -550,7 +528,7 @@ class RealtimeEvaluator(Manager,GraphManager):
             for patient in patients:
                 # total_risks.append(data_dicts[patient]["10000000"])
                 total_risks.append(self.df_eval[patient+"_10000000"].tail(self.smoothing_w).mean())
-            patients_rank=(-np.array(total_risks)).argsort()
+            patients_rank=get_risk_rank_by_patient(patients,total_risks)
 
             # 最も高リスクな患者の決定
             most_risky_patient=patients[np.array(total_risks).argmax()]
@@ -591,7 +569,7 @@ class RealtimeEvaluator(Manager,GraphManager):
             # 今回の危険患者をメモ
             self.previous_risky_patient=most_risky_patient
 
-            for patient,rank in zip(patients,patients_rank):
+            for patient,rank in patients_rank.items():
                 additional_data_dicts["rank"][patient]={}
                 additional_data_dicts["rank"][patient]["10000000"]=rank
         except Exception as e:

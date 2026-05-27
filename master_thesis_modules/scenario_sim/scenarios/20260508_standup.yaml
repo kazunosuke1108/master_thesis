@@ -1,0 +1,107 @@
+scenario_name: 20260508_standup
+time_range: {duration_s: 10.0, step_s: 0.5}
+patients:
+  - id: A
+    is_patient_label: yes
+    age_group_label: old
+    position: {x: 2.0, y: 5.0}
+    action_label: neutral_sitting
+  - id: B
+    is_patient_label: yes
+    age_group_label: old
+    position: {x: 2.0, y: 2.0}
+    action_label: neutral_sitting
+  - id: C
+    is_patient_label: yes
+    age_group_label: old
+    position: {x: 5.0, y: 2.0}
+    action_label: neutral_sitting
+objects:
+  # - id: wheelchair_a
+  #   type: wheelchair
+  #   position: {x: 2.1, y: 5.0}
+  # - id: wheelchair_b
+  #   type: wheelchair
+  #   position: {x: 2.1, y: 2.0}
+  - id: wheelchair_a
+    type: wheelchair
+    position: {x: 2.1, y: 5.0}
+  - id: wheelchair_b
+    type: wheelchair
+    position: {x: 2.1, y: 2.0}
+  - id: wheelchair_c
+    type: wheelchair
+    position: {x: 5.1, y: 2.0}
+  - id: iv_c
+    type: iv_pole
+    position: {x: 5.1, y: 2.0}
+  # - id: handrail_a
+  #   type: handrail
+  #   position: {x: 0.0, y: 5.0}
+  # - id: handrail_b
+  #   type: handrail
+  #   position: {x: 2.0, y: 0.0}
+  # - id: handrail_c
+  #   type: handrail
+  #   position: {x: 6.0, y: 2.0}
+staff:
+  - id: NS
+    position: {x: 2.2, y: 2.2}
+    velocity: {vx: -0.1, vy: -0.1}
+events:
+  # Generic scenario_sim runners use these semantic events. run_profile_sweep
+  # detects this scenario_name and uses the exact master_v5-compatible 20Hz
+  # pseudo-data generator instead. Risk calculation still uses the current
+  # risk_core logic, so output can intentionally differ from master_v5.py.
+  - time_s: 2.0
+    event_type: set_action
+    target_id: A
+    action_label: standing_up
+  - time_s: 4.0
+    event_type: set_action
+    target_id: B
+    action_label: standing_up
+  - time_s: 6.0
+    event_type: set_action
+    target_id: C
+    action_label: standing_up
+  # - time_s: 3.0
+  #   event_type: move_staff
+  #   target_id: NS
+  #   position: {x: 3.5, y: 3.5}
+  #   velocity: {vx: -0.5, vy: -0.5}
+  # - time_s: 4.0
+  #   event_type: move_staff
+  #   target_id: NS
+  #   position: {x: 2.5, y: 2.5}
+  #   velocity: {vx: -0.5, vy: -0.5}
+  # - time_s: 5.0
+  #   event_type: move_staff
+  #   target_id: NS
+  #   position: {x: 2.0, y: 2.0}
+  #   velocity: {vx: -0.5, vy: -0.5}
+  - time_s: 3.0
+    event_type: set_action
+    target_id: A
+    action_label: neutral_sitting
+  - time_s: 5.0
+    event_type: set_action
+    target_id: B
+    action_label: neutral_sitting
+  - time_s: 7.0
+    event_type: set_action
+    target_id: C
+    action_label: neutral_sitting
+  # - time_s: 6.0
+  #   event_type: set_action
+  #   target_id: C
+  #   action_label: standing_up
+  # - time_s: 7.0
+  #   event_type: move_staff
+  #   target_id: NS
+  #   position: {x: 1.0, y: 1.0}
+  #   velocity: {vx: -0.4, vy: -0.4}
+  # - time_s: 8.0
+  #   event_type: set_action
+  #   target_id: A
+  #   action_label: standing_up

@@ -1,0 +1,53 @@
+scenario_name: reach_object_context_demo
+time_s: 0.0
+patients:
+  - id: A
+    is_patient_label: yes
+    age_group_label: old
+    position: {x: 2.0, y: 2.0}
+    action_label: reach_floor
+    height_max: 0.55
+  - id: B
+    is_patient_label: yes
+    age_group_label: middle
+    position: {x: 4.5, y: 2.0}
+    action_label: reach_table
+    height_max: 0.45
+  - id: C
+    is_patient_label: yes
+    age_group_label: old
+    position: {x: 1.1, y: 5.0}
+    action_label: reach_iv_pole
+    height_max: 0.50
+objects:
+  - id: iv_for_c
+    type: iv_pole
+    position: {x: 1.0, y: 5.2}
+  - id: iv_far
+    type: iv_pole
+    position: {x: 5.8, y: 5.8}
+  - id: wheelchair_for_a
+    type: wheelchair
+    position: {x: 2.2, y: 2.1}
+  - id: wheelchair_far
+    type: wheelchair
+    position: {x: 5.8, y: 0.3}
+  - id: handrail_near_b
+    type: handrail
+    position: {x: 4.8, y: 2.1}
+  - id: handrail_wall_a
+    type: handrail
+    position: {x: 0.2, y: 0.2}
+  - id: handrail_far_c
+    type: handrail
+    position: {x: 5.8, y: 0.2}
+staff:
+  - id: staff_near_b
+    position: {x: 4.3, y: 2.1}
+    velocity: {vx: 0.2, vy: -0.1}
+  - id: staff_far_a
+    position: {x: 5.8, y: 5.5}
+    velocity: {vx: -0.1, vy: -0.1}
+  - id: staff_not_watching_c
+    position: {x: 4.8, y: 5.7}
+    velocity: {vx: 0.6, vy: 0.2}

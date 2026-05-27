@@ -1,0 +1,5 @@
+plot_label,profile_name,ahp_profile,fuzzy_profile
+P1,ahp_百武__fuzzy_百武,百武,百武
+P2,ahp_百武__fuzzy_釜石,百武,釜石
+P3,ahp_釜石__fuzzy_百武,釜石,百武
+P4,ahp_釜石__fuzzy_釜石,釜石,釜石

@@ -1,0 +1,10 @@
+plot_label,profile_name,ahp_profile,fuzzy_profile
+P1,ahp_中村__fuzzy_中村,中村,中村
+P2,ahp_中村__fuzzy_百武,中村,百武
+P3,ahp_中村__fuzzy_釜石,中村,釜石
+P4,ahp_百武__fuzzy_中村,百武,中村
+P5,ahp_百武__fuzzy_百武,百武,百武
+P6,ahp_百武__fuzzy_釜石,百武,釜石
+P7,ahp_釜石__fuzzy_中村,釜石,中村
+P8,ahp_釜石__fuzzy_百武,釜石,百武
+P9,ahp_釜石__fuzzy_釜石,釜石,釜石
