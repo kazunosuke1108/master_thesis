@@ -62,5 +62,5 @@ for hour_key in sorted(hourly_data.keys()):
     hour_labels.append(hour_key)
     data_list.append(concat_df)
 
-visualizer=Visualizer(trial_name="20260105_test",strage="NASK")
+visualizer=Visualizer(trial_name="20260112_test",strage="local")
 visualizer.draw_positions2(data_list=data_list,labels=hour_labels)
