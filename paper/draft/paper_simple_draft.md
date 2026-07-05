@@ -2,7 +2,7 @@
 病棟共有空間における空間的文脈を考慮した危険性評価システム
 
 # 投稿先
-IEEE Access または IEEE T-MSC
+IEEE Access または IEEE Transactions on Systems, Man, and Cybernetics
 
 # 1. Introduction
 - 病棟共有空間における見守り業務負荷が増大している
