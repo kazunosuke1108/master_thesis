@@ -49,6 +49,7 @@ def visualize_profile_sweep(
         "profile_ranking_summary": output_dir / "profile_ranking_summary.csv",
         "profile_plot_labels": output_dir / "profile_plot_labels.csv",
         "profile_total_risk_grid": output_dir / "profile_total_risk_grid.png",
+        "profile_total_risk_by_profile_dir": output_dir,
         "profile_hierarchy_timeseries_dir": output_dir,
         "profile_top_risk_comparison": output_dir / "profile_top_risk_comparison.png",
         "profile_notification_counts": output_dir / "profile_notification_counts.png",
@@ -57,6 +58,7 @@ def visualize_profile_sweep(
     build_ranking_summary(runs).to_csv(paths["profile_ranking_summary"], index=False)
     build_profile_label_table(runs).to_csv(paths["profile_plot_labels"], index=False)
     plot_total_risk_grid(runs, paths["profile_total_risk_grid"])
+    plot_total_risk_by_profile(runs, output_dir)
     plot_hierarchy_timeseries_by_profile(runs, output_dir)
     plot_top_risk_comparison(runs, paths["profile_top_risk_comparison"])
     plot_notification_counts(runs, paths["profile_notification_counts"])
@@ -169,22 +171,7 @@ def plot_total_risk_grid(runs: list[ProfileRun], output_png: str | Path) -> Path
     fig, axes = plt.subplots(rows, cols, figsize=(5.2 * cols, 3.4 * rows), sharey=True)
     axes_list = list(axes.ravel()) if hasattr(axes, "ravel") else [axes]
     for run_index, (ax, run) in enumerate(zip(axes_list, runs), start=1):
-        for patient_id, patient_data in run.risk_timeseries.groupby("patient_id"):
-            patient_data = patient_data.sort_values("timestamp")
-            style = _patient_line_style(patient_data)
-            ax.plot(
-                patient_data["timestamp"],
-                patient_data["10000000"],
-                marker="o",
-                linestyle=style["linestyle"],
-                linewidth=style["linewidth"],
-                markersize=style["markersize"],
-                alpha=style["alpha"],
-                label=str(patient_id),
-            )
-        ax.set_title(_profile_label(run_index))
-        ax.set_xlabel("Time [s]")
-        ax.grid(True, alpha=0.3)
+        _plot_total_risk_run(ax, run, _profile_label(run_index))
     for ax in axes_list[::cols]:
         ax.set_ylabel("Total risk")
     for ax in axes_list[len(runs) :]:
@@ -195,6 +182,50 @@ def plot_total_risk_grid(runs: list[ProfileRun], output_png: str | Path) -> Path
     fig.savefig(output_png, dpi=180)
     plt.close(fig)
     return output_png
+
+
+def plot_total_risk_by_profile(
+    runs: list[ProfileRun],
+    output_dir: str | Path,
+) -> list[Path]:
+    output_dir = Path(output_dir)
+    output_paths = []
+    for run_index, run in enumerate(runs, start=1):
+        profile_label = _profile_label(run_index)
+        fig, ax = plt.subplots(figsize=(6.4, 4.2))
+        _plot_total_risk_run(ax, run, profile_label)
+        ax.set_ylabel("Total risk")
+        handles, labels = ax.get_legend_handles_labels()
+        ax.legend(handles, labels, loc="best", fontsize=9)
+        fig.tight_layout()
+        output_png = output_dir / f"{profile_label}_total_risk.png"
+        fig.savefig(output_png, dpi=180)
+        plt.close(fig)
+        output_paths.append(output_png)
+    return output_paths
+
+
+def _plot_total_risk_run(
+    ax: plt.Axes,
+    run: ProfileRun,
+    profile_label: str,
+) -> None:
+    for patient_id, patient_data in run.risk_timeseries.groupby("patient_id"):
+        patient_data = patient_data.sort_values("timestamp")
+        style = _patient_line_style(patient_data)
+        ax.plot(
+            patient_data["timestamp"],
+            patient_data["10000000"],
+            marker="o",
+            linestyle=style["linestyle"],
+            linewidth=style["linewidth"],
+            markersize=style["markersize"],
+            alpha=style["alpha"],
+            label=str(patient_id),
+        )
+    ax.set_title(profile_label)
+    ax.set_xlabel("Time [s]")
+    ax.grid(True, alpha=0.3)
 
 
 def plot_hierarchy_timeseries_by_profile(

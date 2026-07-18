@@ -1,0 +1,73 @@
+timestamp,entity_type,entity_id,x,y,action_label,vx,vy,object_type,events
+0.0,patient,A,2.0,5.0,neutral_sitting,,,,
+0.0,patient,B,2.0,2.0,neutral_sitting,,,,
+0.0,patient,C,5.0,2.0,neutral_sitting,,,,
+0.0,staff,NS,3.0,3.0,,-0.1,-0.1,,
+0.0,object,wheelchair_a,2.1,5.0,,,,wheelchair,
+0.0,object,wheelchair_c,5.1,2.0,,,,wheelchair,
+0.0,object,iv_c,5.1,2.0,,,,iv_pole,
+0.0,object,handrail_a,0.0,5.0,,,,handrail,
+0.0,object,handrail_b,2.0,0.0,,,,handrail,
+2.0,patient,A,2.0,5.0,standing_up,,,,A: standing_up
+2.0,patient,B,2.0,2.0,neutral_sitting,,,,A: standing_up
+2.0,patient,C,5.0,2.0,neutral_sitting,,,,A: standing_up
+2.0,staff,NS,3.0,3.0,,-0.1,-0.1,,A: standing_up
+2.0,object,wheelchair_a,2.1,5.0,,,,wheelchair,A: standing_up
+2.0,object,wheelchair_c,5.1,2.0,,,,wheelchair,A: standing_up
+2.0,object,iv_c,5.1,2.0,,,,iv_pole,A: standing_up
+2.0,object,handrail_a,0.0,5.0,,,,handrail,A: standing_up
+2.0,object,handrail_b,2.0,0.0,,,,handrail,A: standing_up
+3.0,patient,A,2.0,5.0,neutral_sitting,,,,A: neutral_sitting
+3.0,patient,B,2.0,2.0,neutral_sitting,,,,A: neutral_sitting
+3.0,patient,C,5.0,2.0,neutral_sitting,,,,A: neutral_sitting
+3.0,staff,NS,3.0,3.0,,-0.1,-0.1,,A: neutral_sitting
+3.0,object,wheelchair_a,2.1,5.0,,,,wheelchair,A: neutral_sitting
+3.0,object,wheelchair_c,5.1,2.0,,,,wheelchair,A: neutral_sitting
+3.0,object,iv_c,5.1,2.0,,,,iv_pole,A: neutral_sitting
+3.0,object,handrail_a,0.0,5.0,,,,handrail,A: neutral_sitting
+3.0,object,handrail_b,2.0,0.0,,,,handrail,A: neutral_sitting
+4.0,patient,A,2.0,5.0,neutral_sitting,,,,B: standing_up
+4.0,patient,B,2.0,2.0,standing_up,,,,B: standing_up
+4.0,patient,C,5.0,2.0,neutral_sitting,,,,B: standing_up
+4.0,staff,NS,3.0,3.0,,-0.1,-0.1,,B: standing_up
+4.0,object,wheelchair_a,2.1,5.0,,,,wheelchair,B: standing_up
+4.0,object,wheelchair_c,5.1,2.0,,,,wheelchair,B: standing_up
+4.0,object,iv_c,5.1,2.0,,,,iv_pole,B: standing_up
+4.0,object,handrail_a,0.0,5.0,,,,handrail,B: standing_up
+4.0,object,handrail_b,2.0,0.0,,,,handrail,B: standing_up
+5.0,patient,A,2.0,5.0,neutral_sitting,,,,B: neutral_sitting
+5.0,patient,B,2.0,2.0,neutral_sitting,,,,B: neutral_sitting
+5.0,patient,C,5.0,2.0,neutral_sitting,,,,B: neutral_sitting
+5.0,staff,NS,3.0,3.0,,-0.1,-0.1,,B: neutral_sitting
+5.0,object,wheelchair_a,2.1,5.0,,,,wheelchair,B: neutral_sitting
+5.0,object,wheelchair_c,5.1,2.0,,,,wheelchair,B: neutral_sitting
+5.0,object,iv_c,5.1,2.0,,,,iv_pole,B: neutral_sitting
+5.0,object,handrail_a,0.0,5.0,,,,handrail,B: neutral_sitting
+5.0,object,handrail_b,2.0,0.0,,,,handrail,B: neutral_sitting
+6.0,patient,A,2.0,5.0,neutral_sitting,,,,C: standing_up
+6.0,patient,B,2.0,2.0,neutral_sitting,,,,C: standing_up
+6.0,patient,C,5.0,2.0,standing_up,,,,C: standing_up
+6.0,staff,NS,3.0,3.0,,-0.1,-0.1,,C: standing_up
+6.0,object,wheelchair_a,2.1,5.0,,,,wheelchair,C: standing_up
+6.0,object,wheelchair_c,5.1,2.0,,,,wheelchair,C: standing_up
+6.0,object,iv_c,5.1,2.0,,,,iv_pole,C: standing_up
+6.0,object,handrail_a,0.0,5.0,,,,handrail,C: standing_up
+6.0,object,handrail_b,2.0,0.0,,,,handrail,C: standing_up
+7.0,patient,A,2.0,5.0,neutral_sitting,,,,C: neutral_sitting
+7.0,patient,B,2.0,2.0,neutral_sitting,,,,C: neutral_sitting
+7.0,patient,C,5.0,2.0,neutral_sitting,,,,C: neutral_sitting
+7.0,staff,NS,3.0,3.0,,-0.1,-0.1,,C: neutral_sitting
+7.0,object,wheelchair_a,2.1,5.0,,,,wheelchair,C: neutral_sitting
+7.0,object,wheelchair_c,5.1,2.0,,,,wheelchair,C: neutral_sitting
+7.0,object,iv_c,5.1,2.0,,,,iv_pole,C: neutral_sitting
+7.0,object,handrail_a,0.0,5.0,,,,handrail,C: neutral_sitting
+7.0,object,handrail_b,2.0,0.0,,,,handrail,C: neutral_sitting
+10.0,patient,A,2.0,5.0,neutral_sitting,,,,
+10.0,patient,B,2.0,2.0,neutral_sitting,,,,
+10.0,patient,C,5.0,2.0,neutral_sitting,,,,
+10.0,staff,NS,3.0,3.0,,-0.1,-0.1,,
+10.0,object,wheelchair_a,2.1,5.0,,,,wheelchair,
+10.0,object,wheelchair_c,5.1,2.0,,,,wheelchair,
+10.0,object,iv_c,5.1,2.0,,,,iv_pole,
+10.0,object,handrail_a,0.0,5.0,,,,handrail,
+10.0,object,handrail_b,2.0,0.0,,,,handrail,
