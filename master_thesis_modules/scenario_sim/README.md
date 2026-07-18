@@ -279,14 +279,16 @@ python -m master_thesis_modules.scenario_sim.runner.run_thesis_simulation \
 
 ## 比較モデル
 
-動作のみ、属性+動作、空間的文脈込みの3モデルを比較します。
+動作のみ、患者文脈のみ、患者文脈と空間的文脈込みの3モデルを比較します。
 
 ```bash
 python -m master_thesis_modules.scenario_sim.runner.compare_models \
   --scenario master_thesis_modules/scenario_sim/scenarios/reach_object_context_demo.yaml \
-  --models action_only action_attribute spatial_context \
+  --models action_only patient_context spatial_context \
   --output outputs/reach_context_comparison
 ```
+
+`--model spatial_context` は患者属性・年齢・動作に加え、周辺物体とスタッフ見守りも使います。`--model patient_context` は患者属性・年齢・動作だけを使い、周辺物体とスタッフ見守りの空間的文脈は総合危険度に入れません。旧名 `action_attribute` も互換用に使えますが、新しい比較実験では `patient_context` を使ってください。
 
 ## AHP / Fuzzy プロファイル総当たり
 

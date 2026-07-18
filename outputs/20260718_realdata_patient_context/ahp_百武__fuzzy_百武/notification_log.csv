@@ -1,0 +1,2 @@
+timestamp,target_patient_id,total_risk,rank,reason,message,notification_type
+1740549673.710641,00036,0.3157095678540524,1,00036さんが，高齢であるのに，車椅子を動かそうとしているので，危険です．,00036さんが，高齢であるのに，車椅子を動かそうとしているので，危険です．,notice

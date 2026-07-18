@@ -52,7 +52,7 @@ class RiskEngine:
                 node_id: (factor_risks[node_id] if node_id in ids.ACTION_RISK_NODES else 0.0)
                 for node_id in factor_risks
             }
-        elif self.config.model_type == "action_attribute":
+        elif self._uses_patient_context_only():
             factor_risks = {
                 node_id: (
                     factor_risks[node_id]
@@ -109,7 +109,7 @@ class RiskEngine:
         )
         if self.config.model_type == "action_only":
             total = internal_dynamic
-        elif self.config.model_type == "action_attribute":
+        elif self._uses_patient_context_only():
             total = internal
         elif self.config.use_legacy_like_fuzzy:
             total = LegacyLikeFuzzyAggregator(
@@ -148,6 +148,9 @@ class RiskEngine:
         if self.config.action_aggregation == "weighted_max":
             return WeightedMaxAggregator(self.config.action_weights).aggregate(action_inputs)
         raise ValueError(f"Unknown action_aggregation: {self.config.action_aggregation}")
+
+    def _uses_patient_context_only(self) -> bool:
+        return self.config.model_type in {"patient_context", "action_attribute"}
 
 
 def patient_attribute_tfn(label: str) -> tuple[float, float, float]:

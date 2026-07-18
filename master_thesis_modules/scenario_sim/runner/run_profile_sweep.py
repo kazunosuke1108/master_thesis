@@ -7,6 +7,7 @@ from pathlib import Path
 
 from master_thesis_modules.risk_core.engine.batch_risk_engine import BatchRiskEngine
 from master_thesis_modules.risk_core.engine.profile_config import make_profile_risk_config
+from master_thesis_modules.risk_core.engine.risk_config import VALID_MODEL_TYPES
 from master_thesis_modules.risk_core.engine.risk_engine import RiskEngine
 from master_thesis_modules.risk_core.features.dataframe_adapter import (
     data_dicts_to_feature_sequences,
@@ -92,7 +93,12 @@ def main() -> None:
     parser.add_argument("--output", required=True)
     parser.add_argument("--staff-names", nargs="+", default=["中村", "百武"])
     parser.add_argument("--common-dir", default="master_thesis_modules/database/common")
-    parser.add_argument("--model", default="spatial_context")
+    parser.add_argument(
+        "--model",
+        choices=sorted(VALID_MODEL_TYPES),
+        default="spatial_context",
+        help="risk model. spatial_context uses patient and spatial context; patient_context ignores object/staff context",
+    )
     parser.add_argument(
         "--action-aggregation",
         choices=["weighted_sum", "weighted_max"],

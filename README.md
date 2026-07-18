@@ -292,12 +292,14 @@ python -m master_thesis_modules.scenario_sim.runner.run_thesis_simulation \
   --output outputs/thesis_4_5_new
 ```
 
+`--model spatial_context` は患者の文脈と空間的文脈の両方を考慮します。患者の文脈のみで評価する比較手法は `--model patient_context` を指定します。この場合、周辺物体リスクとスタッフ見守りリスクは総合危険度に入らず、`10000000` は内的リスク `20000000` と同じ値になります。
+
 比較モデル実行:
 
 ```bash
 python -m master_thesis_modules.scenario_sim.runner.compare_models \
   --scenario master_thesis_modules/scenario_sim/scenarios/reach_object_context_demo.yaml \
-  --models action_only action_attribute spatial_context \
+  --models action_only patient_context spatial_context \
   --output outputs/reach_context_comparison
 ```
 
@@ -360,3 +362,37 @@ python -m master_thesis_modules.real_data.runner.compare_real_data_with_legacy \
 ## ChatGPT に説明するときの要約
 
 このリポジトリは、人物ごとの時系列特徴量から転倒・見守りリスクを階層的に推定する修論用コードである。特徴量とリスクは 8 桁のノード番号で管理され、先頭桁が階層を表す。第5・6層の入力特徴量、たとえば姿勢 `50000100`-`50000103`、物体座標 `50001000` 系、スタッフ座標・速度 `50001100` 系、本人座標 `60010000` 系を、第4層の解釈可能なリスク `40000010`, `40000100`, `40000110`, `40000111` などへ変換する。その後、AHP、Fuzzy 推論、重み和で `300000xx`, `200000xx` へ集約し、最終的に総合危険度 `10000000` を出す。現行の正本は `master_v5.py` で、評価順序と主要ノード仕様は `risk/schema.py` に記録されている。
+
+
+## memo
+よく使うコマンド
+```bash
+python -m master_thesis_modules.real_data.runner.run_real_data_eval --input /home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/3_立ち上がり実験データのクレンジング/data_dicts.pickle --model spatial_context --output outputs/20260718_realdata_spatial_context --staff-names 山口 百武 --common-dir master_thesis_modules/database/common --visualize --action-aggregation weighted_max --notification-message-style legacy
+```
+
+```bash
+python -m master_thesis_modules.real_data.runner.run_real_data_eval --input /home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/3_立ち上がり実験データのクレンジング/data_dicts.pickle --model patient_context --output outputs/20260718_realdata_patient_context --staff-names 山口 百武 --common-dir master_thesis_modules/database/common --visualize --action-aggregation weighted_max --notification-message-style legacy
+```
+
+```bash
+python -m master_thesis_modules.scenario_sim.runner.run_profile_sweep --scenario /home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scenario_sim/scenarios/20260508_standup.yaml --output /home/hayashide/kazu_ws/master_thesis/outputs/20260718_standup_spatial_context --model spatial_context --staff-names 山口 百武 --action-aggregation weighted_max --visualize --notification-message-style legacy
+```
+
+```bash
+python -m master_thesis_modules.scenario_sim.runner.run_profile_sweep --scenario /home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scenario_sim/scenarios/20260508_standup.yaml --output /home/hayashide/kazu_ws/master_thesis/outputs/20260718_standup_patient_context --model patient_context --staff-names 山口 百武 --action-aggregation weighted_max --visualize --notification-message-style legacy
+```
+
+```bash
+python -m master_thesis_modules.scenario_sim.runner.run_profile_sweep --scenario /home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scenario_sim/scenarios/20260508_touchface.yaml --output /home/hayashide/kazu_ws/master_thesis/outputs/20260718_touchface_spatial_context --model spatial_context --staff-names 山口 百武 --action-aggregation weighted_max --visualize --notification-message-style legacy
+```
+
+```bash
+python -m master_thesis_modules.scenario_sim.runner.run_profile_sweep --scenario /home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scenario_sim/scenarios/20260508_touchface.yaml --output /home/hayashide/kazu_ws/master_thesis/outputs/20260718_touchface_patient_context --model patient_context --staff-names 山口 百武 --action-aggregation weighted_max --visualize --notification-message-style legacy
+```
+
+```bash
+python -m master_thesis_modules.scenario_sim.runner.run_profile_sweep --scenario /home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scenario_sim/scenarios/20260508_standup.yaml --output /home/hayashide/kazu_ws/master_thesis/outputs/20260718_standup_spatial_context --model spatial_context --staff-names 山口 百武 --action-aggregation weighted_max --visualize --notification-message-style legacy
+python -m master_thesis_modules.scenario_sim.runner.run_profile_sweep --scenario /home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scenario_sim/scenarios/20260508_standup.yaml --output /home/hayashide/kazu_ws/master_thesis/outputs/20260718_standup_patient_context --model patient_context --staff-names 山口 百武 --action-aggregation weighted_max --visualize --notification-message-style legacy
+python -m master_thesis_modules.scenario_sim.runner.run_profile_sweep --scenario /home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scenario_sim/scenarios/20260508_touchface.yaml --output /home/hayashide/kazu_ws/master_thesis/outputs/20260718_touchface_spatial_context --model spatial_context --staff-names 山口 百武 --action-aggregation weighted_max --visualize --notification-message-style legacy
+python -m master_thesis_modules.scenario_sim.runner.run_profile_sweep --scenario /home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scenario_sim/scenarios/20260508_touchface.yaml --output /home/hayashide/kazu_ws/master_thesis/outputs/20260718_touchface_patient_context --model patient_context --staff-names 山口 百武 --action-aggregation weighted_max --visualize --notification-message-style legacy
+```

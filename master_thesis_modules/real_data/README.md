@@ -40,6 +40,17 @@ python -m master_thesis_modules.real_data.runner.run_real_data_eval \
   --staff-count 1
 ```
 
+`--model` で文脈の使い方を切り替えます。`spatial_context` は患者属性・年齢・動作に加えて、周辺物体とスタッフ見守りも使います。`patient_context` は患者属性・年齢・動作だけを使い、空間的文脈を総合危険度に入れない比較手法です。
+
+```bash
+python -m master_thesis_modules.real_data.runner.run_real_data_eval \
+  --input /path/to/data_dicts.pickle \
+  --output outputs/real_data_patient_context \
+  --staff-names 山口 百武 \
+  --model patient_context \
+  --visualize
+```
+
 既に計算済みの出力を後から可視化する場合は、次を実行します。
 
 ```bash
