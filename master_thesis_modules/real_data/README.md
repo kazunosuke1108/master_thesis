@@ -40,6 +40,21 @@ python -m master_thesis_modules.real_data.runner.run_real_data_eval \
   --staff-count 1
 ```
 
+`--staff-names all` を指定すると、`--common-dir` 内で動作AHP・物体AHP・Fuzzyの3ファイルが揃った全スタッフを使います。AHP を山口に固定し、Fuzzy を全スタッフで掃引する場合は次のように実行します。
+
+```bash
+python -m master_thesis_modules.real_data.runner.run_real_data_eval \
+  --input /path/to/data_dicts.pickle \
+  --output outputs/real_data_eval_ahp_yamaguchi \
+  --staff-names all \
+  --ahp-staff-names 山口 \
+  --common-dir master_thesis_modules/database/common \
+  --model spatial_context \
+  --action-aggregation weighted_max \
+  --notification-message-style legacy \
+  --visualize
+```
+
 `--model` で文脈の使い方を切り替えます。`spatial_context` は患者属性・年齢・動作に加えて、周辺物体とスタッフ見守りも使います。`patient_context` は患者属性・年齢・動作だけを使い、空間的文脈を総合危険度に入れない比較手法です。
 
 ```bash
@@ -57,6 +72,18 @@ python -m master_thesis_modules.real_data.runner.run_real_data_eval \
 python -m master_thesis_modules.real_data.runner.visualize_profile_sweep \
   --input outputs/real_data_eval_new
 ```
+
+## Fuzzyプロファイルと患者危険度の後解析
+
+実データのプロファイル掃引出力にも、シナリオシミュレーションと同じFuzzyプロファイル後解析を適用できます。`C_i` と患者別の正規化平均総リスクの関係を折れ線グラフとCSVへ出力します。AHPプロファイルが複数ある出力では、比較対象を `--ahp-profile` で指定してください。
+
+```bash
+python -m master_thesis_modules.real_data.runner.analyze_fuzzy_profile_rankings \
+  --input outputs/20260726_realdata \
+  --ahp-profile 山口
+```
+
+既定では `<input>/analysis/` に図とCSVを保存します。
 
 ## 旧実装との比較
 

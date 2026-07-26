@@ -1,0 +1,2 @@
+timestamp,target_patient_id,total_risk,rank,reason,message,notification_type
+0.0,,0.9229478358961359,0,デイルームで複数の患者さんの対応が必要です．デイルームに来てください．,デイルームで複数の患者さんの対応が必要です．デイルームに来てください．,help

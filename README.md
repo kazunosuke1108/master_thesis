@@ -407,3 +407,16 @@ python -m master_thesis_modules.scenario_sim.runner.run_profile_sweep --scenario
 # exp
 python -m master_thesis_modules.real_data.runner.run_real_data_eval --input /home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scripts_202511/3_立ち上がり実験データのクレンジング/data_dicts.pickle --model spatial_context --output outputs/20260719_realdata --staff-names 山口 百武 貞方 --common-dir master_thesis_modules/database/common --visualize --action-aggregation weighted_max --notification-message-style legacy
 ```
+
+```bash
+# 全員分
+python -m master_thesis_modules.scenario_sim.runner.run_profile_sweep --scenario /home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scenario_sim/scenarios/20260720_4patients.yaml --output /home/hayashide/kazu_ws/master_thesis/outputs/20260720_4patients --model spatial_context --staff-names 山口 百武 貞方 --action-aggregation weighted_max --visualize --notification-message-style legacy
+```
+
+```bash
+python -m master_thesis_modules.scenario_sim.runner.run_profile_sweep   --scenario /home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scenario_sim/scenarios/20260720_4patients.yaml   --output /home/hayashide/kazu_ws/master_thesis/outputs/20260720_4patients_ahp_yamaguchi   --model spatial_context   --staff-names all  --ahp-staff-names 山口   --action-aggregation weighted_max   --visualize   --notification-message-style legacy
+```
+
+```bash
+python -m master_thesis_modules.scenario_sim.runner.analyze_fuzzy_profile_rankings   --input /home/hayashide/kazu_ws/master_thesis/outputs/20260720_4patients_ahp_yamaguchi   --ahp-profile 山口
+```
