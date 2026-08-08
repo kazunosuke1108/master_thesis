@@ -56,6 +56,8 @@ def test_run_real_data_eval_writes_profile_sweep_outputs(tmp_path):
     analysis_paths = analyze_fuzzy_profile_rankings(output, ahp_profile="中村")
     assert analysis_paths["fuzzy_profile_ranking_plot"].exists()
     assert analysis_paths["fuzzy_ci_patient_mean"].exists()
+    assert analysis_paths["fuzzy_profile_di_plot"].exists()
+    assert analysis_paths["fuzzy_di_patient_mean"].exists()
 
 
 def test_run_real_data_eval_can_fix_ahp_while_sweeping_fuzzy_profiles(tmp_path):

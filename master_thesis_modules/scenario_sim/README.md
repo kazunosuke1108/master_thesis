@@ -346,7 +346,7 @@ python -m master_thesis_modules.scenario_sim.runner.run_profile_sweep \
 
 ## Fuzzyプロファイルと患者順位の後解析
 
-`analyze_fuzzy_profile_rankings` は、各Fuzzyプロファイルについて患者ごとの平均総リスクを計算し、同一プロファイル内でmin--max正規化します。TFNの `c` 列から計算した `C_i = (c(9行目) - c(10行目)) + (c(11行目) - c(12行目))` を横軸、正規化平均総リスクを縦軸とし、患者IDごとの折れ線グラフを作成します。各プロファイルで最高リスクは1、最低リスクは0です。同じ `C_i` のスタッフは、正規化平均総リスクの `C - B` が大きい順に左から配置します。さらに、同じ `C_i` の各患者の正規化危険度平均を、太い破線とひし形マーカーで併記します。
+`analyze_fuzzy_profile_rankings` は、各Fuzzyプロファイルについて患者ごとの平均総リスクを計算し、同一プロファイル内でmin--max正規化します。TFNの `c` 列から計算した `C_i = c(11行目) - c(10行目)` を横軸、正規化平均総リスクを縦軸とし、患者IDごとの折れ線グラフを作成します。各プロファイルで最高リスクは1、最低リスクは0です。同じ `C_i` のスタッフは、正規化平均総リスクの `C - B` が大きい順に左から配置します。さらに、同じ `C_i` の各患者の正規化危険度平均を、太い破線とひし形マーカーで併記します。
 
 ```bash
 python -m master_thesis_modules.scenario_sim.runner.analyze_fuzzy_profile_rankings \
@@ -354,7 +354,7 @@ python -m master_thesis_modules.scenario_sim.runner.analyze_fuzzy_profile_rankin
   --ahp-profile 山口
 ```
 
-既定では `<input>/analysis/` に、図 `fuzzy_profile_ranking.png`、プロファイル別の明細CSV、患者IDの正規化危険度表CSV、および `C_i` ごとの患者別平均CSVを保存します。
+既定では `<input>/analysis/` に、`C_i` の図 `fuzzy_profile_ranking.png`、`D_i` の図 `fuzzy_profile_di.png`、プロファイル別の明細CSV、患者IDの正規化危険度表CSV、および各指標値ごとの患者別平均CSVを保存します。`D_i = c(10行目) - c(7行目)` は、TFNの指定行（ゼロ始まりでは `tfn.iloc[9]["c"] - tfn.iloc[6]["c"]`）から算出します。
 
 旧出力との差分確認は次のように行えます。差分がある場合、このコマンドは差分列を出力して非ゼロ終了します。
 

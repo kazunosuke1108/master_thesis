@@ -27,7 +27,7 @@ def analyze_fuzzy_profile_rankings(
     """Write normalized mean-risk tables and a Fuzzy-profile comparison figure.
 
     ``C_i`` is calculated from the central (``c``) TFN values at human-facing
-    CSV rows 9--12: ``(row9 - row10) + (row11 - row12)``.
+    CSV rows 10--11: ``row11 - row10``.
     """
     sweep_dir = Path(sweep_dir)
     output_dir = Path(output_dir) if output_dir is not None else sweep_dir / "analysis"
@@ -44,11 +44,15 @@ def analyze_fuzzy_profile_rankings(
         "fuzzy_profile_ranking_matrix": output_dir / "fuzzy_profile_ranking_matrix.csv",
         "fuzzy_ci_patient_mean": output_dir / "fuzzy_ci_patient_mean.csv",
         "fuzzy_profile_ranking_plot": output_dir / "fuzzy_profile_ranking.png",
+        "fuzzy_di_patient_mean": output_dir / "fuzzy_di_patient_mean.csv",
+        "fuzzy_profile_di_plot": output_dir / "fuzzy_profile_di.png",
     }
     rankings.to_csv(paths["fuzzy_profile_ranking_summary"], index=False)
     build_normalized_risk_matrix(rankings).to_csv(paths["fuzzy_profile_ranking_matrix"])
     build_ci_patient_means(rankings).to_csv(paths["fuzzy_ci_patient_mean"], index=False)
     plot_fuzzy_profile_rankings(rankings, paths["fuzzy_profile_ranking_plot"])
+    build_di_patient_means(rankings).to_csv(paths["fuzzy_di_patient_mean"], index=False)
+    plot_fuzzy_profile_di(rankings, paths["fuzzy_profile_di_plot"])
     return paths
 
 
@@ -79,13 +83,16 @@ def build_fuzzy_profile_rankings(
             if risk_range > 0
             else 0.5
         )
-        ci = load_fuzzy_ci(common_dir / f"TFN_{run.fuzzy_profile}.csv")
+        tfn_path = common_dir / f"TFN_{run.fuzzy_profile}.csv"
+        ci = load_fuzzy_ci(tfn_path)
+        di = load_fuzzy_di(tfn_path)
         for rank, row in enumerate(mean_risks.itertuples(index=False), start=1):
             rows.append(
                 {
                     "ahp_profile": run.ahp_profile,
                     "fuzzy_profile": run.fuzzy_profile,
                     "C_i": ci,
+                    "D_i": di,
                     "rank": rank,
                     "patient_id": row.patient_id,
                     "mean_total_risk": row.mean_total_risk,
@@ -98,19 +105,25 @@ def build_fuzzy_profile_rankings(
 
 
 def load_fuzzy_ci(tfn_path: str | Path) -> float:
-    """Return ``(c9 - c10) + (c11 - c12)`` from a headerless TFN CSV."""
+    """Return ``c[row 11] - c[row 10]`` from a headerless TFN CSV."""
     tfn_path = Path(tfn_path)
     if not tfn_path.exists():
         raise FileNotFoundError(f"Fuzzy profile file not found: {tfn_path}")
     tfn = pd.read_csv(tfn_path, header=None, names=["l", "c", "r"])
-    if len(tfn) < 12:
-        raise ValueError(f"TFN CSV needs at least 12 rows: {tfn_path}")
-    return float(
-        # (tfn.iloc[8]["c"] - tfn.iloc[9]["c"])
-        # + (tfn.iloc[10]["c"] - tfn.iloc[11]["c"])
-        (tfn.iloc[10]["c"] - tfn.iloc[9]["c"])
-        
-    )
+    if len(tfn) < 11:
+        raise ValueError(f"TFN CSV needs at least 11 rows: {tfn_path}")
+    return float(tfn.iloc[10]["c"] - tfn.iloc[9]["c"])
+
+
+def load_fuzzy_di(tfn_path: str | Path) -> float:
+    """Return ``c[row 10] - c[row 7]`` from a headerless TFN CSV."""
+    tfn_path = Path(tfn_path)
+    if not tfn_path.exists():
+        raise FileNotFoundError(f"Fuzzy profile file not found: {tfn_path}")
+    tfn = pd.read_csv(tfn_path, header=None, names=["l", "c", "r"])
+    if len(tfn) < 10:
+        raise ValueError(f"TFN CSV needs at least 10 rows: {tfn_path}")
+    return float(tfn.iloc[9]["c"] - tfn.iloc[6]["c"])
 
 
 def build_normalized_risk_matrix(rankings: pd.DataFrame) -> pd.DataFrame:
@@ -132,30 +145,56 @@ def build_normalized_risk_matrix(rankings: pd.DataFrame) -> pd.DataFrame:
 
 def build_ci_patient_means(rankings: pd.DataFrame) -> pd.DataFrame:
     """Average normalized risks for each patient within every equal-``C_i`` group."""
+    return build_profile_index_patient_means(rankings, "C_i")
+
+
+def build_di_patient_means(rankings: pd.DataFrame) -> pd.DataFrame:
+    """Average normalized risks for each patient within every equal-``D_i`` group."""
+    return build_profile_index_patient_means(rankings, "D_i")
+
+
+def build_profile_index_patient_means(
+    rankings: pd.DataFrame, index_column: str
+) -> pd.DataFrame:
+    """Average normalized risks for each patient within equal index-value groups."""
     return (
-        rankings.groupby(["C_i", "patient_id"], as_index=False)
+        rankings.groupby([index_column, "patient_id"], as_index=False)
         .agg(
             mean_normalized_total_risk=("normalized_mean_total_risk", "mean"),
             profile_count=("fuzzy_profile", "nunique"),
         )
-        .sort_values(["C_i", "patient_id"], kind="stable")
+        .sort_values([index_column, "patient_id"], kind="stable")
     )
 
 
 def plot_fuzzy_profile_rankings(rankings: pd.DataFrame, output_png: str | Path) -> Path:
-    """Plot normalized patient risks on a numeric ``C_i`` axis.
+    """Plot normalized patient risks on the numeric ``C_i`` axis."""
+    return plot_fuzzy_profile_index(rankings, output_png, "C_i")
 
-    Profiles sharing the same ``C_i`` are given small symmetric offsets so
+
+def plot_fuzzy_profile_di(rankings: pd.DataFrame, output_png: str | Path) -> Path:
+    """Plot normalized patient risks on the numeric ``D_i`` axis."""
+    return plot_fuzzy_profile_index(rankings, output_png, "D_i")
+
+
+def plot_fuzzy_profile_index(
+    rankings: pd.DataFrame,
+    output_png: str | Path,
+    index_column: str,
+) -> Path:
+    """Plot normalized patient risks on a numeric Fuzzy-profile index axis.
+
+    Profiles sharing the same index value are given small symmetric offsets so
     their individual profile points remain visible while their shared parameter
     value is apparent from the common tick/grid line.
     """
     patient_ids = sorted(rankings["patient_id"].unique())
     colors = dict(zip(patient_ids, plt.get_cmap("tab10").colors))
-    profile_positions = _profile_x_positions(rankings)
+    profile_positions = _profile_x_positions(rankings, index_column)
     profile_ci = (
-        rankings[["fuzzy_profile", "C_i"]]
+        rankings[["fuzzy_profile", index_column]]
         .drop_duplicates()
-        .set_index("fuzzy_profile")["C_i"]
+        .set_index("fuzzy_profile")[index_column]
         .to_dict()
     )
     ci_values = sorted(set(profile_ci.values()))
@@ -174,10 +213,10 @@ def plot_fuzzy_profile_rankings(rankings: pd.DataFrame, output_png: str | Path) 
             alpha=0.35,
         )
 
-    ci_patient_means = build_ci_patient_means(rankings)
+    ci_patient_means = build_profile_index_patient_means(rankings, index_column)
     for patient_id, patient_data in ci_patient_means.groupby("patient_id", sort=True):
         axis.plot(
-            patient_data["C_i"],
+            patient_data[index_column],
             patient_data["mean_normalized_total_risk"],
             marker="D",
             markersize=6,
@@ -192,7 +231,7 @@ def plot_fuzzy_profile_rankings(rankings: pd.DataFrame, output_png: str | Path) 
         axis.text(
             x,
             -0.18,
-            f"{fuzzy_profile} (C_i={profile_ci[fuzzy_profile]:g})",
+            f"{fuzzy_profile} ({index_column}={profile_ci[fuzzy_profile]:g})",
             transform=axis.get_xaxis_transform(),
             rotation=45,
             ha="right",
@@ -208,12 +247,12 @@ def plot_fuzzy_profile_rankings(rankings: pd.DataFrame, output_png: str | Path) 
         min(profile_positions.values()) - 0.1,
         max(profile_positions.values()) + 0.1,
     )
-    axis.set_xlabel("C_i", labelpad=62)
+    axis.set_xlabel(index_column, labelpad=62)
     axis.set_ylabel("Normalized mean total risk")
-    axis.set_title("Fuzzy profile parameter C_i and normalized patient risk")
+    axis.set_title(f"Fuzzy profile parameter {index_column} and normalized patient risk")
     axis.set_axisbelow(True)
     axis.grid(which="major", color="0.85")
-    axis.legend(title="Patient ID (C_i group mean)", loc="best")
+    axis.legend(title=f"Patient ID ({index_column} group mean)", loc="best")
     figure.tight_layout(rect=(0, 0.22, 1, 1))
     output_png = Path(output_png)
     figure.savefig(output_png, dpi=200)
@@ -221,20 +260,22 @@ def plot_fuzzy_profile_rankings(rankings: pd.DataFrame, output_png: str | Path) 
     return output_png
 
 
-def _profile_x_positions(rankings: pd.DataFrame) -> dict[str, float]:
-    """Return numeric x positions, separating profiles with equal ``C_i``.
+def _profile_x_positions(
+    rankings: pd.DataFrame, index_column: str = "C_i"
+) -> dict[str, float]:
+    """Return numeric x positions, separating profiles with equal index values.
 
-    Within an equal-``C_i`` group, profiles are arranged left-to-right by the
+    Within an equal-value group, profiles are arranged left-to-right by the
     descending normalized mean-risk difference for patients C and B.
     """
-    profiles = rankings[["fuzzy_profile", "C_i"]].drop_duplicates()
+    profiles = rankings[["fuzzy_profile", index_column]].drop_duplicates()
     c_minus_b = _normalized_c_minus_b(rankings)
-    ci_values = sorted(profiles["C_i"].unique())
+    ci_values = sorted(profiles[index_column].unique())
     gaps = np.diff(ci_values)
     minimum_gap = float(gaps[gaps > 0].min()) if len(gaps) else 1.0
     maximum_offset = minimum_gap * 0.35
     positions = {}
-    for ci, group in profiles.groupby("C_i", sort=True):
+    for ci, group in profiles.groupby(index_column, sort=True):
         names = sorted(
             group["fuzzy_profile"],
             key=lambda name: (-c_minus_b.get(name, float("-inf")), name),

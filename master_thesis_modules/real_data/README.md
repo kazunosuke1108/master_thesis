@@ -83,7 +83,7 @@ python -m master_thesis_modules.real_data.runner.analyze_fuzzy_profile_rankings 
   --ahp-profile 山口
 ```
 
-既定では `<input>/analysis/` に図とCSVを保存します。
+既定では `<input>/analysis/` に、`C_i` と `D_i` の各グラフおよびCSVを保存します。`D_i = c(10行目) - c(7行目)` です。
 
 ## 旧実装との比較
 

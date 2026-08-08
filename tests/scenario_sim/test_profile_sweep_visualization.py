@@ -10,6 +10,7 @@ from master_thesis_modules.scenario_sim.visualization.plot_fuzzy_profile_ranking
     _profile_x_positions,
     build_ci_patient_means,
     build_fuzzy_profile_rankings,
+    load_fuzzy_di,
     load_fuzzy_ci,
 )
 from master_thesis_modules.scenario_sim.encoder.scenario_loader import ScenarioLoader
@@ -91,7 +92,8 @@ def test_fuzzy_profile_ranking_uses_c_column_and_mean_total_risk(tmp_path):
 
     rankings = build_fuzzy_profile_rankings([run], tmp_path)
 
-    assert load_fuzzy_ci(tmp_path / "TFN_テスト.csv") == -2.0
+    assert load_fuzzy_ci(tmp_path / "TFN_テスト.csv") == 1.0
+    assert load_fuzzy_di(tmp_path / "TFN_テスト.csv") == 3.0
     assert rankings[["rank", "patient_id"]].values.tolist() == [[1, "B"], [2, "A"]]
     assert rankings[["patient_id", "normalized_mean_total_risk"]].values.tolist() == [
         ["B", 1.0],

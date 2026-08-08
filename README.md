@@ -411,6 +411,7 @@ python -m master_thesis_modules.real_data.runner.run_real_data_eval --input /hom
 ```bash
 # 全員分
 python -m master_thesis_modules.scenario_sim.runner.run_profile_sweep --scenario /home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scenario_sim/scenarios/20260720_4patients.yaml --output /home/hayashide/kazu_ws/master_thesis/outputs/20260720_4patients --model spatial_context --staff-names 山口 百武 貞方 --action-aggregation weighted_max --visualize --notification-message-style legacy
+python -m master_thesis_modules.scenario_sim.runner.run_profile_sweep --scenario /home/hayashide/kazu_ws/master_thesis/master_thesis_modules/scenario_sim/scenarios/20260808_4patients2.yaml --output /home/hayashide/kazu_ws/master_thesis/outputs/20260808_4patients2 --model spatial_context --staff-names 山口 百武 貞方 --action-aggregation weighted_max --visualize --notification-message-style legacy
 ```
 
 ```bash
