@@ -8,12 +8,20 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 from matplotlib.axes import Axes
+from matplotlib.lines import Line2D
 import pandas as pd
 
 from master_thesis_modules.risk_core.features.position import Position2D
 from master_thesis_modules.scenario_sim.domain.world_state import WorldState
 from master_thesis_modules.scenario_sim.events.event_engine import EventEngine
 from master_thesis_modules.scenario_sim.events.scenario_event import ScenarioEvent
+
+
+ROOM_MIN_X = 0.0
+ROOM_MAX_X = 7.0
+STORYBOARD_MAX_X = 8.0
+ROOM_MIN_Y = 0.0
+WALL_DISPLAY_MARGIN = 0.8
 
 
 @dataclass(frozen=True)
@@ -151,7 +159,7 @@ def _plot_snapshots(
     fig, axes = plt.subplots(
         rows,
         columns,
-        figsize=(4.6 * columns, 4.2 * rows),
+        figsize=(4.6 * columns, 4.8 * rows),
         squeeze=False,
     )
     axes_list = list(axes.ravel())
@@ -160,7 +168,15 @@ def _plot_snapshots(
     for ax in axes_list[len(snapshots) :]:
         ax.axis("off")
     fig.suptitle(f"Scenario storyboard: {world_state.scenario_name}", fontsize=15)
-    fig.tight_layout(rect=(0, 0, 1, 0.96))
+    fig.legend(
+        handles=_storyboard_legend_handles(),
+        loc="lower center",
+        bbox_to_anchor=(0.5, 0.005),
+        ncol=5,
+        frameon=True,
+        fontsize=9,
+    )
+    fig.tight_layout(rect=(0, 0.055, 1, 0.96), h_pad=2.6)
     fig.savefig(output_png, dpi=180)
     plt.close(fig)
 
@@ -174,12 +190,17 @@ def _draw_snapshot(
     ax.set_xlim(min_x, max_x)
     ax.set_ylim(min_y, max_y)
     ax.set_aspect("equal", adjustable="box")
+    _draw_wall_regions(ax, bounds)
     ax.grid(True, alpha=0.25)
     ax.set_title(f"t = {snapshot.time_s:g}s", fontsize=11)
     ax.set_xlabel("x")
     ax.set_ylabel("y")
 
-    for item in snapshot.world_state.objects:
+    object_label_offsets = _object_label_offsets(snapshot.world_state.objects)
+    for item, (offset_x, offset_y, horizontal_alignment) in zip(
+        snapshot.world_state.objects,
+        object_label_offsets,
+    ):
         marker, color = _object_style(item.object_type)
         ax.scatter(
             item.position.x,
@@ -191,14 +212,22 @@ def _draw_snapshot(
             linewidth=0.7,
             zorder=2,
         )
-        ax.text(
-            item.position.x,
-            item.position.y - 0.18,
+        ax.annotate(
             f"{item.object_type}\n{item.object_id}",
-            ha="center",
+            xy=(item.position.x, item.position.y),
+            xytext=(offset_x, offset_y),
+            textcoords="offset points",
+            ha=horizontal_alignment,
             va="top",
             fontsize=7,
             color="#333333",
+            bbox={
+                "boxstyle": "round,pad=0.12",
+                "fc": "#ffffff",
+                "ec": "none",
+                "alpha": 0.72,
+            },
+            zorder=3,
         )
         _draw_position_delta(
             ax,
@@ -292,29 +321,88 @@ def _draw_snapshot(
             color="#1e4f7a",
             linestyle="--",
         )
-        ax.text(
-            staff.position.x,
-            staff.position.y + 0.25,
-            f"v=({staff.velocity.vx:g},{staff.velocity.vy:g})",
-            ha="center",
-            va="bottom",
-            fontsize=8,
-            bbox={"boxstyle": "round,pad=0.18", "fc": "#eef7ff", "ec": "#6aa6d8"},
-            zorder=6,
-        )
+        if snapshot.world_state.scenario_name not in {
+            "20260807_standup2",
+            "20260807_touchface2",
+        }:
+            ax.text(
+                staff.position.x,
+                staff.position.y + 0.25,
+                f"v=({staff.velocity.vx:g},{staff.velocity.vy:g})",
+                ha="center",
+                va="bottom",
+                fontsize=8,
+                bbox={
+                    "boxstyle": "round,pad=0.18",
+                    "fc": "#eef7ff",
+                    "ec": "#6aa6d8",
+                },
+                zorder=6,
+            )
 
     event_text = "\n".join(_event_label(event) for event in snapshot.events)
     if event_text:
         ax.text(
-            0.02,
+            0.98,
             0.98,
             event_text,
             transform=ax.transAxes,
-            ha="left",
+            ha="right",
             va="top",
             fontsize=8,
-            bbox={"boxstyle": "round,pad=0.25", "fc": "#ffffff", "ec": "#bbbbbb"},
+            bbox={
+                "boxstyle": "round,pad=0.25",
+                "fc": "#ffffff",
+                "ec": "#bbbbbb",
+                "alpha": 0.9,
+            },
+            zorder=7,
         )
+
+
+def _object_label_offsets(objects: tuple[object, ...]) -> list[tuple[float, float, str]]:
+    """Return non-overlapping point offsets for labels at the same position."""
+
+    coordinate_groups: dict[tuple[float, float], list[int]] = {}
+    for index, item in enumerate(objects):
+        key = (round(item.position.x, 6), round(item.position.y, 6))
+        coordinate_groups.setdefault(key, []).append(index)
+
+    offsets: list[tuple[float, float, str]] = [(0.0, -10.0, "center")] * len(objects)
+    for indices in coordinate_groups.values():
+        if len(indices) == 1:
+            offsets[indices[0]] = (0.0, -10.0, "center")
+            continue
+        for group_index, object_index in enumerate(indices):
+            row = group_index // 2
+            if group_index % 2 == 0:
+                offsets[object_index] = (-7.0, -10.0 - 23.0 * row, "right")
+            else:
+                offsets[object_index] = (7.0, -10.0 - 23.0 * row, "left")
+    return offsets
+
+
+def _draw_wall_regions(
+    ax: Axes,
+    bounds: tuple[float, float, float, float],
+) -> None:
+    """Shade the regions outside the scenario room as walls."""
+
+    min_x, max_x, min_y, max_y = bounds
+    wall_style = {
+        "facecolor": "#e6e6e6",
+        "edgecolor": "#b8b8b8",
+        "alpha": 0.55,
+        "hatch": "////",
+        "linewidth": 0.0,
+        "zorder": 0,
+    }
+    ax.axvspan(min_x, ROOM_MIN_X, **wall_style)
+    ax.axvspan(ROOM_MAX_X, max_x, **wall_style)
+    ax.axhspan(min_y, ROOM_MIN_Y, **wall_style)
+    ax.axvline(ROOM_MIN_X, color="#9a9a9a", linewidth=1.0, zorder=1)
+    ax.axvline(ROOM_MAX_X, color="#9a9a9a", linewidth=1.0, zorder=1)
+    ax.axhline(ROOM_MIN_Y, color="#9a9a9a", linewidth=1.0, zorder=1)
 
 
 def _draw_position_delta(
@@ -354,11 +442,16 @@ def _plot_bounds(snapshots: list[ScenarioSnapshot]) -> tuple[float, float, float
             xs.append(position.x)
             ys.append(position.y)
     if not xs or not ys:
-        return -1.0, 1.0, -1.0, 1.0
+        return (
+            ROOM_MIN_X - WALL_DISPLAY_MARGIN,
+            STORYBOARD_MAX_X,
+            ROOM_MIN_Y - WALL_DISPLAY_MARGIN,
+            1.0,
+        )
     margin = 0.8
-    min_x = min(xs) - margin
-    max_x = max(xs) + margin
-    min_y = min(ys) - margin
+    min_x = min(min(xs) - margin, ROOM_MIN_X - WALL_DISPLAY_MARGIN)
+    max_x = max(max(xs) + margin, STORYBOARD_MAX_X)
+    min_y = min(min(ys) - margin, ROOM_MIN_Y - WALL_DISPLAY_MARGIN)
     max_y = max(ys) + margin
     if math.isclose(min_x, max_x):
         min_x -= 1.0
@@ -389,6 +482,29 @@ def _object_style(object_type: str) -> tuple[str, str]:
     if object_type == "handrail":
         return "P", "#b7a071"
     return "X", "#a0a0a0"
+
+
+def _storyboard_legend_handles() -> list[Line2D]:
+    styles = (
+        ("Patient", "o", "#f4a259", "#5f3712", 10),
+        ("Staff", "s", "#6aa6d8", "#1e4f7a", 9),
+        ("Wheelchair", "D", "#9b8acb", "#333333", 7),
+        ("IV pole", "^", "#73b37d", "#333333", 7),
+        ("Handrail", "P", "#b7a071", "#333333", 7),
+    )
+    return [
+        Line2D(
+            [],
+            [],
+            linestyle="none",
+            marker=marker,
+            markersize=marker_size,
+            markerfacecolor=facecolor,
+            markeredgecolor=edgecolor,
+            label=label,
+        )
+        for label, marker, facecolor, edgecolor, marker_size in styles
+    ]
 
 
 def _event_label(event: ScenarioEvent) -> str:

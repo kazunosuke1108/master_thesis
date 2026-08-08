@@ -18,6 +18,8 @@ from master_thesis_modules.scenario_sim.visualization.plot_profile_sweep import 
     visualize_profile_sweep,
 )
 from master_thesis_modules.scenario_sim.visualization.plot_scenario_storyboard import (
+    _plot_bounds,
+    build_scenario_snapshots,
     visualize_scenario_storyboard,
 )
 
@@ -167,3 +169,15 @@ def test_scenario_storyboard_visualization_outputs_figure_and_table(tmp_path):
 
     assert paths["scenario_storyboard"].exists()
     assert paths["scenario_storyboard_snapshots"].exists()
+
+
+def test_scenario_storyboard_bounds_include_room_walls():
+    world_state = ScenarioLoader().load(
+        Path("master_thesis_modules/scenario_sim/scenarios/20260507_standup.yaml")
+    )
+
+    min_x, max_x, min_y, _ = _plot_bounds(build_scenario_snapshots(world_state))
+
+    assert min_x < 0.0
+    assert max_x >= 8.0
+    assert min_y < 0.0

@@ -168,7 +168,7 @@ def build_profile_label_table(runs: list[ProfileRun]) -> pd.DataFrame:
 def plot_total_risk_grid(runs: list[ProfileRun], output_png: str | Path) -> Path:
     output_png = Path(output_png)
     rows, cols = _grid_shape(len(runs))
-    fig, axes = plt.subplots(rows, cols, figsize=(5.2 * cols, 3.4 * rows), sharey=True)
+    fig, axes = plt.subplots(rows, cols, figsize=(5.2 * cols, 3.4 * rows), sharey=False)
     axes_list = list(axes.ravel()) if hasattr(axes, "ravel") else [axes]
     for run_index, (ax, run) in enumerate(zip(axes_list, runs), start=1):
         _plot_total_risk_run(ax, run, _profile_label(run_index))
