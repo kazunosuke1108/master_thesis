@@ -6,6 +6,14 @@ import math
 from master_thesis_modules.risk_core.schema import node_ids as ids
 
 
+VALID_MODEL_TYPES = {
+    "action_only",
+    "patient_context",
+    "action_attribute",
+    "spatial_context",
+}
+
+
 @dataclass(frozen=True)
 class RiskConfig:
     """Weights are explicit and can be swapped for legacy AHP/Fuzzy adapters."""
@@ -63,3 +71,8 @@ class RiskConfig:
             ids.STAFF_NOT_WATCHING_RISK: 0.65,
         }
     )
+
+    def __post_init__(self) -> None:
+        if self.model_type not in VALID_MODEL_TYPES:
+            choices = ", ".join(sorted(VALID_MODEL_TYPES))
+            raise ValueError(f"Unknown model_type: {self.model_type}. Choose one of: {choices}")

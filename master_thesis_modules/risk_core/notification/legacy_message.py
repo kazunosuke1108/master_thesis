@@ -131,6 +131,8 @@ class LegacyNotificationMessageGenerator:
                 if person_id != target_person_id
             ]
             significance = abs(averages[target_person_id] - float(np.mean(other_values)))
+            if significance <= 1e-12:
+                continue
             if significance > best_significance:
                 best_node = node_id
                 best_significance = significance

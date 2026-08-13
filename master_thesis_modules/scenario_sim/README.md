@@ -279,14 +279,16 @@ python -m master_thesis_modules.scenario_sim.runner.run_thesis_simulation \
 
 ## 比較モデル
 
-動作のみ、属性+動作、空間的文脈込みの3モデルを比較します。
+動作のみ、患者文脈のみ、患者文脈と空間的文脈込みの3モデルを比較します。
 
 ```bash
 python -m master_thesis_modules.scenario_sim.runner.compare_models \
   --scenario master_thesis_modules/scenario_sim/scenarios/reach_object_context_demo.yaml \
-  --models action_only action_attribute spatial_context \
+  --models action_only patient_context spatial_context \
   --output outputs/reach_context_comparison
 ```
+
+`--model spatial_context` は患者属性・年齢・動作に加え、周辺物体とスタッフ見守りも使います。`--model patient_context` は患者属性・年齢・動作だけを使い、周辺物体とスタッフ見守りの空間的文脈は総合危険度に入れません。旧名 `action_attribute` も互換用に使えますが、新しい比較実験では `patient_context` を使ってください。
 
 ## AHP / Fuzzy プロファイル総当たり
 
@@ -312,6 +314,47 @@ outputs/thesis_4_5_profile_sweep/
 ```
 
 各ディレクトリには、評価済みCSV、順位、通知ログ、説明文が保存されます。
+
+AHP または Fuzzy の候補だけを固定・限定することもできます。たとえば AHP を `山口` に固定し、Fuzzy は指定した全スタッフで総当たりするには、次のように実行します。
+
+```bash
+python -m master_thesis_modules.scenario_sim.runner.run_profile_sweep \
+  --scenario master_thesis_modules/scenario_sim/scenarios/20260720_4patients.yaml \
+  --output outputs/20260720_4patients_ahp_yamaguchi \
+  --staff-names 山口 百武 貞方 \
+  --ahp-staff-names 山口 \
+  --model spatial_context \
+  --action-aggregation weighted_max \
+  --visualize \
+  --notification-message-style legacy
+```
+
+逆に Fuzzy 側だけを限定する場合は `--fuzzy-staff-names` を使います。`--staff-names` は個別指定していない側の候補として使われるため、従来のコマンドの動作は変わりません。
+
+`--staff-names all` を指定すると、`--common-dir`（既定: `master_thesis_modules/database/common`）内で、動作AHP・物体AHP・Fuzzyの3ファイルがすべて揃うスタッフを自動で抽出して総当たりします。したがって、現在の全プロファイルを使うには次のように指定できます。
+
+```bash
+python -m master_thesis_modules.scenario_sim.runner.run_profile_sweep \
+  --scenario master_thesis_modules/scenario_sim/scenarios/20260720_4patients.yaml \
+  --output outputs/20260720_4patients_all_profiles \
+  --staff-names all \
+  --model spatial_context \
+  --action-aggregation weighted_max \
+  --visualize \
+  --notification-message-style legacy
+```
+
+## Fuzzyプロファイルと患者順位の後解析
+
+`analyze_fuzzy_profile_rankings` は、各Fuzzyプロファイルについて患者ごとの平均総リスクを計算し、同一プロファイル内でmin--max正規化します。TFNの `c` 列から計算した `C_i = c(11行目) - c(10行目)` を横軸、正規化平均総リスクを縦軸とし、患者IDごとの折れ線グラフを作成します。各プロファイルで最高リスクは1、最低リスクは0です。同じ `C_i` のスタッフは、正規化平均総リスクの `C - B` が大きい順に左から配置します。さらに、同じ `C_i` の各患者の正規化危険度平均を、太い破線とひし形マーカーで併記します。
+
+```bash
+python -m master_thesis_modules.scenario_sim.runner.analyze_fuzzy_profile_rankings \
+  --input outputs/20260720_4patients_ahp_yamaguchi \
+  --ahp-profile 山口
+```
+
+既定では `<input>/analysis/` に、`C_i` の図 `fuzzy_profile_ranking.png`、`D_i` の図 `fuzzy_profile_di.png`、プロファイル別の明細CSV、患者IDの正規化危険度表CSV、および各指標値ごとの患者別平均CSVを保存します。`D_i = c(10行目) - c(7行目)` は、TFNの指定行（ゼロ始まりでは `tfn.iloc[9]["c"] - tfn.iloc[6]["c"]`）から算出します。
 
 旧出力との差分確認は次のように行えます。差分がある場合、このコマンドは差分列を出力して非ゼロ終了します。
 

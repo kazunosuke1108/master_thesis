@@ -1,0 +1,2 @@
+timestamp,target_patient_id,total_risk,rank,reason,message,notification_type
+4.0,A,0.35768805150649674,1,Aさんが，点滴の近くにいるのに，立ち上がろうとしているので，危険です．,Aさんが，点滴の近くにいるのに，立ち上がろうとしているので，危険です．,notice

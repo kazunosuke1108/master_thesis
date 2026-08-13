@@ -9,7 +9,7 @@ import json
 import pandas as pd
 
 from master_thesis_modules.risk_core.engine.batch_risk_engine import BatchRiskEngine
-from master_thesis_modules.risk_core.engine.risk_config import RiskConfig
+from master_thesis_modules.risk_core.engine.risk_config import RiskConfig, VALID_MODEL_TYPES
 from master_thesis_modules.risk_core.engine.risk_engine import RiskEngine
 from master_thesis_modules.scenario_sim.encoder.dataframe_builder import (
     ScenarioDataFrameBuilder,
@@ -89,7 +89,12 @@ def _top1_match_rate(left: pd.DataFrame, right: pd.DataFrame) -> float:
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--scenario", required=True)
-    parser.add_argument("--models", nargs="+", default=["action_only", "action_attribute", "spatial_context"])
+    parser.add_argument(
+        "--models",
+        nargs="+",
+        choices=sorted(VALID_MODEL_TYPES),
+        default=["action_only", "patient_context", "spatial_context"],
+    )
     parser.add_argument("--output", required=True)
     args = parser.parse_args()
     paths = compare_models(args.scenario, args.models, args.output)
@@ -99,4 +104,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

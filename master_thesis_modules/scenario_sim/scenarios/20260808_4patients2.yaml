@@ -1,0 +1,67 @@
+scenario_name: 20260720_4patients
+time_range: {duration_s: 1.0, step_s: 1.0}
+patients:
+  - id: A
+    is_patient_label: yes
+    age_group_label: old
+    position: {x: 1.0, y: 5.0}
+    action_label: neutral_sitting
+  - id: B
+    is_patient_label: yes
+    age_group_label: old
+    position: {x: 5.0, y: 5.0}
+    action_label: neutral_sitting
+  - id: C
+    is_patient_label: yes
+    age_group_label: old
+    position: {x: 1.0, y: 1.0}
+    action_label: neutral_sitting
+  - id: D
+    is_patient_label: yes
+    age_group_label: old
+    position: {x: 5.0, y: 1.0}
+    action_label: neutral_sitting
+objects:
+  - id: wheelchair_a
+    type: wheelchair
+    position:  {x: 1.0, y: 5.0}
+  - id: wheelchair_c
+    type: wheelchair
+    position:  {x: 1.0, y: 1.0}
+  - id: iv_a
+    type: iv_pole
+    position: {x: 1.0, y: 5.0}
+  - id: iv_c
+    type: iv_pole
+    position: {x: 1.0, y: 1.0}
+  - id: handrail_b
+    type: handrail
+    position: {x: 6.0, y: 5.0}
+  - id: handrail_d
+    type: handrail
+    position: {x: 5.0, y: 0.0}
+staff:
+  - id: NS
+    position: {x: 3, y: 3}
+    velocity: {vx: 0, vy: -1}
+events:
+  # Generic scenario_sim runners use these semantic events. run_profile_sweep
+  # detects this scenario_name and uses the exact master_v5-compatible 20Hz
+  # pseudo-data generator instead. Risk calculation still uses the current
+  # risk_core logic, so output can intentionally differ from master_v5.py.
+  - time_s: 0.0
+    event_type: set_action
+    target_id: A
+    action_label: standing_up
+  - time_s: 0.0
+    event_type: set_action
+    target_id: B
+    action_label: standing_up
+  - time_s: 0.0
+    event_type: set_action
+    target_id: C
+    action_label: standing_up
+  - time_s: 0.0
+    event_type: set_action
+    target_id: D
+    action_label: standing_up

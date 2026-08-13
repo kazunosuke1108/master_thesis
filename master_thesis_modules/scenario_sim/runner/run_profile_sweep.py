@@ -7,6 +7,7 @@ from pathlib import Path
 
 from master_thesis_modules.risk_core.engine.batch_risk_engine import BatchRiskEngine
 from master_thesis_modules.risk_core.engine.profile_config import make_profile_risk_config
+from master_thesis_modules.risk_core.engine.risk_config import VALID_MODEL_TYPES
 from master_thesis_modules.risk_core.engine.risk_engine import RiskEngine
 from master_thesis_modules.risk_core.features.dataframe_adapter import (
     data_dicts_to_feature_sequences,
@@ -31,15 +32,65 @@ from master_thesis_modules.scenario_sim.visualization.plot_scenario_storyboard i
 )
 
 
+def _expand_all_profile_names(
+    profile_names: list[str], common_dir: str | Path
+) -> list[str]:
+    """Replace the ``all`` selector with complete profiles in ``common_dir``."""
+    if "all" not in profile_names:
+        return profile_names
+    if profile_names != ["all"]:
+        raise ValueError("'all' cannot be combined with individual profile names")
+
+    common_dir = Path(common_dir)
+    action_profiles = {
+        path.stem.removeprefix("comparison_mtx_30000001_")
+        for path in common_dir.glob("comparison_mtx_30000001_*.csv")
+    }
+    object_profiles = {
+        path.stem.removeprefix("comparison_mtx_30000010_")
+        for path in common_dir.glob("comparison_mtx_30000010_*.csv")
+    }
+    fuzzy_profiles = {
+        path.stem.removeprefix("TFN_") for path in common_dir.glob("TFN_*.csv")
+    }
+    complete_profiles = sorted(action_profiles & object_profiles & fuzzy_profiles)
+    if not complete_profiles:
+        raise ValueError(
+            f"No complete AHP/Fuzzy profiles found in common directory: {common_dir}"
+        )
+    return complete_profiles
+
+
 def run_profile_sweep(
     scenario: str | Path,
     output: str | Path,
-    staff_names: list[str],
+    staff_names: list[str] | None = None,
     common_dir: str | Path = "master_thesis_modules/database/common",
     model: str = "spatial_context",
     action_aggregation: str = "weighted_sum",
     notification_message_style: str = "current",
+    ahp_staff_names: list[str] | None = None,
+    fuzzy_staff_names: list[str] | None = None,
 ) -> list[Path]:
+    """Evaluate every requested AHP/Fuzzy profile combination.
+
+    ``staff_names`` is the shared candidate list retained for backwards
+    compatibility.  Supplying either dedicated list restricts only that side
+    of the Cartesian product.
+    """
+    staff_names = _expand_all_profile_names(
+        staff_names or ["中村", "百武"], common_dir
+    )
+    ahp_staff_names = (
+        _expand_all_profile_names(ahp_staff_names, common_dir)
+        if ahp_staff_names
+        else staff_names
+    )
+    fuzzy_staff_names = (
+        _expand_all_profile_names(fuzzy_staff_names, common_dir)
+        if fuzzy_staff_names
+        else staff_names
+    )
     world_state = ScenarioLoader().load(scenario)
     use_master_v5_source = world_state.scenario_name == "thesis_4_5_multi_patient_action_demo"
     if use_master_v5_source:
@@ -51,8 +102,8 @@ def run_profile_sweep(
     output = Path(output)
     written_dirs = []
 
-    for staff_name_ahp in staff_names:
-        for staff_name_fuzzy in staff_names:
+    for staff_name_ahp in ahp_staff_names:
+        for staff_name_fuzzy in fuzzy_staff_names:
             config = make_profile_risk_config(
                 ahp_profile_name=staff_name_ahp,
                 fuzzy_profile_name=staff_name_fuzzy,
@@ -90,9 +141,31 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--scenario", required=True)
     parser.add_argument("--output", required=True)
-    parser.add_argument("--staff-names", nargs="+", default=["中村", "百武"])
+    parser.add_argument(
+        "--staff-names",
+        nargs="+",
+        default=None,
+        help="AHP/Fuzzy両方に使うプロファイル候補。allならcommon-dir内でAHP/Fuzzyが揃う全員を使う",
+    )
+    parser.add_argument(
+        "--ahp-staff-names",
+        nargs="+",
+        default=None,
+        help="AHPプロファイル候補。allならcommon-dir内でAHP/Fuzzyが揃う全員を使う",
+    )
+    parser.add_argument(
+        "--fuzzy-staff-names",
+        nargs="+",
+        default=None,
+        help="Fuzzyプロファイル候補。allならcommon-dir内でAHP/Fuzzyが揃う全員を使う",
+    )
     parser.add_argument("--common-dir", default="master_thesis_modules/database/common")
-    parser.add_argument("--model", default="spatial_context")
+    parser.add_argument(
+        "--model",
+        choices=sorted(VALID_MODEL_TYPES),
+        default="spatial_context",
+        help="risk model. spatial_context uses patient and spatial context; patient_context ignores object/staff context",
+    )
     parser.add_argument(
         "--action-aggregation",
         choices=["weighted_sum", "weighted_max"],
@@ -119,6 +192,8 @@ def main() -> None:
         model=args.model,
         action_aggregation=args.action_aggregation,
         notification_message_style=args.notification_message_style,
+        ahp_staff_names=args.ahp_staff_names,
+        fuzzy_staff_names=args.fuzzy_staff_names,
     )
     for path in written_dirs:
         print(path)

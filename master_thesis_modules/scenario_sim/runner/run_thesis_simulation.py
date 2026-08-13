@@ -6,7 +6,7 @@ import argparse
 from pathlib import Path
 
 from master_thesis_modules.risk_core.engine.batch_risk_engine import BatchRiskEngine
-from master_thesis_modules.risk_core.engine.risk_config import RiskConfig
+from master_thesis_modules.risk_core.engine.risk_config import RiskConfig, VALID_MODEL_TYPES
 from master_thesis_modules.risk_core.engine.risk_engine import RiskEngine
 from master_thesis_modules.risk_core.features.dataframe_adapter import results_to_dataframe
 from master_thesis_modules.scenario_sim.encoder.dataframe_builder import (
@@ -57,7 +57,12 @@ def run_thesis_simulation(
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--scenario", required=True)
-    parser.add_argument("--model", default="spatial_context")
+    parser.add_argument(
+        "--model",
+        choices=sorted(VALID_MODEL_TYPES),
+        default="spatial_context",
+        help="risk model. spatial_context uses patient and spatial context; patient_context ignores object/staff context",
+    )
     parser.add_argument("--output", required=True)
     parser.add_argument(
         "--notification-message-style",

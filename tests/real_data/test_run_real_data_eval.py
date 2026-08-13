@@ -7,6 +7,9 @@ from master_thesis_modules.risk_core.schema import node_ids as ids
 from master_thesis_modules.scenario_sim.visualization.plot_profile_sweep import (
     visualize_profile_sweep,
 )
+from master_thesis_modules.scenario_sim.visualization.plot_fuzzy_profile_rankings import (
+    analyze_fuzzy_profile_rankings,
+)
 
 
 def test_run_real_data_eval_writes_profile_sweep_outputs(tmp_path):
@@ -49,3 +52,38 @@ def test_run_real_data_eval_writes_profile_sweep_outputs(tmp_path):
     assert paths["profile_summary"].exists()
     assert paths["profile_ranking_summary"].exists()
     assert paths["profile_total_risk_grid"].exists()
+
+    analysis_paths = analyze_fuzzy_profile_rankings(output, ahp_profile="中村")
+    assert analysis_paths["fuzzy_profile_ranking_plot"].exists()
+    assert analysis_paths["fuzzy_ci_patient_mean"].exists()
+    assert analysis_paths["fuzzy_profile_di_plot"].exists()
+    assert analysis_paths["fuzzy_di_patient_mean"].exists()
+
+
+def test_run_real_data_eval_can_fix_ahp_while_sweeping_fuzzy_profiles(tmp_path):
+    input_path = tmp_path / "data_dicts.pickle"
+    data_dicts = {
+        "00001": pd.DataFrame(
+            {
+                "timestamp": [0.0],
+                str(ids.IS_PATIENT): ["yes"],
+                str(ids.AGE_CATEGORY): ["old"],
+                str(ids.PERSON_X): [0.0],
+                str(ids.PERSON_Y): [0.0],
+            }
+        )
+    }
+    with input_path.open("wb") as handle:
+        pickle.dump(data_dicts, handle)
+
+    written_dirs = run_real_data_eval(
+        input_path=input_path,
+        output=tmp_path / "fixed_ahp",
+        staff_names=["中村", "百武"],
+        ahp_staff_names=["中村"],
+    )
+
+    assert {path.name for path in written_dirs} == {
+        "ahp_中村__fuzzy_中村",
+        "ahp_中村__fuzzy_百武",
+    }

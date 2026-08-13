@@ -13,8 +13,27 @@
 `RiskConfig.model_type` では次を切り替えられます。
 
 - `action_only`: `40000010`-`40000016` の動作リスクのみを使います。
-- `action_attribute`: 属性と動作リスクを使います。
-- `spatial_context`: 属性、動作、周辺物体、スタッフ見守りを使います。
+- `patient_context`: 患者の文脈だけを使います。患者属性・年齢・動作リスクを使い、周辺物体とスタッフ見守りの空間的文脈は `0.0` として扱います。総合危険度 `10000000` は内的リスク `20000000` と同じ値になります。
+- `spatial_context`: 患者の文脈と空間的文脈の両方を使います。属性、動作、周辺物体、スタッフ見守りを階層的に統合します。
+- `action_attribute`: `patient_context` の旧名です。過去スクリプトとの互換用に残しています。
+
+CLI からは `--model` で切り替えます。
+
+```bash
+# 患者・空間両方の文脈を考慮
+python -m master_thesis_modules.scenario_sim.runner.run_profile_sweep \
+  --scenario master_thesis_modules/scenario_sim/scenarios/20260508_touchface.yaml \
+  --output outputs/touchface_spatial \
+  --staff-names 山口 百武 \
+  --model spatial_context
+
+# 患者の文脈のみを考慮
+python -m master_thesis_modules.scenario_sim.runner.run_profile_sweep \
+  --scenario master_thesis_modules/scenario_sim/scenarios/20260508_touchface.yaml \
+  --output outputs/touchface_patient_context \
+  --staff-names 山口 百武 \
+  --model patient_context
+```
 
 ## ノード番号との対応
 

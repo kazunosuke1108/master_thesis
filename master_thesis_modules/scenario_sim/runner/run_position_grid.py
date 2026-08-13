@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from master_thesis_modules.risk_core.engine.risk_config import RiskConfig
+from master_thesis_modules.risk_core.engine.risk_config import RiskConfig, VALID_MODEL_TYPES
 from master_thesis_modules.risk_core.engine.risk_engine import RiskEngine
 from master_thesis_modules.risk_core.features.feature_frame import FeatureFrame
 from master_thesis_modules.risk_core.features.pose_features import PoseFeatures
@@ -54,11 +54,15 @@ def run_position_grid(output: str | Path, model: str = "spatial_context") -> Pat
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--output", required=True)
-    parser.add_argument("--model", default="spatial_context")
+    parser.add_argument(
+        "--model",
+        choices=sorted(VALID_MODEL_TYPES),
+        default="spatial_context",
+        help="risk model. spatial_context uses patient and spatial context; patient_context ignores object/staff context",
+    )
     args = parser.parse_args()
     print(run_position_grid(args.output, args.model))
 
 
 if __name__ == "__main__":
     main()
-
