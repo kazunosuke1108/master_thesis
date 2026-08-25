@@ -32,7 +32,7 @@
 
 第一に、見守り優先順位は患者本人の状態・行動だけでなく、患者を取り巻く状況に依存する。Figure 1に示すように、同じ立ち上がり動作でも、スタッフが患者を直接介助している場合と、近くのスタッフが別業務に従事している場合では、見守り優先順位が異なり得る。本研究では、周囲物体、施設構造、スタッフと各患者の距離・方向、見守り状況など、患者本人以外の空間的状況を**spatial context（空間的文脈）**と定義する。なお、患者の属性や動作といった状況を、空間的文脈と対比して患者文脈と定義する。
 
-![Example illustrating spatial-context- and staff-dependent monitoring priority.](./paper_v9_figures/fig1_problem_setting.png)
+![Example illustrating spatial-context- and staff-dependent monitoring priority.](./paper_v12_r1_figures/fig1_problem_setting.svg)
 
 **Figure 1.** 病棟共有空間における見守り優先順位の例。同じ立ち上がり動作でも、周囲物体・施設構造・スタッフの見守り状況によって優先順位が変化し得る。また、スタッフが直接介助している比較的安全な状況でも、患者の立ち上がり自体を重視し危険と評価するスタッフと、見守るスタッフの有無を重視して比較的安全と評価するスタッフでは評価が異なり得る。  
 *Draft note: source slide p.2. Final figureでは “notification priority” を “monitoring priority” に変更し、左側の状況に「患者文脈を重視するスタッフ：立ち上がりを重視して優先度を維持」「空間的文脈を重視するスタッフ：スタッフが直接介助していれば優先度を下げる」という対比を追加する。*
@@ -119,24 +119,6 @@ Figure 3に提案システムの全体構成を示す。患者属性・行動、
 
 危険度評価に用いる特徴量を、患者本人に由来する内的要因と患者周囲に由来する外的要因に分け、さらに静的・動的の2軸で4群に分類する。患者文脈は内的要因、空間的文脈は外的要因に対応する。Table 1に本研究で使用する特徴量を示す。
 
-**Table 1. 危険度評価に用いる特徴量。**
-
-| ID | 文脈 | 時間特性 | 特徴量 | 定義・評価方法 |
-|---|---|---|---|---|
-| 1-1 | 患者文脈 | 静的 | 患者判別 | 対象人物が患者であるかを表す。yes/noのラベルを三角型Fuzzy数へ変換して評価する。 |
-| 1-2 | 患者文脈 | 静的 | 年齢層 | 対象人物の年齢層をyoung/middle/oldで表し、三角型Fuzzy数へ変換して評価する。 |
-| 2-1 | 患者文脈 | 動的 | 立ち上がり動作 | 姿勢特徴と立ち上がり動作テンプレートとの類似度から評価する。高さ情報がある場合は、高さに基づく立ち上がり度を用いる。 |
-| 2-2 | 患者文脈 | 動的 | 車椅子のブレーキ解除 | 姿勢特徴と車椅子のブレーキを解除する動作テンプレートとの類似度から評価する。 |
-| 2-3 | 患者文脈 | 動的 | 車椅子を動かす動作 | 姿勢特徴と車椅子を動かす動作テンプレートとの類似度から評価する。 |
-| 2-4 | 患者文脈 | 動的 | バランスを崩す動作 | 主に体幹の傾きを含む姿勢特徴から、バランスを崩した動作との類似度を評価する。 |
-| 2-5 | 患者文脈 | 動的 | 手を挙げる・動かす動作 | 主に手首と腰の位置関係を含む姿勢特徴から、手を動かす動作との類似度を評価する。 |
-| 2-6 | 患者文脈 | 動的 | せき込む動作 | 体幹および手首の姿勢特徴から、せき込む動作との類似度を評価する。 |
-| 2-7 | 患者文脈 | 動的 | 顔を触る動作 | 体幹および手首の姿勢特徴から、顔を触る動作との類似度を評価する。 |
-| 3-1 | 空間的文脈 | 静的 | 点滴との距離 | 対象者と最も近い点滴ポールとの距離を用い、近いほど危険度を高くする。 |
-| 3-2 | 空間的文脈 | 静的 | 車椅子との距離 | 対象者と最も近い車椅子との距離を用い、近いほど危険度を高くする。 |
-| 3-3 | 空間的文脈 | 静的 | 手すりとの距離 | 対象者と最も近い手すりまたは壁との距離を用い、遠いほど危険度を高くする。 |
-| 4-1 | 空間的文脈 | 動的 | スタッフとの距離 | 対象者と最も近いスタッフとの相対距離を用い、遠いほど危険度を高くする。 |
-| 4-2 | 空間的文脈 | 動的 | スタッフの見守り方向 | スタッフの移動方向と対象者の相対位置から、スタッフが対象者を見ていない可能性を評価する。 |
 
 ### 3.2.3 Feature extraction
 
@@ -144,16 +126,65 @@ Figure 3に提案システムの全体構成を示す。患者属性・行動、
 
 姿勢特徴はTable 2に示す4種類を用いる。各特徴量は0--1に正規化し、危険動作テンプレートとの類似度算出に用いる。
 
-**Table 2. 危険動作の評価に用いる姿勢特徴。**
-
-| ID | 姿勢特徴 | 算出方法 | 値が小さい場合 | 値が大きい場合 |
-|---|---|---|---|---|
-| P-1 | 立位度 | 人物バウンディングボックスの縦横比を用いる。縦横比2.0以下を0、3.5以上を1とし、その間を線形に正規化する。 | 座位に近い | 立位に近い |
-| P-2 | 体幹傾斜度 | 左右肩の中点と左右腰の中点を結ぶ体幹軸の鉛直方向からの傾斜角を求め、45度以上を1として正規化する。 | 体幹が鉛直に近い | 体幹の傾きが大きい |
-| P-3 | 手首・腰間距離 | 左右それぞれの手首と腰の距離を求め、大きい方を体幹長の2倍で除して正規化する。 | 手首が腰に近い | 手首が腰から離れている |
-| P-4 | 下肢伸展度 | 左右それぞれの腰と足首の距離を求め、大きい方を鼻と腰中央の距離で除して正規化する。 | 腰と足首の距離が短い | 腰と足首の距離が長い |
 
 *Draft note: 実装で使用したVQA／画像モデルの名称と引用、ならびにシミュレーション・実データ評価で実際に入力した各特徴量の時系列値・波形を示す図表を追加する。*
+
+<!-- tex形式なので適宜修正 -->
+\begin{table}[t]
+    \centering
+    \caption{Rules for deriving surrounding staff risk from distance and direction risk}
+    \begin{tabular}{ccc}
+        \bhline{1.5pt}
+        Distance risk \( r^i_{330} \) & Direction risk \( r^i_{331} \) & Staff risk \( r^i_{23} \) \\ \hline
+        Large ($A$)                & Large ($B$)                & Large ($C$)                 \\ 
+        Large ($A$)                & Small ($\bar{B}$)          & Moderate ($D$)              \\ 
+        Small ($\bar{A}$)          & Large ($B$)                & Moderate ($D$)              \\ 
+        Small ($\bar{A}$)          & Small ($\bar{B}$)          & Small ($E$)                 \\ \bhline{1.5pt}
+    \end{tabular}
+    \label{tab:fuzzy_rules_33}
+\end{table}
+\begin{table}[t]
+    \centering
+    \caption{Rules for deriving External risk based on the sizes of Object risk and surrounding staff risk}
+    \begin{tabular}{ccc}
+        \bhline{1.5pt}
+        Object risk \( r^i_{22} \) & Staff risk \( r^i_{23} \) & External risk \( r^i_{11} \) \\ \hline
+        Large ($A$)                & Large ($B$)                & Large ($C$)                 \\ 
+        Large ($A$)                & Small ($\bar{B}$)          & Moderate ($D$)              \\ 
+        Small ($\bar{A}$)          & Large ($B$)                & Moderate ($D$)              \\ 
+        Small ($\bar{A}$)          & Small ($\bar{B}$)          & Small ($E$)                 \\ \bhline{1.5pt}
+    \end{tabular}
+    \label{tab:fuzzy_rules_21}
+\end{table}
+\begin{table}[t]
+    \centering
+    \caption{Rules for deriving total risk based on the sizes of Internal risk and External risk}
+    \begin{tabular}{ccc}
+        \bhline{1.5pt}
+        Internal risk \( r^i_{10} \) & External risk \( r^i_{11} \) & Total risk \( r^i_{00} \) \\ \hline
+        Large ($A$)                & Large ($B$)                & Large ($C$)                 \\ 
+        Large ($A$)                & Small ($\bar{B}$)          & Moderate ($D$)              \\ 
+        Small ($\bar{A}$)          & Large ($B$)                & Moderate ($D$)              \\ 
+        Small ($\bar{A}$)          & Small ($\bar{B}$)          & Small ($E$)                 \\ \bhline{1.5pt}
+    \end{tabular}
+    \label{tab:fuzzy_rules_10}
+\end{table}
+\begin{table}[!t]
+\centering
+\caption{System performance limits and maximum required performance}
+\resizebox{\linewidth}{!}{
+    \begin{tabular}{c|cccc||c}
+    \bhline{1.5pt}
+         & Query [/(person・iteration)] & Maximum patients & Evaluation per second [/s] & Required FPS [Hz] & Maximum FPS [Hz] \\ \hline
+        BLIP & 4 & 10 & 20 & 800 & 10 \\ 
+        YOLO & 1 & 10 & 20 & 200 & 50 \\ 
+        Position & 1 & 10 & 20 & 200 & $\infty$ \\ \bhline{1.5pt}
+    \end{tabular}
+    \label{tab:system_performance}
+}
+\end{table}
+
+
 
 ## 3.3 Questionnaire-based Parameterization
 
@@ -283,7 +314,7 @@ $F_{ED}$、$F_E$、$F_T$にはFuzzy推論を用い、異なるリスク因子間
 
 *Draft note: Questionnaire 1B No.1--4と患者文脈内の統合方法の対応は、一般モデルの実装説明として最終稿で整理する。なお、4.3.2の実データ評価では内的・静的要因を全患者で同一値に固定しているため、この設問ブロックに由来するスタッフ別パラメータは使用しない。*
 
-## 3.5 Prioritization and Traceability
+<!-- ## 3.5 Prioritization and Traceability
 
 各時刻で$R_i(k)$を患者間で比較し、見守り優先順位を決定する。
 
@@ -292,7 +323,7 @@ $F_{ED}$、$F_E$、$F_T$にはFuzzy推論を用い、異なるリスク因子間
 ![Illustrative example of extracting factors contributing to a risk change and generating a notification.](./paper_v9_figures/fig9_notification_example.png)
 
 **Figure 4.** 危険度変化と内部要因から通知理由を生成する補助例。  
-*Draft note: source slide p.21. Main contributionではなく、Method末尾またはSupplementaryの例として扱う。*
+*Draft note: source slide p.21. Main contributionではなく、Method末尾またはSupplementaryの例として扱う。* -->
 
 # 4. Evaluation
 
@@ -472,3 +503,32 @@ Source slides pp.12-15は、スタッフの判断知識と見守り優先順位�
 Source slide p.20は、VQA、Pose similarity evaluator、relative position calculator等の実装詳細を示す。今回の論文ではFigure 3をMain textのシステム図とし、p.20相当の詳細図はSupplementaryまたはImplementation節の補助図とする。
 
 ![Implementation-level system diagram.](./paper_v9_figures/figS3_implementation_detail.png)
+
+## D. 特徴量 detail
+**Table 1. 危険度評価に用いる特徴量。**
+
+| ID | 文脈 | 時間特性 | 特徴量 | 定義・評価方法 |
+|---|---|---|---|---|
+| 1-1 | 患者文脈 | 静的 | 患者判別 | 対象人物が患者であるかを表す。yes/noのラベルを三角型Fuzzy数へ変換して評価する。 |
+| 1-2 | 患者文脈 | 静的 | 年齢層 | 対象人物の年齢層をyoung/middle/oldで表し、三角型Fuzzy数へ変換して評価する。 |
+| 2-1 | 患者文脈 | 動的 | 立ち上がり動作 | 姿勢特徴と立ち上がり動作テンプレートとの類似度から評価する。高さ情報がある場合は、高さに基づく立ち上がり度を用いる。 |
+| 2-2 | 患者文脈 | 動的 | 車椅子のブレーキ解除 | 姿勢特徴と車椅子のブレーキを解除する動作テンプレートとの類似度から評価する。 |
+| 2-3 | 患者文脈 | 動的 | 車椅子を動かす動作 | 姿勢特徴と車椅子を動かす動作テンプレートとの類似度から評価する。 |
+| 2-4 | 患者文脈 | 動的 | バランスを崩す動作 | 主に体幹の傾きを含む姿勢特徴から、バランスを崩した動作との類似度を評価する。 |
+| 2-5 | 患者文脈 | 動的 | 手を挙げる・動かす動作 | 主に手首と腰の位置関係を含む姿勢特徴から、手を動かす動作との類似度を評価する。 |
+| 2-6 | 患者文脈 | 動的 | せき込む動作 | 体幹および手首の姿勢特徴から、せき込む動作との類似度を評価する。 |
+| 2-7 | 患者文脈 | 動的 | 顔を触る動作 | 体幹および手首の姿勢特徴から、顔を触る動作との類似度を評価する。 |
+| 3-1 | 空間的文脈 | 静的 | 点滴との距離 | 対象者と最も近い点滴ポールとの距離を用い、近いほど危険度を高くする。 |
+| 3-2 | 空間的文脈 | 静的 | 車椅子との距離 | 対象者と最も近い車椅子との距離を用い、近いほど危険度を高くする。 |
+| 3-3 | 空間的文脈 | 静的 | 手すりとの距離 | 対象者と最も近い手すりまたは壁との距離を用い、遠いほど危険度を高くする。 |
+| 4-1 | 空間的文脈 | 動的 | スタッフとの距離 | 対象者と最も近いスタッフとの相対距離を用い、遠いほど危険度を高くする。 |
+| 4-2 | 空間的文脈 | 動的 | スタッフの見守り方向 | スタッフの移動方向と対象者の相対位置から、スタッフが対象者を見ていない可能性を評価する。 |
+
+**Table 2. 危険動作の評価に用いる姿勢特徴。**
+
+| ID | 姿勢特徴 | 算出方法 | 値が小さい場合 | 値が大きい場合 |
+|---|---|---|---|---|
+| P-1 | 立位度 | 人物バウンディングボックスの縦横比を用いる。縦横比2.0以下を0、3.5以上を1とし、その間を線形に正規化する。 | 座位に近い | 立位に近い |
+| P-2 | 体幹傾斜度 | 左右肩の中点と左右腰の中点を結ぶ体幹軸の鉛直方向からの傾斜角を求め、45度以上を1として正規化する。 | 体幹が鉛直に近い | 体幹の傾きが大きい |
+| P-3 | 手首・腰間距離 | 左右それぞれの手首と腰の距離を求め、大きい方を体幹長の2倍で除して正規化する。 | 手首が腰に近い | 手首が腰から離れている |
+| P-4 | 下肢伸展度 | 左右それぞれの腰と足首の距離を求め、大きい方を鼻と腰中央の距離で除して正規化する。 | 腰と足首の距離が短い | 腰と足首の距離が長い |
