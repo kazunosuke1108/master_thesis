@@ -1,4 +1,12 @@
-from fuzzy.fuzzy_reasoning_v5 import FuzzyReasoning
+import sys
+from pathlib import Path
+
+
+MODULE_DIR = Path(__file__).resolve().parents[2]
+if str(MODULE_DIR) not in sys.path:
+    sys.path.insert(0, str(MODULE_DIR))
+
+from scripts.fuzzy.fuzzy_reasoning_v5 import FuzzyReasoning
 
 def approx_equal(a,b,eps=1e-9):
     return abs(a-b) < eps

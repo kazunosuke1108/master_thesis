@@ -48,12 +48,12 @@ for staff_name in data.columns:
     eigvals,eigvecs,max_eigval,weights,CI = cls.evaluate_mtx(A)
     comparison_mtx_csv_path=f"/media/hayashide/MasterThesis/common/comparison_mtx_30000001_{staff_name}.csv"
     pd.DataFrame(A).to_csv(comparison_mtx_csv_path,index=False,header=False)
-    
-    comparison_mtx_csv_path=f"/media/hayashide/MasterThesis/common/comparison_mtx_30000001_{staff_name}4.csv"
-    pd.DataFrame(A[:-3,:-3]).to_csv(comparison_mtx_csv_path,index=False,header=False)
+    comparison_mtx_csv_path=f"/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/database/common/comparison_mtx_30000001_{staff_name}.csv"
+    pd.DataFrame(A).to_csv(comparison_mtx_csv_path,index=False,header=False)
+
     print(CI)
     print(weights)
-raise NotImplementedError
+# raise NotImplementedError
 # 外的・静的（物体）30000010
 criteria = [
     "点滴の近くにいること",
@@ -66,6 +66,8 @@ for staff_name in data.columns:
     A=cls.get_comparison_mtx(criteria,comparison_answer)
     eigvals,eigvecs,max_eigval,weights,CI = cls.evaluate_mtx(A)
     comparison_mtx_csv_path=f"/media/hayashide/MasterThesis/common/comparison_mtx_30000010_{staff_name}.csv"
+    pd.DataFrame(A).to_csv(comparison_mtx_csv_path,index=False,header=False)
+    comparison_mtx_csv_path=f"/home/hayashide/kazu_ws/master_thesis/master_thesis_modules/database/common/comparison_mtx_30000010_{staff_name}.csv"
     pd.DataFrame(A).to_csv(comparison_mtx_csv_path,index=False,header=False)
     print(CI)
     print(weights)

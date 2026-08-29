@@ -1,0 +1,5 @@
+plot_label,profile_name,ahp_profile,fuzzy_profile
+P1,ahp_中村__fuzzy_中村,中村,中村
+P2,ahp_中村__fuzzy_百武,中村,百武
+P3,ahp_百武__fuzzy_中村,百武,中村
+P4,ahp_百武__fuzzy_百武,百武,百武

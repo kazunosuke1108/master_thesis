@@ -42,6 +42,26 @@ class PreprocessObject(Manager):
         # 最大値が1
         val=np.exp(-norm**2/(2*sigma**2))
         return val
+
+    def closest_object_xy(self,x,object_positions):
+        if len(object_positions)==0:
+            nan_coord=np.full_like(np.asarray(x[0],dtype=float),np.nan,dtype=float)
+            return nan_coord,nan_coord
+        xs=[]
+        ys=[]
+        distances=[]
+        shape=np.asarray(x[0]).shape
+        for mu in object_positions:
+            mu=np.asarray(mu)
+            mu_x=np.broadcast_to(mu[0],shape)
+            mu_y=np.broadcast_to(mu[1],shape)
+            xs.append(mu_x)
+            ys.append(mu_y)
+            distances.append(np.sqrt((np.asarray(x[0])-mu_x)**2+(np.asarray(x[1])-mu_y)**2))
+        closest_idx=np.argmin(np.stack(distances),axis=0)
+        closest_x=np.take_along_axis(np.stack(xs),np.expand_dims(closest_idx,axis=0),axis=0).squeeze(axis=0)
+        closest_y=np.take_along_axis(np.stack(ys),np.expand_dims(closest_idx,axis=0),axis=0).squeeze(axis=0)
+        return closest_x,closest_y
     
     def object_snapshot(self,data_dict,structure_dict):
         """
@@ -66,19 +86,17 @@ class PreprocessObject(Manager):
         for mu in structure_dict["ivPole"]:
             potential_ivPole+=self.gauss_func(x=x,mu=mu,r=3)
         potential_ivPole=np.clip(potential_ivPole,0,1)
-        data_dict["50001000"]=potential_ivPole
-        data_dict["50001001"]=potential_ivPole
-        data_dict["50001002"]=1
-        data_dict["50001003"]=1
+        data_dict["50001000"],data_dict["50001001"]=self.closest_object_xy(x,structure_dict["ivPole"])
+        data_dict["50001002"]=potential_ivPole
+        data_dict["50001003"]=potential_ivPole
         # 車椅子
         potential_wheelchair=0
         for mu in structure_dict["wheelchair"]:
             potential_wheelchair+=self.gauss_func(x=x,mu=mu,r=3)
         potential_wheelchair=np.clip(potential_wheelchair,0,1)
-        data_dict["50001010"]=potential_wheelchair
-        data_dict["50001011"]=potential_wheelchair
-        data_dict["50001012"]=1
-        data_dict["50001013"]=1
+        data_dict["50001010"],data_dict["50001011"]=self.closest_object_xy(x,structure_dict["wheelchair"])
+        data_dict["50001012"]=potential_wheelchair
+        data_dict["50001013"]=potential_wheelchair
         # 手すり
         closest_wall=np.argmin([
             abs(structure_dict["handrail"]["xrange"][0]-data_dict["60010000"]),

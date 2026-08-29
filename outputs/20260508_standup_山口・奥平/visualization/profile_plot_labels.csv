@@ -1,0 +1,5 @@
+plot_label,profile_name,ahp_profile,fuzzy_profile
+P1,ahp_奥平__fuzzy_奥平,奥平,奥平
+P2,ahp_奥平__fuzzy_山口,奥平,山口
+P3,ahp_山口__fuzzy_奥平,山口,奥平
+P4,ahp_山口__fuzzy_山口,山口,山口

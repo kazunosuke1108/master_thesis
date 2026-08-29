@@ -17,12 +17,15 @@ from scripts.AHP.get_comparison_mtx_v3 import getConsistencyMtx
 from scripts.fuzzy.fuzzy_reasoning_v5 import FuzzyReasoning
 from scripts.entropy.entropy_weight_generator import EntropyWeightGenerator
 from scripts.pseudo_data.pseudo_data_generator import PseudoDataGenerator
+from scripts.risk.schema import EVALUATION_STEPS
 
 class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
-    def __init__(self,trial_name,data_dicts,strage="NASK",AHP_array_type=3,staff_name_ahp="",staff_name_fuzzy=""):
+    def __init__(self,trial_name,data_dicts=None,strage="NASK",AHP_array_type=3,staff_name_ahp="",staff_name_fuzzy="",scenario_dict=None,fps=20):
         super().__init__()
         self.trial_name=trial_name
         self.strage=strage
+        self.scenario_dict={} if scenario_dict is None else scenario_dict
+        self.fps=fps
         default_graph=self.get_default_graph()
 
         # parameters
@@ -31,12 +34,18 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
         self.staff_name_ahp=staff_name_ahp
         self.staff_name_fuzzy=staff_name_fuzzy
 
-        self.data_dicts=data_dicts
+        if data_dicts is None:
+            patients=self.scenario_dict.get("general_dict",{}).get("patients",["A","B","C"])
+            self.graph_dicts={patient:copy.deepcopy(default_graph) for patient in patients}
+            data_dicts=self.define_scenario(fps=self.fps,scenario_dict=self.scenario_dict)
+
+        self.data_dicts=self.normalize_data_dicts(data_dicts)
         self.patients=list(self.data_dicts.keys())
         self.graph_dicts={}
         for patient in self.patients:
             self.graph_dicts[patient]=copy.deepcopy(default_graph)
             # dataに列が存在するかどうか確認
+        self.ensure_graph_columns()
 
         # 危険動作の事前定義
         self.risky_motion_dict={
@@ -77,6 +86,99 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
         TFN_data = pd.read_csv(TFN_csv_path,names=["l","c","r"])
         self.define_custom_rules(TFN_data=TFN_data)
 
+    def normalize_data_dicts(self,data_dicts):
+        normalized={}
+        for patient,data in data_dicts.items():
+            if not isinstance(data,pd.DataFrame):
+                data=pd.DataFrame([data])
+            data=data.copy()
+            columns=[]
+            for column in data.columns:
+                try:
+                    columns.append(int(column))
+                except (TypeError,ValueError):
+                    columns.append(column)
+            data.columns=columns
+            if "timestamp" not in data.columns:
+                data.insert(0,"timestamp",np.arange(len(data)))
+            normalized[patient]=data.reset_index(drop=True)
+        return normalized
+
+    def ensure_graph_columns(self):
+        for patient in self.patients:
+            for col in self.graph_dicts[patient]["node_dict"].keys():
+                if col not in self.data_dicts[patient].columns:
+                    self.data_dicts[patient][col]=np.nan
+
+    def define_scenario(self,fps,scenario_dict):
+        start_timestamp=0
+        end_timestamp=10
+        xrange=[0,6]
+        yrange=[0,6]
+        patients=list(self.graph_dicts.keys())
+        if len(scenario_dict)==0:
+            general_dict={
+                "start_timestamp":start_timestamp,
+                "end_timestamp":end_timestamp,
+                "fps":fps,
+                "patients":patients,
+                "xrange":xrange,
+                "yrange":yrange,
+            }
+            zokusei_dict={
+                "A":{"patient":"yes","age":"old"},
+                "B":{"patient":"yes","age":"old"},
+                "C":{"patient":"yes","age":"old"},
+                "NS":{"patient":"no","age":"middle"},
+            }
+            position_dict={
+                "A":(2,5),
+                "B":(2,2),
+                "C":(5,2),
+                "NS":(5,5),
+            }
+            action_dict={
+                "A":{
+                    0:{"label":"sit","start_timestamp":0,"end_timestamp":end_timestamp},
+                },
+                "B":{
+                    0:{"label":"sit","start_timestamp":0,"end_timestamp":2},
+                    2:{"label":"standup","start_timestamp":2,"end_timestamp":4},
+                    4:{"label":"stand","start_timestamp":4,"end_timestamp":6},
+                    6:{"label":"sitdown","start_timestamp":6,"end_timestamp":8},
+                    8:{"label":"sit","start_timestamp":8,"end_timestamp":end_timestamp},
+                },
+                "C":{
+                    0:{"label":"sit","start_timestamp":0,"end_timestamp":end_timestamp},
+                },
+                "NS":{
+                    0:{"label":"work","start_timestamp":0,"end_timestamp":5},
+                    5:{"label":"approach_B","start_timestamp":5,"end_timestamp":7},
+                    7:{"label":"work_B","start_timestamp":7,"end_timestamp":9},
+                    9:{"label":"leave_B","start_timestamp":9,"end_timestamp":end_timestamp},
+                },
+            }
+            surrounding_objects={
+                "A":["wheelchair","ivPole"],
+                "B":["wheelchair"],
+                "C":[],
+            }
+        else:
+            general_dict=scenario_dict["general_dict"]
+            zokusei_dict=scenario_dict["zokusei_dict"]
+            position_dict=scenario_dict["position_dict"]
+            action_dict=scenario_dict["action_dict"]
+            surrounding_objects=scenario_dict["surrounding_objects"]
+
+        return PseudoDataGenerator(trial_name=self.trial_name,strage=self.strage).get_pseudo_data(
+            graph_dicts=self.graph_dicts,
+            general_dict=general_dict,
+            zokusei_dict=zokusei_dict,
+            position_dict=position_dict,
+            action_dict=action_dict,
+            surrounding_objects=surrounding_objects,
+        )
+
     def activation_func(self,val):
         return val
 
@@ -113,8 +215,6 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
             else:
                 raise Exception(f"Unexpected value in 内的・静的・年齢: {val}")
         for patient in self.data_dicts.keys():
-            print(self.data_dicts[patient])
-            print(self.data_dicts[patient][50000000])
             self.data_dicts[patient][40000000]=list(map(patient_or_not,self.data_dicts[patient][50000000]))
             self.data_dicts[patient][40000001]=list(map(age,self.data_dicts[patient][50000010]))
         pass
@@ -127,8 +227,10 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
             # similarity=self.activation_func(similarity)
             return similarity
         def stand_sit(data_dict):
-            zmax=data_dict[60010002]
-            return 1/(1+np.exp(-5*(zmax-1)))
+            if 60010002 in data_dict and data_dict[60010002].notna().any():
+                zmax=data_dict[60010002]
+                return 1/(1+np.exp(-5*(zmax-1)))
+            return data_dict[50000100]
         
         for patient in self.data_dicts.keys():
             for risk in self.risky_motion_dict.keys():
@@ -165,7 +267,10 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
         def direction_risk(patient_x,patient_y,staff_x,staff_y,staff_vx,staff_vy):
             relative_pos=np.array([patient_x-staff_x,patient_y-staff_y])
             relative_vel=np.array([staff_vx,staff_vy])
-            cos_theta=np.dot(relative_pos,relative_vel)/(np.linalg.norm(relative_pos)*np.linalg.norm(relative_vel))
+            norm_product=np.linalg.norm(relative_pos)*np.linalg.norm(relative_vel)
+            if norm_product==0 or not np.isfinite(norm_product):
+                return np.nan
+            cos_theta=np.dot(relative_pos,relative_vel)/norm_product
             val=1-(cos_theta/2+0.5)
             # if cos_theta>1:
             #     val=0
@@ -183,7 +288,7 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
             self.data_dicts[patient][40000110]=self.activation_func(self.data_dicts[patient][40000110])
             # 向きリスク
             for i in range(len(self.data_dicts[patient])):
-                self.data_dicts[patient][40000111]=direction_risk(
+                self.data_dicts[patient].loc[i,40000111]=direction_risk(
                                                             self.data_dicts[patient].loc[i,60010000],
                                                             self.data_dicts[patient].loc[i,60010001],
                                                             self.data_dicts[patient].loc[i,50001100],
@@ -314,6 +419,13 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
             self.data_dicts[patient].to_csv(self.data_dir_dict["trial_dir_path"]+"/data_"+patient+"_eval.csv",index=False)
     
     def evaluate(self):
+        """Evaluate canonical thesis risk pipeline.
+
+        The execution order and node contracts are documented in
+        scripts.risk.schema.EVALUATION_STEPS. This method intentionally keeps
+        the historical side-effect based implementation for compatibility.
+        """
+        self.evaluation_steps=EVALUATION_STEPS
         # raise NotImplementedError
         # print("# 5 -> 4層推論 #")
         # 内的・静的
@@ -350,10 +462,23 @@ class Master(Manager,GraphManager,FuzzyReasoning,EntropyWeightGenerator):
         # print("# 2 -> 1層推論 #")
         # self.ewm_master(input_node_codes=[20000000,20000001],output_node_code=10000000)
         self.fuzzy_reasoning_master(input_node_codes=[20000000,20000001],output_node_code=10000000)
-        print(self.data_dicts["00001"])
         return self.data_dicts
 
 if __name__=="__main__":
+
+    # Sim
+    staff_names = ["中村","百武"]
+    for staff_name_ahp in staff_names:
+        for staff_name_fuzzy in staff_names:
+    
+            trial_name=f"20260506_Simで動作確認_{staff_name_ahp[0]}{staff_name_fuzzy[1]}"
+            strage="NASK"
+            cls=Master(trial_name=trial_name,strage=strage,AHP_array_type=staff_name_ahp,staff_name_ahp=staff_name_ahp,staff_name_fuzzy=staff_name_fuzzy)
+            cls.evaluate()
+            cls.save_session()
+    sys.exit(0)
+
+    # 実データ
     # staff_name_ahp="中村"
     # staff_name_fuzzy="中村"
     

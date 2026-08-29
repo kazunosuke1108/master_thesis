@@ -24,6 +24,7 @@ from scripts.preprocess.preprocess_blip_snapshot import PreprocessBlip
 from scripts.preprocess.preprocess_yolo_snapshot import PreprocessYolo
 from master_thesis_modules.scripts.preprocess.preprocess_objects_snapshot import PreprocessHandrail
 from scripts.network.graph_manager_v3 import GraphManager
+from scripts.notification.rank_utils import get_risk_rank_by_patient
 # preprocessorのインスタンス
 cls_blip=PreprocessBlip()
 cls_yolo=PreprocessYolo()
@@ -260,7 +261,7 @@ def evaluate_rank(data_dicts,additional_data_dicts):
     total_risks=[]
     for patient in patients:
         total_risks.append(data_dicts[patient]["10000000"])
-    patients_rank=(-np.array(total_risks)).argsort()
+    patients_rank=get_risk_rank_by_patient(patients,total_risks)
 
     most_risky_patient=patients[np.array(total_risks).argmax()]
 
@@ -273,7 +274,7 @@ def evaluate_rank(data_dicts,additional_data_dicts):
     print(text)
     additional_data_dicts["alert"]=text
 
-    for patient,rank in zip(patients,patients_rank):
+    for patient,rank in patients_rank.items():
         additional_data_dicts["rank"][patient]={}
         additional_data_dicts["rank"][patient]["10000000"]=rank
     return additional_data_dicts

@@ -27,6 +27,7 @@ else:
 from scripts.management.manager import Manager
 from scripts.master_v4 import Master
 from scripts.network.graph_manager_v4 import GraphManager
+from scripts.notification.rank_utils import get_risk_rank_by_patient
 # from scripts.preprocess.preprocess_blip_snapshot import PreprocessBlip
 # from scripts.preprocess.preprocess_zokusei_snapshot import PreprocessZokusei
 # from scripts.preprocess.preprocess_yolo_snapshot import PreprocessYolo
@@ -337,7 +338,7 @@ class NotificationAdjust(Manager,GraphManager):
             for patient in patients:
                 # total_risks.append(data_dicts[patient]["10000000"])
                 total_risks.append(self.df_eval.loc[iteration_idx:iteration_idx+self.smoothing_w,patient+"_10000000"].mean())
-            patients_rank=(-np.array(total_risks)).argsort()
+            patients_rank=get_risk_rank_by_patient(patients,total_risks)
 
             # 最も高リスクな患者の決定
             most_risky_patient=patients[np.array(total_risks).argmax()]
@@ -378,7 +379,7 @@ class NotificationAdjust(Manager,GraphManager):
             # 今回の危険患者をメモ
             self.previous_risky_patient=most_risky_patient
 
-            for patient,rank in zip(patients,patients_rank):
+            for patient,rank in patients_rank.items():
                 additional_data_dicts["rank"][patient]={}
                 additional_data_dicts["rank"][patient]["10000000"]=rank
         except Exception as e:

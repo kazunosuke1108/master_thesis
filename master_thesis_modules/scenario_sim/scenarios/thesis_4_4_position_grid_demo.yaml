@@ -1,0 +1,17 @@
+scenario_name: thesis_4_4_position_grid_demo
+time_range: {duration_s: 0.0, step_s: 1.0}
+patients:
+  - id: A
+    is_patient_label: yes
+    age_group_label: old
+    position: {x: 3.0, y: 3.0}
+    action_label: reach_table
+objects:
+  - id: handrail
+    type: handrail
+    position: {x: 0.0, y: 3.0}
+staff:
+  - id: staff_1
+    position: {x: 5.5, y: 5.5}
+    velocity: {vx: 0.2, vy: 0.2}
+

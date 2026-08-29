@@ -1,0 +1,2 @@
+timestamp,target_patient_id,total_risk,rank,reason,message,notification_type
+1740549676.258251,00021,0.3588886424771894,1,00021さんが，高齢であるのに，スタッフが見ていないので，危険です．,00021さんが，高齢であるのに，スタッフが見ていないので，危険です．,notice
