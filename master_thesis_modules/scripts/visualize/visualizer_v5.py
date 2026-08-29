@@ -18,6 +18,7 @@ import plotly.graph_objects as go
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import matplotlib.colors as mcolors
+import ast
 
 
 from scripts.management.manager import Manager
@@ -559,15 +560,123 @@ class Visualizer(Manager):
         pass
 
     def draw_positions3(self,data_list,labels=None,max_points=1000):
-        def plot_points(data,name,plot_data):
+        import cv2
+        import colorsys
+
+        def normalize_image_path(image_path):
+            # print("image_path",image_path)
+            sensor_name=os.path.basename(image_path).split("_")[1]
+            new_image_path=f"//192.168.1.5/common/FY2024/09_MobileSensing/Nagasaki20240827/jpg/{sensor_name}/"+os.path.basename(image_path)
+            # print("new_image_path",new_image_path)
+            # raise NotImplementedError
+            return new_image_path
+
+        def parse_image_path(path_value):
+            # print("path_value",path_value)            
+            # print("path_value",type(path_value))            
+            if path_value=="0":
+                return None  
+            if isinstance(path_value, float):
+                return None
+            if isinstance(path_value, int):
+                return None
+            if isinstance(path_value, list):
+                if not path_value:
+                    return None
+                return normalize_image_path(path_value[0])
+            if pd.isna(path_value):
+                return None
+            try:
+                parsed = ast.literal_eval(path_value)
+            except (ValueError, SyntaxError, TypeError):
+                parsed = path_value
+            if isinstance(parsed, list):
+                if not parsed:
+                    return None
+                parsed = parsed[0]
+            if pd.isna(parsed):
+                return None
+            return normalize_image_path(parsed)
+
+        def get_center_rgb(image_path, cache):
+            if not image_path:
+                return "blue"
+            if image_path in cache:
+                return cache[image_path]
+            img = cv2.imread(image_path)
+            if img is None:
+                cache[image_path] = "blue"
+                return cache[image_path]
+            height, width = img.shape[:2]
+            b, g, r = img[height // 2, width // 2]
+            cache[image_path] = f"rgb({int(r)}, {int(g)}, {int(b)})"
+            return cache[image_path]
+
+        def hsv_to_plotly_rgb(h_01, s_01=1.0, v_01=1.0):
+            """h,s,v in [0,1] -> 'rgb(r,g,b)'"""
+            r, g, b = colorsys.hsv_to_rgb(h_01, s_01, v_01)
+            return f"rgb({int(r*255)}, {int(g*255)}, {int(b*255)})"
+
+        def get_center_hsv_color(image_path, cache,
+                                use_fixed_sv=True,
+                                fixed_s=1.0, fixed_v=1.0,
+                                min_s=0.15, min_v=0.10,
+                                fallback="black"):
+            """
+            中心画素のHSVから色を決める。
+            - 明るさ変動に強くしたいなら Hue を主に使う
+            - 彩度が低い/暗すぎる場合は fallback にする（グレーっぽいとHueが不安定なので）
+            """
+            if not image_path:
+                return fallback
+            if image_path in cache:
+                return cache[image_path]
+
+            img = cv2.imread(image_path)
+            if img is None:
+                cache[image_path] = fallback
+                return cache[image_path]
+
+            h, w = img.shape[:2]
+            bgr = img[h // 2, w // 2].reshape(1, 1, 3)
+            hsv = cv2.cvtColor(bgr, cv2.COLOR_BGR2HSV)[0, 0]  # [H,S,V]
+            H, S, V = float(hsv[0]), float(hsv[1]), float(hsv[2])
+
+            h_01 = H / 179.0
+            s_01 = S / 255.0
+            v_01 = V / 255.0
+
+            # Hueが信用できないケース（灰色/暗い）を弾く
+            if s_01 < min_s or v_01 < min_v:
+                cache[image_path] = fallback
+                return cache[image_path]
+
+            # 「明るさに影響されにくく」したいならSVは固定してHueだけ使うのが強い
+            if use_fixed_sv:
+                color = hsv_to_plotly_rgb(h_01, fixed_s, fixed_v)
+            else:
+                # その場のS,Vも使う（ただしVが照明影響を受けやすい点は残る）
+                color = hsv_to_plotly_rgb(h_01, s_01, v_01)
+
+            cache[image_path] = color
+            return color
+
+        def plot_points(data,name,plot_data,cache):
             print(name)
+            image_col = name + "_imagePath"
+            if image_col in data.columns:
+                raw_paths = data[image_col].tolist()
+                image_paths = [parse_image_path(path_value) for path_value in raw_paths]
+                # colors = [get_center_rgb(path, cache) for path in image_paths]
+                colors = [get_center_hsv_color(path, cache, use_fixed_sv=True) for path in image_paths]
+            else:
+                colors = "black"
             trace=go.Scatter3d(
                 x=data[name+"_x"], # nameの_x
                 y=data[name+"_y"], # nameの_y
                 z=data["timestamp"]-data["timestamp"].values[0],
                 mode="markers",
-                marker=dict(size=3), # マーカーのサイズは小さめ
-                marker_color="blue",
+                marker=dict(size=3, color=colors), # マーカーのサイズは小さめ
                 name=str(name),
             )
             plot_data.append(trace)
@@ -582,9 +691,10 @@ class Visualizer(Manager):
             if len(data)>max_points:
                 data=data.sample(n=max_points,random_state=None).sort_values("timestamp")
             plot_data=[]
+            image_color_cache = {}
             names=[k[:-len("_x")] for k in data.columns if "_x" in k]
             for name in names:
-                plot_data=plot_points(data,name,plot_data)
+                plot_data=plot_points(data,name,plot_data,image_color_cache)
             fig=go.Figure(data=plot_data)
             fig.update_layout(
                     scene_aspectmode='manual',
