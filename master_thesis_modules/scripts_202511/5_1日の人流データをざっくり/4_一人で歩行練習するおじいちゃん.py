@@ -78,5 +78,5 @@ for csv_path in csv_paths:
     data=pd.read_csv(csv_path,header=0)
     data_list.append(data)
 
-visualizer.draw_positions2(data_list=data_list,labels=["20240827_18","20240827_19"])
+visualizer.draw_positions3(data_list=data_list,labels=["20240827_18","20240827_19"],max_points=5000)
 # raise NotImplementedError
