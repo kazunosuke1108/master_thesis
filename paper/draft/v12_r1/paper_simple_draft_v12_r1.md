@@ -391,7 +391,10 @@ Figure 5に示すシナリオに対し、(a) 空間的文脈に対応する特�
 
 Figure 6に、両条件における時系列危険度の比較例を示す。
 
-![Risk time-series comparison with and without spatial context.](./paper_v9_figures/fig5_rq1_standup_result.png)
+<!-- ![Risk time-series comparison with and without spatial context.](./paper_v9_figures/fig5_rq1_standup_result.png) -->
+![Risk time-series comparison without spatial context.](./paper_v12_r1_figures/figx_eval1_patient_context.svg)
+
+![Risk time-series comparison with spatial context.](./paper_v12_r1_figures/figx_eval1_spatial_context.svg)
 
 **Figure 6.** 空間的文脈の有無による時系列危険度の比較。  
 *Draft note: source slide p.9. Final figureではP4のみを用い、同一条件に対する「Patient context only」と「Spatial context included」を直接比較できる形式へ再設計する。*
