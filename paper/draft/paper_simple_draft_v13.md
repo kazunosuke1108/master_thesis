@@ -24,9 +24,8 @@
 * **RQ2：** スタッフごとの判断知識を反映することで、同一入力に対する時系列危険度と見守り優先順位はどのように変化するか。
 
 # 1. Introduction
-患者見守り支援は、転倒・離床・姿勢・活動の検知を中心に広く研究されてきた。ベッド周辺など局所的な環境を対象としたリスク評価に加え、電子カルテ・バイタル等を用いて病棟全体の患者状態を継続的に評価する方法も提案されている \cite{Gutierrez2021VisionFallReview,Escobar2020Deterioration}。
+患者見守り支援は、転倒・離床・姿勢・活動の検知を中心に広く研究されてきた \cite{Griffiths2024SurveillanceTechnology,Khanna2025ContinuousMonitoring,vanZeistdeJonge2025NursesExperiences}。ベッド周辺など局所的な環境を対象としたリスク評価に加え、電子カルテ・バイタル等を用いて病棟全体の患者状態を継続的に評価する方法も提案されている \cite{Gutierrez2021VisionFallReview,Escobar2020Deterioration}。
 
-*Draft note: Introduction冒頭の患者見守り支援全体について、2020年代の包括的なレビューを追加できるか最終確認する。*
 
 本研究では、こうした見守り支援を食堂・デイルームといった**病棟共有空間における複数患者の見守り**へ適用する。この環境には、危険度と見守り優先順位を評価するうえで重要な2つの特徴がある。
 
@@ -35,7 +34,6 @@
 ![Example illustrating spatial-context- and staff-dependent monitoring priority.](./paper_v12_r1_figures/fig1_problem_setting.svg)
 
 **Figure 1.** 病棟共有空間における見守り優先順位の例。同じ立ち上がり動作でも、周囲物体・施設構造・スタッフの見守り状況によって優先順位が変化し得る。また、スタッフが直接介助している比較的安全な状況でも、患者の立ち上がり自体を重視し危険と評価するスタッフと、見守るスタッフの有無を重視して比較的安全と評価するスタッフでは評価が異なり得る。  
-*Draft note: source slide p.2. Final figureでは “notification priority” を “monitoring priority” に変更し、左側の状況に「患者文脈を重視するスタッフ：立ち上がりを重視して優先度を維持」「空間的文脈を重視するスタッフ：スタッフが直接介助していれば優先度を下げる」という対比を追加する。*
 
 第二に、病棟共有空間では複数のスタッフが見守りに関与し、同じ状況でも危険度の判断基準が異なり得る。Figure 1左側の状況でも、患者の立ち上がり自体を重視して一定の優先度を保つスタッフと、スタッフが直接介助しているため優先度を下げるスタッフが考えられる。本研究では、このような特徴量の重み付けや条件の組み合わせに関する考え方を**スタッフの判断知識**と呼ぶ。
 
@@ -117,58 +115,29 @@ Figure 3に提案システムの全体構成を示す。患者属性・行動、
 
 ### 3.2.2 Feature classification
 
-危険度評価に用いる特徴量を、患者本人に由来する内的要因と患者周囲に由来する外的要因に分け、さらに静的・動的の2軸で4群に分類する。患者文脈は内的要因、空間的文脈は外的要因に対応する。Table 1に本研究で使用する特徴量を示す。
+危険度評価に用いる特徴量を、患者本人に由来する内的要因と患者周囲に由来する外的要因に分け、さらに静的・動的の2軸で4群に分類する。患者文脈は内的要因、空間的文脈は外的要因に対応する。特徴量の分類をTable 1に、各特徴量の詳細をAppendix Table A1に示す。
+
+**Table 1. 特徴量の4分類。**
+
+| 分類 | 文脈 | 主な内容 |
+|---|---|---|
+| 内的・静的要因 | 患者文脈 | 患者判別、年齢層などの患者属性 |
+| 内的・動的要因 | 患者文脈 | 立ち上がり、車椅子操作、姿勢変化などの患者行動 |
+| 外的・静的要因 | 空間的文脈 | 点滴、車椅子、手すり等との位置関係 |
+| 外的・動的要因 | 空間的文脈 | スタッフとの距離、見守り方向 |
 
 
 ### 3.2.3 Feature extraction
 
 内的・静的要因は、画像から取得した人物情報または既存の患者情報から取得する。内的・動的要因は、姿勢推定結果から算出した姿勢特徴と危険動作テンプレートとの類似度に基づいて評価する。外的・静的要因は周囲物体・施設構造との距離から、外的・動的要因はスタッフとの相対距離および見守り方向から算出する。実装では、RGB画像、点群、位置情報、姿勢推定、VQA、施設地図等を組み合わせて各特徴量を取得する。
 
-姿勢特徴はTable 2に示す4種類を用いる。各特徴量は0--1に正規化し、危険動作テンプレートとの類似度算出に用いる。
+姿勢特徴はAppendix Table A2に示す4種類を用いる。各特徴量は0--1に正規化し、危険動作テンプレートとの類似度算出に用いる。
 
 
-*Draft note: 実装で使用したVQA／画像モデルの名称と引用、ならびにシミュレーション・実データ評価で実際に入力した各特徴量の時系列値・波形を示す図表を追加する。*
+*Draft note: 実装で使用したVQA／画像モデルの名称と引用を最終稿で明記する。実データについて、危険度時系列の解釈に必要な入力イベント・特徴量をどこまで本文に示すかは要確認。*
 
-<!-- tex形式なので適宜修正 -->
-\begin{table}[t]
-    \centering
-    \caption{Rules for deriving surrounding staff risk from distance and direction risk}
-    \begin{tabular}{ccc}
-        \bhline{1.5pt}
-        Distance risk \( r^i_{330} \) & Direction risk \( r^i_{331} \) & Staff risk \( r^i_{23} \) \\ \hline
-        Large ($A$)                & Large ($B$)                & Large ($C$)                 \\ 
-        Large ($A$)                & Small ($\bar{B}$)          & Moderate ($D$)              \\ 
-        Small ($\bar{A}$)          & Large ($B$)                & Moderate ($D$)              \\ 
-        Small ($\bar{A}$)          & Small ($\bar{B}$)          & Small ($E$)                 \\ \bhline{1.5pt}
-    \end{tabular}
-    \label{tab:fuzzy_rules_33}
-\end{table}
-\begin{table}[t]
-    \centering
-    \caption{Rules for deriving External risk based on the sizes of Object risk and surrounding staff risk}
-    \begin{tabular}{ccc}
-        \bhline{1.5pt}
-        Object risk \( r^i_{22} \) & Staff risk \( r^i_{23} \) & External risk \( r^i_{11} \) \\ \hline
-        Large ($A$)                & Large ($B$)                & Large ($C$)                 \\ 
-        Large ($A$)                & Small ($\bar{B}$)          & Moderate ($D$)              \\ 
-        Small ($\bar{A}$)          & Large ($B$)                & Moderate ($D$)              \\ 
-        Small ($\bar{A}$)          & Small ($\bar{B}$)          & Small ($E$)                 \\ \bhline{1.5pt}
-    \end{tabular}
-    \label{tab:fuzzy_rules_21}
-\end{table}
-\begin{table}[t]
-    \centering
-    \caption{Rules for deriving total risk based on the sizes of Internal risk and External risk}
-    \begin{tabular}{ccc}
-        \bhline{1.5pt}
-        Internal risk \( r^i_{10} \) & External risk \( r^i_{11} \) & Total risk \( r^i_{00} \) \\ \hline
-        Large ($A$)                & Large ($B$)                & Large ($C$)                 \\ 
-        Large ($A$)                & Small ($\bar{B}$)          & Moderate ($D$)              \\ 
-        Small ($\bar{A}$)          & Large ($B$)                & Moderate ($D$)              \\ 
-        Small ($\bar{A}$)          & Small ($\bar{B}$)          & Small ($E$)                 \\ \bhline{1.5pt}
-    \end{tabular}
-    \label{tab:fuzzy_rules_10}
-\end{table}
+
+<!-- Draft-only appendix candidate: system performance table
 \begin{table}[!t]
 \centering
 \caption{System performance limits and maximum required performance}
@@ -183,7 +152,7 @@ Figure 3に提案システムの全体構成を示す。患者属性・行動、
     \label{tab:system_performance}
 }
 \end{table}
-
+-->
 
 
 ## 3.3 Questionnaire-based Parameterization
@@ -246,6 +215,48 @@ $$
 ### 3.3.3 Fuzzy-rule parameterization
 
 Questionnaire 1Bでは、Table 4の各条件に対して5段階で危険度を評価させる。これらの回答を、階層モデルでカテゴリ間のリスクを統合するFuzzyルールの後件側に対応づける。これにより、例えば「患者行動が危険でもスタッフによる見守りが十分であれば危険度を低く評価する」といった、単純な加算では表現しにくい条件依存的な判断をスタッフごとに反映する。
+
+以下に、階層間のFuzzy推論で用いる基本的なルール構造を示す。
+
+\begin{table}[t]
+    \centering
+    \caption{Rules for deriving surrounding staff risk from distance and direction risk}
+    \begin{tabular}{ccc}
+        \bhline{1.5pt}
+        Distance risk \( r^i_{330} \) & Direction risk \( r^i_{331} \) & Staff risk \( r^i_{23} \) \\ \hline
+        Large ($A$)                & Large ($B$)                & Large ($C$)                 \\ 
+        Large ($A$)                & Small ($\bar{B}$)          & Moderate ($D$)              \\ 
+        Small ($\bar{A}$)          & Large ($B$)                & Moderate ($D$)              \\ 
+        Small ($\bar{A}$)          & Small ($\bar{B}$)          & Small ($E$)                 \\ \bhline{1.5pt}
+    \end{tabular}
+    \label{tab:fuzzy_rules_33}
+\end{table}
+\begin{table}[t]
+    \centering
+    \caption{Rules for deriving External risk based on the sizes of Object risk and surrounding staff risk}
+    \begin{tabular}{ccc}
+        \bhline{1.5pt}
+        Object risk \( r^i_{22} \) & Staff risk \( r^i_{23} \) & External risk \( r^i_{11} \) \\ \hline
+        Large ($A$)                & Large ($B$)                & Large ($C$)                 \\ 
+        Large ($A$)                & Small ($\bar{B}$)          & Moderate ($D$)              \\ 
+        Small ($\bar{A}$)          & Large ($B$)                & Moderate ($D$)              \\ 
+        Small ($\bar{A}$)          & Small ($\bar{B}$)          & Small ($E$)                 \\ \bhline{1.5pt}
+    \end{tabular}
+    \label{tab:fuzzy_rules_21}
+\end{table}
+\begin{table}[t]
+    \centering
+    \caption{Rules for deriving total risk based on the sizes of Internal risk and External risk}
+    \begin{tabular}{ccc}
+        \bhline{1.5pt}
+        Internal risk \( r^i_{10} \) & External risk \( r^i_{11} \) & Total risk \( r^i_{00} \) \\ \hline
+        Large ($A$)                & Large ($B$)                & Large ($C$)                 \\ 
+        Large ($A$)                & Small ($\bar{B}$)          & Moderate ($D$)              \\ 
+        Small ($\bar{A}$)          & Large ($B$)                & Moderate ($D$)              \\ 
+        Small ($\bar{A}$)          & Small ($\bar{B}$)          & Small ($E$)                 \\ \bhline{1.5pt}
+    \end{tabular}
+    \label{tab:fuzzy_rules_10}
+\end{table}
 
 *Draft note: Questionnaire 1Bの5段階回答をFuzzy集合・後件値へ変換する具体的な対応関係と、メンバーシップ関数の設定方法を実装に合わせて明記する。*
 
@@ -312,18 +323,8 @@ $F_{ED}$、$F_E$、$F_T$にはFuzzy推論を用い、異なるリスク因子間
 
 スタッフごとにAHP重み、$\alpha$、Fuzzyルール等を設定し、同一入力に対するスタッフ別の時系列危険度を生成する。
 
-*Draft note: Questionnaire 1B No.1--4と患者文脈内の統合方法の対応は、一般モデルの実装説明として最終稿で整理する。なお、4.3.2の実データ評価では内的・静的要因を全患者で同一値に固定しているため、この設問ブロックに由来するスタッフ別パラメータは使用しない。*
+**Discussion point:** 一般モデルではQuestionnaire 1B No.1--4と患者文脈内の統合式の対応を最終確認する。なお、4.3.2の実データ評価では内的・静的要因を全患者で同一値に固定しているため、この設問ブロックに由来するスタッフ別パラメータは使用しない。
 
-<!-- ## 3.5 Prioritization and Traceability
-
-各時刻で$R_i(k)$を患者間で比較し、見守り優先順位を決定する。
-
-また、階層構造内の特徴量と中間危険度を保持し、危険度変化に寄与した要因を参照できるようにする。必要に応じて、順位変化や危険度上昇をトリガとして通知を生成し、主要因を通知理由として付加する。
-
-![Illustrative example of extracting factors contributing to a risk change and generating a notification.](./paper_v9_figures/fig9_notification_example.png)
-
-**Figure 4.** 危険度変化と内部要因から通知理由を生成する補助例。  
-*Draft note: source slide p.21. Main contributionではなく、Method末尾またはSupplementaryの例として扱う。* -->
 
 # 4. Evaluation
 
@@ -331,7 +332,7 @@ $F_{ED}$、$F_E$、$F_T$にはFuzzy推論を用い、異なるリスク因子間
 
 評価はRQ1とRQ2に沿って構成する。RQ1では、同一の患者行動を与えたシミュレーションに対し、空間的文脈を使用しない条件と使用する条件を比較する。これにより、Figure 1で示したような周囲物体・スタッフの見守り状況の違いが、時系列危険度と見守り優先順位へ反映されるかを確認する。
 
-RQ2では、スタッフごとの判断知識の違いが出力へ反映されるかを、統制したシミュレーションと病棟共有空間で取得した実データの両方で評価する。シミュレーションでは特定の判断軸を対照的に設定したスタッフ別プロファイルを比較し、実データでは対照的な2名のケースと全回答者（n=10）の傾向を分析する。
+RQ2では、スタッフごとの判断知識の違いが出力へ反映されるかを、統制したシミュレーションと病棟共有空間で取得した実データの両方で評価する。職種・経験年数などのスタッフ属性が一つの層に偏らないよう選定した事例を用い、その中で実際に得られた判断傾向の違いとモデル出力の対応をシミュレーションおよび実データで確認する。さらに、全回答者（n=10）の傾向を分析する。
 
 * **RQ1:** 空間的文脈の有無による時系列危険度と見守り優先順位の変化。
 * **RQ2:** スタッフごとの判断知識による時系列危険度と見守り優先順位の変化。
@@ -343,13 +344,26 @@ RQ2では、スタッフごとの判断知識の違いが出力へ反映され�
 Figure 5に示すシナリオに対し、(a) 空間的文脈に対応する特徴量を全患者で0に固定した条件と、(b) 空間的文脈の特徴量を入力した条件の2条件で、患者ごとの時系列危険度を比較する。両条件で患者文脈とスタッフ別プロファイルは同一に固定する。本評価では絶対的な危険度の妥当性ではなく、同一プロファイル内での患者間の相対的な危険度と見守り優先順位に着目するため、条件(a)の0は空間的文脈による患者間差を除くための共通基準値として用いる。
 
 本評価では、空間的文脈の影響を分離するため、スタッフの判断知識をP4のプロファイルに固定する。RQ1ではスタッフ別プロファイル間の比較を目的としないため、全条件に同一のP4プロファイルを適用する。P4のアンケート回答、導出パラメータ、CI/CRはTable 5と同じ形式でTable Xに示す。
+**Table 6. RQ1シミュレーションで患者間差を与えた主な正規化特徴量。**
 
-*Draft note: シナリオで実際に入力した各特徴量の値・時系列波形を示すTable/Figureを追加する。P4・P6・P8は、職種・経験年数などのスタッフ属性が一つの層に偏らないよう選定した事例である。若手看護師・熟練看護師・介護福祉士との対応関係は、最終稿への記載前にアンケート原票で確認する。*
+| 特徴量 | 患者A | 患者B | 患者C |
+|---|---:|---:|---:|
+| `stand_up` | 0.09--1.00 | 0.09--1.00 | 0.09--1.00 |
+| `near_iv_pole` | 0.57 | 0.75 | 0.99 |
+| `near_wheelchair` | 0.99 | 0.75 | 0.99 |
+| `far_handrail` | 0.24 | 0.24 | 0.24 |
+| `staff_distance` | 0.30 | 0.08 | 0.19 |
+| `staff_watch_loss` | 0.78 | 0.00 | 0.72 |
+
+患者行動に関するその他の入力は患者A--Cで同一とした。動的な患者行動は所定のイベント区間のみ変化し、それ以外の特徴量はシナリオ中で固定した。
+
+
+*Draft note: P4・P6・P8は、職種・経験年数などのスタッフ属性が一つの層に偏らないよう選定した事例である。若手看護師・熟練看護師・介護福祉士との対応関係は、最終稿への記載前にアンケート原票で確認する。*
 
 ![Simulation scenario for evaluating the effect of spatial context.](./paper_v9_figures/fig4_rq1_standup_scenario.png)
 
 **Figure 5.** RQ1で用いる立ち上がりシナリオ。  
-*Draft note: source slide p.8. Final figureでは代表4時刻程度に削減し、患者・スタッフ・周囲物体・施設構造の変化を読みやすくする。*
+*Draft note: Figure 5の最終版では代表時刻を絞り、患者・スタッフ・周囲物体の条件が読み取れるよう簡略化する。*
 
 比較条件は以下とする。
 
@@ -361,10 +375,11 @@ Figure 5に示すシナリオに対し、(a) 空間的文脈に対応する特�
 
 Figure 6に、両条件における時系列危険度の比較例を示す。
 
-![Risk time-series comparison with and without spatial context.](./paper_v9_figures/fig5_rq1_standup_result.png)
+![Risk time-series comparison without spatial context.](./paper_v12_r1_figures/figx_eval1_patient_context.svg)
+
+![Risk time-series comparison with spatial context.](./paper_v12_r1_figures/figx_eval1_spatial_context.svg)
 
 **Figure 6.** 空間的文脈の有無による時系列危険度の比較。  
-*Draft note: source slide p.9. Final figureではP4のみを用い、同一条件に対する「Patient context only」と「Spatial context included」を直接比較できる形式へ再設計する。*
 
 患者文脈のみを用いた条件では、空間的文脈の違いが出力に反映されず、各患者の立ち上がりに対して同様の危険度変化が生じた。一方、空間的文脈を含む条件では、立ち上がり動作が生じる前から、スタッフの見守り状況および車椅子・点滴の有無に応じて患者間の危険度に差が生じた。立ち上がり時の危険度は、「見守りあり・車椅子あり・点滴なし」、「見守りなし・車椅子あり・点滴なし」、「見守りなし・車椅子あり・点滴あり」の順に高くなり、上位患者間では見守り優先順位の変化も確認された。
 
@@ -383,22 +398,23 @@ Figure 6に、両条件における時系列危険度の比較例を示す。
 
 **Scenario 1:** 4名の患者を2×2に配置し、スタッフを正面から4名を見渡せる位置に配置する。奥側の2名は手前側の2名よりスタッフから遠いため、スタッフとの距離に関する空間的文脈が異なる。ここでスタッフから見て左側の2名に立ち上がり動作を与え、患者文脈と空間的文脈のどちらを重視するかが異なるスタッフ別モデル間で、見守り優先順位を比較する。
 
-*Draft note: Scenario 1の図を追加する。患者A–Dの配置、スタッフ位置、立ち上がる患者を図中で固定して示す。*
+![Scenario 1の環境設定](./paper_v12_r1_figures/figx_eval2_scenario1.svg)
+
 
 **Scenario 2:** 4名の患者を2×2に配置し、スタッフを中央付近に配置する。スタッフからはC、Dを見守れる一方、A、Bは見守られにくい状況とする。また、左側の2名は車椅子に座り、点滴ポールの近くにいる条件とする。スタッフの見守り状況と周囲物体のどちらを重視するかが異なるスタッフ別モデル間で、見守り優先順位を比較する。
 
-*Draft note: Scenario 2の図を追加する。患者A–D、スタッフの視野、車椅子、点滴ポールの配置を明示する。*
+![Scenario 2の環境設定](./paper_v12_r1_figures/figx_eval2_scenario2.svg)
 
 
 #### Results
 
 Scenario 1では、空間的文脈を重視するスタッフ別モデルでスタッフから遠い患者の見守り優先順位が高くなった。一方、患者文脈を重視するスタッフ別モデルでは、立ち上がり動作の影響がより強く反映された。
 
-*Draft note: Scenario 1の時系列危険度または順位推移を示す図を追加する。本文では、比較対象となる患者をA–Dで明示する。*
+![Scenario 1の結果](./paper_v12_r1_figures/figx_eval2_scenario1_risk_bar.svg)
 
 Scenario 2では、スタッフの見守り状況を周囲物体より重視するスタッフ別モデルで、見守られにくい患者の見守り優先順位が高くなった。一方、周囲物体を重視するスタッフ別モデルでは、車椅子に座り点滴ポールの近くにいる患者の見守り優先順位が高くなった。
 
-*Draft note: Scenario 2の時系列危険度または順位推移を示す図を追加する。*
+![Scenario 2の結果](./paper_v12_r1_figures/figx_eval2_scenario2_risk_bar.svg)
 
 
 ### 4.3.2 Real-world Data Evaluation
@@ -409,17 +425,40 @@ Scenario 2では、スタッフの見守り状況を周囲物体より重視す�
 
 なお、本実データでは内的・静的要因を全患者で同一値に固定したため、Questionnaire 1B No.1--4に対応する患者属性と患者行動の組み合わせに関するスタッフ別の判断知識は、本評価では使用しない。
 
-全回答者の分析では、患者文脈と空間的文脈の相対的な重視傾向を表す指標$C_i$と、周囲物体とスタッフの見守り状況の相対的な重視傾向を表す指標$D_i$を用いる。
+全回答者の分析では、患者文脈と空間的文脈の相対的な重視傾向を表す指標$C_i$を用いる。
 
-*Draft note: $C_i$と$D_i$の算出式、および値の大小がどちらの重視傾向を表すかを3.3または本節に明示する。P4・P6・P8の職種・経験年数の対応関係は、最終稿への記載前にアンケート原票で確認する。*
+##### Profile-orientation index $C_i$
+
+患者文脈と空間的文脈の相対的な重視傾向を定量化するため、総合危険度を算出するFuzzyルールのうち、内的危険度が高く外的危険度が低い条件（HL）と、その逆の条件（LH）の後件部中央代表値を用いて、
+
+$$
+C_i=c_i^{LH}-c_i^{HL}=\frac{s_i^{LH}-s_i^{HL}}{4}
+$$
+
+と定義する。ここで$s_i$はQuestionnaire 1Bの5段階回答である。$C_i>0$は空間的文脈を、$C_i<0$は患者文脈を相対的に重視する傾向を表し、$|C_i|$が大きいほどその傾向が強い。本指標は最上位Fuzzyルールの中央代表値の差を表すものであり、Fuzzy集合の幅やモデル全体の感度を直接表すものではない。
 
 #### Results
 
-現時点の可視化候補をFigures 7,8および9に示す。
+現時点の可視化候補をFigures 7,8および9に示す
 
-![Risk time series obtained from staff-specific models for real-world data.](./paper_v9_figures/fig6_rq2_case_study.png)
+![Risk time series obtained from staff-specific models for real-world data.](./paper_v12_r1_figures/P6_total_risk_75_83.png)
+![Risk time series obtained from staff-specific models for real-world data.](./paper_v12_r1_figures/P8_total_risk_75_83.png)
+
 **Figure 7.** 実データに対するスタッフ別モデルの時系列危険度の比較。  
-*Draft note: 時系列危険度は平滑化せず、実際の出力をそのまま示す。最終図では主要イベントの時刻を縦線等で示し、対応する代表フレームを併記して、どの患者がどの時点でどの行動を取ったかを読み取れるようにする。*
+*Draft note: Figure 7の最終版では平滑化せず、時系列危険度と代表フレームを一つのマルチパネル図へ統合し、主要イベントの時刻を対応づける。横軸はUNIX時刻のオフセット表示ではなく、解析区間開始からの相対時刻に変更する。*
+
+![時刻73での状況写真](./paper_v12_r1_figures/figx_realdata_73.jpg)
+
+![時刻75での状況写真](./paper_v12_r1_figures/figx_realdata_75.jpg)
+
+![時刻77での状況写真](./paper_v12_r1_figures/figx_realdata_77.jpg)
+
+![時刻79での状況写真](./paper_v12_r1_figures/figx_realdata_79.jpg)
+
+![時刻81での状況写真](./paper_v12_r1_figures/figx_realdata_81.jpg)
+
+![時刻83での状況写真](./paper_v12_r1_figures/figx_realdata_83.jpg)
+
 
 患者文脈を重視するP8のスタッフ別モデルでは、立ち上がった患者00021が最も高い見守り優先順位となった。一方、空間的文脈を重視するP6のスタッフ別モデルでは、スタッフから離れた位置で車椅子に座り、車椅子を動かそうとしていた患者00006が最も高い見守り優先順位となった。
 
@@ -429,12 +468,6 @@ Scenario 2では、スタッフの見守り状況を周囲物体より重視す�
 
 患者文脈をより重視するスタッフでは患者00021の危険度が高く評価され、空間的文脈の重視度が高まるにつれて、患者00021の危険度が低下する傾向がみられた。
 
-![Relationship between the object-vs-monitoring preference index and model output.](./paper_v9_figures/fig8_rq2_group_di.png)
-
-**Figure 9.** 周囲物体とスタッフの見守り状況の重視度と危険度出力の関係を示す現行可視化。  
-*Draft note: source slide p.18. Figure 8と同様、スタッフごとの判断指標と対応する出力差を直接比較する散布図へ変更する。*
-
-*Draft note: Figure 9をMain analysisに含めるかは、$D_i$の定義とRQ2に対する追加的な情報量を確認して決定する。*
 
 # 5. Discussion
 
@@ -505,7 +538,7 @@ Source slide p.20は、VQA、Pose similarity evaluator、relative position calcu
 ![Implementation-level system diagram.](./paper_v9_figures/figS3_implementation_detail.png)
 
 ## D. 特徴量 detail
-**Table 1. 危険度評価に用いる特徴量。**
+**Table A1. 危険度評価に用いる特徴量の詳細。**
 
 | ID | 文脈 | 時間特性 | 特徴量 | 定義・評価方法 |
 |---|---|---|---|---|
@@ -524,7 +557,7 @@ Source slide p.20は、VQA、Pose similarity evaluator、relative position calcu
 | 4-1 | 空間的文脈 | 動的 | スタッフとの距離 | 対象者と最も近いスタッフとの相対距離を用い、遠いほど危険度を高くする。 |
 | 4-2 | 空間的文脈 | 動的 | スタッフの見守り方向 | スタッフの移動方向と対象者の相対位置から、スタッフが対象者を見ていない可能性を評価する。 |
 
-**Table 2. 危険動作の評価に用いる姿勢特徴。**
+**Table A2. 危険動作の評価に用いる姿勢特徴。**
 
 | ID | 姿勢特徴 | 算出方法 | 値が小さい場合 | 値が大きい場合 |
 |---|---|---|---|---|
