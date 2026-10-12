@@ -6,6 +6,7 @@ from pathlib import Path
 
 import pandas as pd
 
+from master_thesis_modules.risk_core.aggregators.fuzzy import validate_internal_rule_results
 from master_thesis_modules.risk_core.aggregators.legacy_ahp_adapter import (
     load_ahp_weights_from_matrix_csv,
 )
@@ -65,8 +66,10 @@ def make_profile_risk_config(
                 fuzzy_profile_name,
                 DEFAULT_FUZZY_QUESTIONNAIRE_PATH,
             )
-            if not fuzzy_rule_results:
-                fuzzy_rule_results = _fallback_fuzzy_profile(fuzzy_profile_name)
+            if ids.INTERNAL_RISK not in fuzzy_rule_results:
+                raise ValueError(
+                    f"Internal Fuzzy consequents unavailable for profile: {fuzzy_profile_name}"
+                )
 
     return RiskConfig(
         model_type=model_type,
@@ -90,8 +93,18 @@ def _resolve_common_file(common_dir: Path, filename: str) -> Path:
 
 
 def _fuzzy_rule_results_from_tfn_csv(path: Path) -> dict[int, tuple[float, ...]]:
-    data = pd.read_csv(path, names=["l", "c", "r"])
+    try:
+        data = pd.read_csv(path, header=None)
+        if data.shape[1] != 3 or len(data) < 12:
+            raise ValueError("TFN CSV requires three columns and at least 12 rows")
+        data.columns = ["l", "c", "r"]
+        internal_results = validate_internal_rule_results(tuple(data.loc[:3, "c"]))
+        # Parse every TFN component; the range restriction applies only to internal c.
+        data = data.apply(pd.to_numeric, errors="raise")
+    except (ValueError, TypeError, pd.errors.ParserError, pd.errors.EmptyDataError) as exc:
+        raise ValueError(f"Invalid TFN CSV: {path}: {exc}") from exc
     return {
+        ids.INTERNAL_RISK: internal_results,
         ids.EXTERNAL_RISK: (
             float(data.loc[5, "c"]),
             float(data.loc[4, "c"]),
@@ -132,10 +145,17 @@ def _fuzzy_rule_results_from_questionnaire(
     data = pd.read_csv(path, index_col="1b")
     if profile_name not in data.columns:
         return {}
-    values = [_convert_questionnaire_score(value) for value in data[profile_name].tolist()]
-    if len(values) < 12:
+    answers = data[profile_name].tolist()
+    if len(answers) < 12:
         return {}
+    try:
+        if any(float(value) not in {1.0, 2.0, 3.0, 4.0, 5.0} for value in answers[:4]):
+            raise ValueError("Internal questionnaire answers must be scores from 1 to 5")
+        values = [_convert_questionnaire_score(value) for value in answers]
+    except (ValueError, TypeError, KeyError, OverflowError) as exc:
+        raise ValueError(f"Invalid Fuzzy questionnaire profile: {profile_name}: {path}") from exc
     return {
+        ids.INTERNAL_RISK: validate_internal_rule_results(tuple(values[:4])),
         ids.EXTERNAL_RISK: (
             values[5],
             values[4],

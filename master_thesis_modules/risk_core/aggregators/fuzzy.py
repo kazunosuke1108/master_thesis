@@ -1,5 +1,7 @@
 """Fuzzy-compatible aggregators."""
 
+import math
+
 from master_thesis_modules.risk_core.factors.common import clip01
 from master_thesis_modules.risk_core.schema import node_ids as ids
 
@@ -22,6 +24,12 @@ class LegacyLikeFuzzyAggregator:
     """Standalone implementation of scripts/fuzzy/fuzzy_reasoning_v5.py rules."""
 
     DEFAULT_RULES = {
+        ids.INTERNAL_RISK: (
+            ({ids.INTERNAL_STATIC_RISK: "high", ids.INTERNAL_DYNAMIC_RISK: "high"}, "high"),
+            ({ids.INTERNAL_STATIC_RISK: "high", ids.INTERNAL_DYNAMIC_RISK: "low"}, "high"),
+            ({ids.INTERNAL_STATIC_RISK: "low", ids.INTERNAL_DYNAMIC_RISK: "high"}, "middle"),
+            ({ids.INTERNAL_STATIC_RISK: "low", ids.INTERNAL_DYNAMIC_RISK: "low"}, "low"),
+        ),
         ids.EXTERNAL_DYNAMIC_RISK: (
             ({ids.STAFF_DISTANCE_RISK: "high", ids.STAFF_NOT_WATCHING_RISK: "high"}, "high"),
             ({ids.STAFF_DISTANCE_RISK: "low", ids.STAFF_NOT_WATCHING_RISK: "high"}, "high"),
@@ -48,7 +56,11 @@ class LegacyLikeFuzzyAggregator:
         custom_results: tuple[str | float, ...] | None = None,
     ) -> None:
         self.output_node = output_node
-        self.custom_results = custom_results
+        self.custom_results = (
+            validate_internal_rule_results(custom_results)
+            if output_node == ids.INTERNAL_RISK and custom_results is not None
+            else custom_results
+        )
 
     def aggregate(self, inputs: dict[int, float]) -> float:
         rules = self.DEFAULT_RULES.get(self.output_node)
@@ -67,6 +79,21 @@ class LegacyLikeFuzzyAggregator:
         if denominator == 0.0:
             return 0.0
         return clip01(numerator / denominator)
+
+
+def validate_internal_rule_results(
+    results: tuple[str | float, ...],
+) -> tuple[float, ...]:
+    """Validate the four HH/HL/LH/LL consequent representative values."""
+    if len(results) != 4:
+        raise ValueError("Internal Fuzzy consequents must contain exactly 4 values (HH/HL/LH/LL)")
+    try:
+        values = tuple(_peak(result) for result in results)
+    except (TypeError, ValueError) as exc:
+        raise ValueError("Internal Fuzzy consequents must be finite values in [0, 1]") from exc
+    if not all(math.isfinite(value) and 0.0 <= value <= 1.0 for value in values):
+        raise ValueError("Internal Fuzzy consequents must be finite values in [0, 1]")
+    return values
 
 
 def _membership(value: float, membership_name: str) -> float:

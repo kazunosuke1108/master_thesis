@@ -151,7 +151,7 @@ flowchart LR
   S --> ED
 
   subgraph context["第2層：文脈別リスク"]
-    INTERNAL["20000000 内的<br/>0.1 × 静的 + 0.9 × 動的"]
+    INTERNAL["20000000 内的<br/>スタッフ別Fuzzy後件"]
     EXTERNAL["20000001 外的<br/>スタッフ別Fuzzy後件"]
   end
   IS --> INTERNAL
@@ -164,6 +164,8 @@ flowchart LR
 ```
 
 入力から総合値までを追う主な実装は [RiskEngine](../master_thesis_modules/risk_core/engine/risk_engine.py)、[動作計算](../master_thesis_modules/risk_core/factors/action_risk.py)、[物体計算](../master_thesis_modules/risk_core/factors/object_risk.py)、[スタッフ計算](../master_thesis_modules/risk_core/factors/staff_risk.py)、[Fuzzy集約](../master_thesis_modules/risk_core/aggregators/fuzzy.py) にある。
+
+内的・外的・総合のFuzzy後件はスタッフ別TFN CSVから取得する。内的は先頭4行の中心値を、静的／動的のhigh-high、high-low、low-high、low-lowの順で使用する。TFNがない場合は既存質問票へ代替し、不正なTFNや指定スタッフの内的後件を取得できない場合はエラーとする。スタッフ未指定時の内的後件は旧既定の1、1、0.5、0であり、従来の固定加重和から評価値が変わる。Fuzzy無効時は内的の0.1 × 静的 + 0.9 × 動的を維持する。
 
 比較モデルでは経路が変わる。`patient_context`／`action_attribute` は総合値を内的リスクに、`action_only` は動作集約値に直接置き換える。`weighted_max` は動作の加重和を加重最大へ変更する。Fuzzy無効時には別の加重平均経路が使われる。EWMは旧実装に残るが、通常の評価経路には接続されていない。
 

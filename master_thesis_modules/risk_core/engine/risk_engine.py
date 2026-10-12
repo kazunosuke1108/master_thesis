@@ -2,7 +2,10 @@
 
 import math
 
-from master_thesis_modules.risk_core.aggregators.fuzzy import LegacyLikeFuzzyAggregator
+from master_thesis_modules.risk_core.aggregators.fuzzy import (
+    LegacyLikeFuzzyAggregator,
+    validate_internal_rule_results,
+)
 from master_thesis_modules.risk_core.aggregators.weighted_sum import (
     WeightedMaxAggregator,
     WeightedSumAggregator,
@@ -30,6 +33,13 @@ class RiskEngine:
         explanation_generator: ExplanationGenerator | None = None,
     ) -> None:
         self.config = config or RiskConfig()
+        internal_results = self.config.fuzzy_rule_results.get(ids.INTERNAL_RISK)
+        if internal_results is not None:
+            validate_internal_rule_results(internal_results)
+        elif self.config.fuzzy_profile_name:
+            raise ValueError(
+                f"Internal Fuzzy consequents unavailable for profile: {self.config.fuzzy_profile_name}"
+            )
         self.action_calculator = ActionRiskCalculator(
             height_config=HeightStandingRiskConfig(
                 sigmoid_gain=self.config.height_sigmoid_gain,
@@ -84,10 +94,19 @@ class RiskEngine:
                 staff_inputs
             )
 
-        internal = clip01(
-            self.config.internal_static_weight * internal_static
-            + self.config.internal_dynamic_weight * internal_dynamic
-        )
+        if self.config.use_legacy_like_fuzzy:
+            internal = LegacyLikeFuzzyAggregator(
+                ids.INTERNAL_RISK,
+                self.config.fuzzy_rule_results.get(ids.INTERNAL_RISK),
+            ).aggregate({
+                ids.INTERNAL_STATIC_RISK: internal_static,
+                ids.INTERNAL_DYNAMIC_RISK: internal_dynamic,
+            })
+        else:
+            internal = clip01(
+                self.config.internal_static_weight * internal_static
+                + self.config.internal_dynamic_weight * internal_dynamic
+            )
         external_inputs = {
             ids.EXTERNAL_STATIC_RISK: external_static,
             ids.EXTERNAL_DYNAMIC_RISK: external_dynamic,
