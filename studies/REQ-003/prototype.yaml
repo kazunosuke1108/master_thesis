@@ -1,0 +1,30 @@
+schema_version: 1
+study_id: REQ003-exploratory-pilot
+cases:
+- case_id: C01
+  scenario: ../../master_thesis_modules/scenario_sim/scenarios/20260720_4patients.yaml
+  time_s: 0
+  description: 図の時点で、追加の見守りを優先する患者の順を答えてください。P01・P03は立ち上がり姿勢、P02・P04は座位という設定です。矢印はスタッフの移動方向で、視線を示すものではありません。
+  patient_ids:
+    A: P01
+    B: P02
+    C: P03
+    D: P04
+- case_id: C02
+  scenario: ../../master_thesis_modules/scenario_sim/scenarios/20260808_4patients2.yaml
+  time_s: 0
+  description: 図の時点で、追加の見守りを優先する患者の順を答えてください。全員が立ち上がり姿勢という設定です。矢印はスタッフの移動方向で、視線を示すものではありません。
+  patient_ids:
+    A: P01
+    B: P02
+    C: P03
+    D: P04
+- case_id: C03
+  scenario: scenarios/pilot_staff_position.yaml
+  time_s: 0
+  description: 図の時点で、追加の見守りを優先する患者の順を答えてください。全員が立ち上がり姿勢という設定です。矢印はスタッフの移動方向で、視線を示すものではありません。
+  patient_ids:
+    A: P01
+    B: P02
+    C: P03
+    D: P04
