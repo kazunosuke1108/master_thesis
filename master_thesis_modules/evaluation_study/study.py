@@ -166,7 +166,7 @@ def _scene(case):
                         "position": asdict(item.position)})
     return {"prototype_notice": NOTICE, "case_id": case["id"], "time_s": world.time_s,
             "description": case["raw"]["description"], "question": QUESTION,
-            "coordinate_note": "座標はm。xは右、yは上。矢印はスタッフの移動速度(m/s)で、視線ではありません。",
+            "coordinate_note": ("座標はm。xは右、yは上。矢印をスタッフの見守り方向とする研究上の設定です。実際の視線を計測したものではありません。" if case["raw"].get("view_proxy_assumption") is True else "座標はm。xは右、yは上。矢印はスタッフの移動速度(m/s)で、視線ではありません。"),
             "state_note": "イベント適用後の瞬間状態。速度による位置の連続補間は行っていません。",
             "patients": patients, "staff": staff, "objects": objects}
 
