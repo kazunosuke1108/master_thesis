@@ -15,3 +15,5 @@
 /master_thesis_modules/database
 # Generated study inputs and AI responses are local research artifacts.
 /outputs/REQ004_pilot_*/
+# Transient lock used by the research discussion app.
+/reports/.discussion-export.lock

@@ -1,0 +1,48 @@
+name: research-discussion
+services:
+  frontend:
+    build: ./frontend
+    ports:
+      - "127.0.0.1:${CHAT_PORT:-8080}:80"
+    depends_on:
+      backend:
+        condition: service_started
+    restart: unless-stopped
+  backend:
+    build:
+      context: ./backend
+      args:
+        CODEX_VERSION: "0.163.0"
+        USER_ID: ${LOCAL_UID:-1000}
+        GROUP_ID: ${LOCAL_GID:-1000}
+    init: true
+    environment:
+      HOST: 0.0.0.0
+      PORT: 8787
+      AI_PROVIDER: ${AI_PROVIDER:-codex}
+      CODEX_MODEL: ${CODEX_MODEL:-}
+      AI_TIMEOUT_MS: ${AI_TIMEOUT_MS:-120000}
+      RESEARCH_REVISION: ${RESEARCH_REVISION:-unknown}
+      YOMIYASU_SCRIPT: /instructions/yomiyasu/yomiyasu_lint.py
+      RESEARCH_WORKSPACE: /workspace
+      DATA_DIR: /data
+      CODEX_HOME: /codex
+      COMMON_AGENTS_PATH: /instructions/AGENTS.md
+      COMMON_WORKFLOW_PATH: /instructions/requirements-workflow.md
+    volumes:
+      - chat-data:/data
+      - codex-state:/codex
+      - ../../AGENTS.md:/workspace/AGENTS.md:ro
+      - ../../requests:/workspace/requests
+      - ../../reports:/workspace/reports
+      - ../../reference:/workspace/reference:ro
+      - ../../.codex/research-docs/requirements-workflow.md:/workspace/.codex/research-docs/requirements-workflow.md:ro
+      - ../../.codex/research-docs/checkpoints:/workspace/.codex/research-docs/checkpoints
+      - ../../paper/latest/paper_full_draft_v18.pdf:/workspace/paper/latest/paper_full_draft_v18.pdf:ro
+      - ${HOME}/.codex/AGENTS.md:/instructions/AGENTS.md:ro
+      - ${HOME}/.codex/research-docs/requirements-workflow.md:/instructions/requirements-workflow.md:ro
+      - ${HOME}/.agents/skills/yomiyasu/scripts:/instructions/yomiyasu:ro
+    restart: unless-stopped
+volumes:
+  chat-data:
+  codex-state:
