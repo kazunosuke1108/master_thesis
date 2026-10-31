@@ -1,0 +1,310 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="921.6pt" height="352.8pt" viewBox="0 0 921.6 352.8" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:date>2026-10-31T22:47:15.355759</dc:date>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>Matplotlib v3.8.0, https://matplotlib.org/</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 352.8 
+L 921.6 352.8 
+L 921.6 0 
+L 0 0 
+z
+" style="fill: #ffffff"/>
+  </g>
+  <g id="axes_1">
+   <g id="patch_2">
+    <path d="M 46.421429 292.448 
+L 473.210714 292.448 
+L 473.210714 81.024 
+L 46.421429 81.024 
+z
+" style="fill: #ffffff"/>
+   </g>
+   <g id="matplotlib.axis_1">
+    <g id="xtick_1">
+     <g id="line2d_1">
+      <defs>
+       <path id="m5d2b6cb4fd" d="M 0 0 
+L 0 3.5 
+" style="stroke: #000000; stroke-width: 0.8"/>
+      </defs>
+      <g>
+       <use xlink:href="#m5d2b6cb4fd" x="152.040999" y="292.448" style="stroke: #000000; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_1">
+      <text style="font: 10px 'Noto Sans CJK JP'; text-anchor: middle" x="152.040999" y="307.407375" transform="rotate(-0 152.040999 307.407375)">状態A</text>
+     </g>
+    </g>
+    <g id="xtick_2">
+     <g id="line2d_2">
+      <g>
+       <use xlink:href="#m5d2b6cb4fd" x="367.591144" y="292.448" style="stroke: #000000; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_2">
+      <text style="font: 10px 'Noto Sans CJK JP'; text-anchor: middle" x="367.591144" y="307.407375" transform="rotate(-0 367.591144 307.407375)">状態B</text>
+     </g>
+    </g>
+   </g>
+   <g id="matplotlib.axis_2">
+    <g id="ytick_1">
+     <g id="line2d_3">
+      <path d="M 46.421429 292.448 
+L 473.210714 292.448 
+" clip-path="url(#p25f7f0b667)" style="fill: none; stroke: #b0b0b0; stroke-opacity: 0.2; stroke-width: 0.8; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_4">
+      <defs>
+       <path id="mbce91c0e2d" d="M 0 0 
+L -3.5 0 
+" style="stroke: #000000; stroke-width: 0.8"/>
+      </defs>
+      <g>
+       <use xlink:href="#mbce91c0e2d" x="46.421429" y="292.448" style="stroke: #000000; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_3">
+      <text style="font: 10px 'Noto Sans CJK JP'; text-anchor: end" x="39.421429" y="296.427688" transform="rotate(-0 39.421429 296.427688)">0.0</text>
+     </g>
+    </g>
+    <g id="ytick_2">
+     <g id="line2d_5">
+      <path d="M 46.421429 257.210667 
+L 473.210714 257.210667 
+" clip-path="url(#p25f7f0b667)" style="fill: none; stroke: #b0b0b0; stroke-opacity: 0.2; stroke-width: 0.8; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_6">
+      <g>
+       <use xlink:href="#mbce91c0e2d" x="46.421429" y="257.210667" style="stroke: #000000; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_4">
+      <text style="font: 10px 'Noto Sans CJK JP'; text-anchor: end" x="39.421429" y="261.190354" transform="rotate(-0 39.421429 261.190354)">0.1</text>
+     </g>
+    </g>
+    <g id="ytick_3">
+     <g id="line2d_7">
+      <path d="M 46.421429 221.973333 
+L 473.210714 221.973333 
+" clip-path="url(#p25f7f0b667)" style="fill: none; stroke: #b0b0b0; stroke-opacity: 0.2; stroke-width: 0.8; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_8">
+      <g>
+       <use xlink:href="#mbce91c0e2d" x="46.421429" y="221.973333" style="stroke: #000000; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_5">
+      <text style="font: 10px 'Noto Sans CJK JP'; text-anchor: end" x="39.421429" y="225.953021" transform="rotate(-0 39.421429 225.953021)">0.2</text>
+     </g>
+    </g>
+    <g id="ytick_4">
+     <g id="line2d_9">
+      <path d="M 46.421429 186.736 
+L 473.210714 186.736 
+" clip-path="url(#p25f7f0b667)" style="fill: none; stroke: #b0b0b0; stroke-opacity: 0.2; stroke-width: 0.8; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_10">
+      <g>
+       <use xlink:href="#mbce91c0e2d" x="46.421429" y="186.736" style="stroke: #000000; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_6">
+      <text style="font: 10px 'Noto Sans CJK JP'; text-anchor: end" x="39.421429" y="190.715687" transform="rotate(-0 39.421429 190.715687)">0.3</text>
+     </g>
+    </g>
+    <g id="ytick_5">
+     <g id="line2d_11">
+      <path d="M 46.421429 151.498667 
+L 473.210714 151.498667 
+" clip-path="url(#p25f7f0b667)" style="fill: none; stroke: #b0b0b0; stroke-opacity: 0.2; stroke-width: 0.8; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_12">
+      <g>
+       <use xlink:href="#mbce91c0e2d" x="46.421429" y="151.498667" style="stroke: #000000; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_7">
+      <text style="font: 10px 'Noto Sans CJK JP'; text-anchor: end" x="39.421429" y="155.478354" transform="rotate(-0 39.421429 155.478354)">0.4</text>
+     </g>
+    </g>
+    <g id="ytick_6">
+     <g id="line2d_13">
+      <path d="M 46.421429 116.261333 
+L 473.210714 116.261333 
+" clip-path="url(#p25f7f0b667)" style="fill: none; stroke: #b0b0b0; stroke-opacity: 0.2; stroke-width: 0.8; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_14">
+      <g>
+       <use xlink:href="#mbce91c0e2d" x="46.421429" y="116.261333" style="stroke: #000000; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_8">
+      <text style="font: 10px 'Noto Sans CJK JP'; text-anchor: end" x="39.421429" y="120.241021" transform="rotate(-0 39.421429 120.241021)">0.5</text>
+     </g>
+    </g>
+    <g id="ytick_7">
+     <g id="line2d_15">
+      <path d="M 46.421429 81.024 
+L 473.210714 81.024 
+" clip-path="url(#p25f7f0b667)" style="fill: none; stroke: #b0b0b0; stroke-opacity: 0.2; stroke-width: 0.8; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_16">
+      <g>
+       <use xlink:href="#mbce91c0e2d" x="46.421429" y="81.024" style="stroke: #000000; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_9">
+      <text style="font: 10px 'Noto Sans CJK JP'; text-anchor: end" x="39.421429" y="85.003687" transform="rotate(-0 39.421429 85.003687)">0.6</text>
+     </g>
+    </g>
+    <g id="text_10">
+     <text style="font: 10px 'Noto Sans CJK JP'; text-anchor: middle" x="19.251116" y="186.736" transform="rotate(-90 19.251116 186.736)">説明用に仮定した重み付き値</text>
+    </g>
+   </g>
+   <g id="patch_3">
+    <path d="M 65.820942 292.448 
+L 238.261057 292.448 
+L 238.261057 198.481778 
+L 65.820942 198.481778 
+z
+" clip-path="url(#p25f7f0b667)" style="fill: #087f8c"/>
+   </g>
+   <g id="patch_4">
+    <path d="M 281.371086 292.448 
+L 453.811201 292.448 
+L 453.811201 268.956444 
+L 281.371086 268.956444 
+z
+" clip-path="url(#p25f7f0b667)" style="fill: #087f8c"/>
+   </g>
+   <g id="patch_5">
+    <path d="M 65.820942 198.481778 
+L 238.261057 198.481778 
+L 238.261057 174.990222 
+L 65.820942 174.990222 
+z
+" clip-path="url(#p25f7f0b667)" style="fill: #d99248"/>
+   </g>
+   <g id="patch_6">
+    <path d="M 281.371086 268.956444 
+L 453.811201 268.956444 
+L 453.811201 174.990222 
+L 281.371086 174.990222 
+z
+" clip-path="url(#p25f7f0b667)" style="fill: #d99248"/>
+   </g>
+   <g id="patch_7">
+    <path d="M 65.820942 174.990222 
+L 238.261057 174.990222 
+L 238.261057 151.498667 
+L 65.820942 151.498667 
+z
+" clip-path="url(#p25f7f0b667)" style="fill: #c0ccd6"/>
+   </g>
+   <g id="patch_8">
+    <path d="M 281.371086 174.990222 
+L 453.811201 174.990222 
+L 453.811201 151.498667 
+L 281.371086 151.498667 
+z
+" clip-path="url(#p25f7f0b667)" style="fill: #c0ccd6"/>
+   </g>
+   <g id="patch_9">
+    <path d="M 46.421429 292.448 
+L 46.421429 81.024 
+" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="patch_10">
+    <path d="M 46.421429 292.448 
+L 473.210714 292.448 
+" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="text_11">
+    <text style="font: 12px 'Noto Sans CJK JP'; text-anchor: middle" x="259.816071" y="75.024" transform="rotate(-0 259.816071 75.024)">① 物体の評価は同じでも、内訳が違う</text>
+   </g>
+   <g id="legend_1">
+    <g id="patch_11">
+     <path d="M 313.910714 96.287437 
+L 331.910714 96.287437 
+L 331.910714 89.987437 
+L 313.910714 89.987437 
+z
+" style="fill: #087f8c"/>
+    </g>
+    <g id="text_12">
+     <text style="font: 9px 'Noto Sans CJK JP'; text-anchor: start" x="339.110714" y="96.287437" transform="rotate(-0 339.110714 96.287437)">IVポール側の重み付き値</text>
+    </g>
+    <g id="patch_12">
+     <path d="M 313.910714 110.012437 
+L 331.910714 110.012437 
+L 331.910714 103.712437 
+L 313.910714 103.712437 
+z
+" style="fill: #d99248"/>
+    </g>
+    <g id="text_13">
+     <text style="font: 9px 'Noto Sans CJK JP'; text-anchor: start" x="339.110714" y="110.012437" transform="rotate(-0 339.110714 110.012437)">車椅子側の重み付き値</text>
+    </g>
+    <g id="patch_13">
+     <path d="M 313.910714 123.737437 
+L 331.910714 123.737437 
+L 331.910714 117.437437 
+L 313.910714 117.437437 
+z
+" style="fill: #c0ccd6"/>
+    </g>
+    <g id="text_14">
+     <text style="font: 9px 'Noto Sans CJK JP'; text-anchor: start" x="339.110714" y="123.737437" transform="rotate(-0 339.110714 123.737437)">手すり側の重み付き値（固定）</text>
+    </g>
+   </g>
+  </g>
+  <g id="axes_2">
+   <g id="text_15">
+    <text style="fill: #183247; font: 15px 'Noto Sans CJK JP'; text-anchor: start" x="505.350179" y="119.08032" transform="rotate(-0 505.350179 119.08032)">総合危険度の差分：0</text>
+   </g>
+   <g id="text_16">
+    <text style="fill: #087f8c; font: 13px 'Noto Sans CJK JP'; text-anchor: start" x="505.350179" y="161.36512" transform="rotate(-0 505.350179 161.36512)">IVポール事象：Aで成立、Bで不成立</text>
+   </g>
+   <g id="text_17">
+    <text style="fill: #087f8c; font: 14px 'Noto Sans CJK JP'" transform="translate(505.350179 181.499732)">現在は成立しているが、</text>
+    <text style="fill: #087f8c; font: 14px 'Noto Sans CJK JP'" transform="translate(505.350179 203.64992)">既知事実だけでは確定できない</text>
+   </g>
+   <g id="text_18">
+    <text style="fill: #587080; font: 11px 'Noto Sans CJK JP'" transform="translate(505.350179 245.444921)">事象別の条件付き期待値でも</text>
+    <text style="fill: #587080; font: 11px 'Noto Sans CJK JP'" transform="translate(505.350179 262.84864)">同じ未確定判定を得られる</text>
+   </g>
+   <g id="text_19">
+    <text style="font: 12px 'Noto Sans CJK JP'; text-anchor: middle" x="697.405357" y="75.024" transform="rotate(-0 697.405357 75.024)">② 現在がA、既知情報からA・Bを許す場合</text>
+   </g>
+  </g>
+  <g id="text_20">
+   <text style="font: 16px 'Noto Sans CJK JP'; text-anchor: middle" x="460.8" y="19.791" transform="rotate(-0 460.8 19.791)">S04：集約値が等しい二状態を許す例</text>
+  </g>
+  <g id="text_21">
+   <text style="fill: #587080; font: 9px 'Noto Sans CJK JP'; text-anchor: middle" x="460.8" y="343.98" transform="rotate(-0 460.8 343.98)">手計算の説明図。両状態で他の入力・判断設定は同じと仮定。RiskEngineの実行結果・性能測定ではありません。</text>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="p25f7f0b667">
+   <rect x="46.421429" y="81.024" width="426.789286" height="211.424"/>
+  </clipPath>
+ </defs>
+</svg>

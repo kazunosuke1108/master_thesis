@@ -1,0 +1,294 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="1036.8pt" height="662.4pt" viewBox="0 0 1036.8 662.4" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:date>2026-10-31T22:47:14.727638</dc:date>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>Matplotlib v3.8.0, https://matplotlib.org/</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 662.4 
+L 1036.8 662.4 
+L 1036.8 0 
+L 0 0 
+z
+" style="fill: #f3f6f8"/>
+  </g>
+  <g id="axes_1">
+   <g id="patch_2">
+    <path d="M 0 0 
+L 1036.8 0 
+L 1036.8 56.16 
+L 0 56.16 
+z
+" clip-path="url(#p88153ce49f)" style="fill: #183247; stroke: #183247; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_3">
+    <path d="M 30.24 104.4 
+L 264.96 104.4 
+Q 273.6 104.4 273.6 113.04 
+L 273.6 592.56 
+Q 273.6 601.2 264.96 601.2 
+L 30.24 601.2 
+Q 21.6 601.2 21.6 592.56 
+L 21.6 113.04 
+Q 21.6 104.4 30.24 104.4 
+z
+" clip-path="url(#p88153ce49f)" style="fill: #ffffff; stroke: #d7e1e8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_4">
+    <path d="M 44.64 169.92 
+L 250.56 169.92 
+Q 259.2 169.92 259.2 178.56 
+L 259.2 189.36 
+Q 259.2 198 250.56 198 
+L 44.64 198 
+Q 36 198 36 189.36 
+L 36 178.56 
+Q 36 169.92 44.64 169.92 
+z
+" clip-path="url(#p88153ce49f)" style="fill: #f3f6f8; stroke: #d7e1e8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_5">
+    <path d="M 44.64 223.92 
+L 250.56 223.92 
+Q 259.2 223.92 259.2 232.56 
+L 259.2 243.36 
+Q 259.2 252 250.56 252 
+L 44.64 252 
+Q 36 252 36 243.36 
+L 36 232.56 
+Q 36 223.92 44.64 223.92 
+z
+" clip-path="url(#p88153ce49f)" style="fill: #f3f6f8; stroke: #d7e1e8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_6">
+    <path d="M 44.64 277.92 
+L 250.56 277.92 
+Q 259.2 277.92 259.2 286.56 
+L 259.2 297.36 
+Q 259.2 306 250.56 306 
+L 44.64 306 
+Q 36 306 36 297.36 
+L 36 286.56 
+Q 36 277.92 44.64 277.92 
+z
+" clip-path="url(#p88153ce49f)" style="fill: #f3f6f8; stroke: #d7e1e8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_7">
+    <path d="M 44.64 432 
+L 250.56 432 
+Q 259.2 432 259.2 440.64 
+L 259.2 456.48 
+Q 259.2 465.12 250.56 465.12 
+L 44.64 465.12 
+Q 36 465.12 36 456.48 
+L 36 440.64 
+Q 36 432 44.64 432 
+z
+" clip-path="url(#p88153ce49f)" style="fill: #087f8c; stroke: #087f8c; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_8">
+    <path d="M 296.64 104.4 
+L 1006.56 104.4 
+Q 1015.2 104.4 1015.2 113.04 
+L 1015.2 261.36 
+Q 1015.2 270 1006.56 270 
+L 296.64 270 
+Q 288 270 288 261.36 
+L 288 113.04 
+Q 288 104.4 296.64 104.4 
+z
+" clip-path="url(#p88153ce49f)" style="fill: #ffffff; stroke: #d7e1e8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_9">
+    <path d="M 312.48 151.2 
+L 622.8 151.2 
+Q 631.44 151.2 631.44 159.84 
+L 631.44 232.56 
+Q 631.44 241.2 622.8 241.2 
+L 312.48 241.2 
+Q 303.84 241.2 303.84 232.56 
+L 303.84 159.84 
+Q 303.84 151.2 312.48 151.2 
+z
+" clip-path="url(#p88153ce49f)" style="fill: #edf7f7; stroke: #d7e1e8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_10">
+    <path d="M 652.32 151.2 
+L 990.72 151.2 
+Q 999.36 151.2 999.36 159.84 
+L 999.36 232.56 
+Q 999.36 241.2 990.72 241.2 
+L 652.32 241.2 
+Q 643.68 241.2 643.68 232.56 
+L 643.68 159.84 
+Q 643.68 151.2 652.32 151.2 
+z
+" clip-path="url(#p88153ce49f)" style="fill: #f7f2e9; stroke: #d7e1e8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_11">
+    <path d="M 296.64 284.4 
+L 1006.56 284.4 
+Q 1015.2 284.4 1015.2 293.04 
+L 1015.2 466.56 
+Q 1015.2 475.2 1006.56 475.2 
+L 296.64 475.2 
+Q 288 475.2 288 466.56 
+L 288 293.04 
+Q 288 284.4 296.64 284.4 
+z
+" clip-path="url(#p88153ce49f)" style="fill: #ffffff; stroke: #d7e1e8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_12">
+    <path d="M 296.64 489.6 
+L 1006.56 489.6 
+Q 1015.2 489.6 1015.2 498.24 
+L 1015.2 592.56 
+Q 1015.2 601.2 1006.56 601.2 
+L 296.64 601.2 
+Q 288 601.2 288 592.56 
+L 288 498.24 
+Q 288 489.6 296.64 489.6 
+z
+" clip-path="url(#p88153ce49f)" style="fill: #ffffff; stroke: #d7e1e8; stroke-linejoin: miter"/>
+   </g>
+   <g id="line2d_1">
+    <path d="M 303.84 352.8 
+L 999.36 352.8 
+" clip-path="url(#p88153ce49f)" style="fill: none; stroke: #d7e1e8; stroke-linecap: square"/>
+   </g>
+   <g id="line2d_2">
+    <path d="M 303.84 407.52 
+L 999.36 407.52 
+" clip-path="url(#p88153ce49f)" style="fill: none; stroke: #d7e1e8; stroke-linecap: square"/>
+   </g>
+   <g id="text_1">
+    <text style="fill: #ffffff; font: 700 20px 'Noto Sans CJK JP'; text-anchor: start" x="21.6" y="29.27875" transform="rotate(-0 21.6 29.27875)">未認識リスク PoC  /  研究者用画面</text>
+   </g>
+   <g id="text_2">
+    <text style="fill: #bfd9e2; font: 13px 'Noto Sans CJK JP'; text-anchor: start" x="720" y="29.067188" transform="rotate(-0 720 29.067188)">画面設計図・未実装</text>
+   </g>
+   <g id="text_3">
+    <text style="fill: #087f8c; font: 700 14px 'Noto Sans CJK JP'; text-anchor: start" x="21.6" y="81.731563" transform="rotate(-0 21.6 81.731563)">1  条件を選ぶ     →     2  二条件を評価する     →     3  候補と根拠を確認する</text>
+   </g>
+   <g id="text_4">
+    <text style="fill: #183247; font: 700 17px 'Noto Sans CJK JP'; text-anchor: start" x="36" y="131.645469" transform="rotate(-0 36 131.645469)">入力条件</text>
+   </g>
+   <g id="text_5">
+    <text style="fill: #587080; font: 11px 'Noto Sans CJK JP'; text-anchor: start" x="36" y="160.675312" transform="rotate(-0 36 160.675312)">シナリオ</text>
+   </g>
+   <g id="text_6">
+    <text style="fill: #183247; font: 11px 'Noto Sans CJK JP'; text-anchor: start" x="44.64" y="184.435313" transform="rotate(-0 44.64 184.435313)">S04  要因の入替</text>
+   </g>
+   <g id="text_7">
+    <text style="fill: #587080; font: 11px 'Noto Sans CJK JP'; text-anchor: start" x="36" y="214.675312" transform="rotate(-0 36 214.675312)">判断設定</text>
+   </g>
+   <g id="text_8">
+    <text style="fill: #183247; font: 11px 'Noto Sans CJK JP'; text-anchor: start" x="44.64" y="238.435312" transform="rotate(-0 44.64 238.435312)">同じ設定を二条件に使用</text>
+   </g>
+   <g id="text_9">
+    <text style="fill: #587080; font: 11px 'Noto Sans CJK JP'; text-anchor: start" x="36" y="268.675313" transform="rotate(-0 36 268.675313)">対象スタッフ</text>
+   </g>
+   <g id="text_10">
+    <text style="fill: #183247; font: 11px 'Noto Sans CJK JP'; text-anchor: start" x="44.64" y="292.435313" transform="rotate(-0 44.64 292.435313)">仮想スタッフ P-F：一部事実が未知</text>
+   </g>
+   <g id="text_11">
+    <text style="fill: #183247; font: 700 13px 'Noto Sans CJK JP'; text-anchor: start" x="36" y="333.653594" transform="rotate(-0 36 333.653594)">既知条件（実験で指定）</text>
+   </g>
+   <g id="text_12">
+    <text style="fill: #183247; font: 11px 'Noto Sans CJK JP'" transform="translate(39.6 359.395312)">観測事実 KF      一部のみ既知</text>
+    <text style="fill: #183247; font: 11px 'Noto Sans CJK JP'" transform="translate(39.6 375.485734)">関係の知識 KE   未評価あり</text>
+    <text style="fill: #183247; font: 11px 'Noto Sans CJK JP'" transform="translate(39.6 391.576156)">危険内容 KR      この要因は未把握</text>
+   </g>
+   <g id="text_13">
+    <text style="fill: #ffffff; font: 700 13px 'Noto Sans CJK JP'; text-anchor: middle" x="147.6" y="449.573594" transform="rotate(-0 147.6 449.573594)">同定結果を表示</text>
+   </g>
+   <g id="text_14">
+    <text style="fill: #587080; font: 11px 'Noto Sans CJK JP'" transform="translate(36 490.435313)">実行前に検査</text>
+    <text style="fill: #587080; font: 11px 'Noto Sans CJK JP'" transform="translate(36 506.525734)">・真の状態が許容集合に含まれる</text>
+    <text style="fill: #587080; font: 11px 'Noto Sans CJK JP'" transform="translate(36 522.616156)">・既知条件に矛盾がない</text>
+    <text style="fill: #587080; font: 11px 'Noto Sans CJK JP'" transform="translate(36 538.706578)">・二条件の判断設定が一致</text>
+   </g>
+   <g id="text_15">
+    <text style="fill: #183247; font: 700 17px 'Noto Sans CJK JP'; text-anchor: start" x="303.84" y="131.645469" transform="rotate(-0 303.84 131.645469)">二条件で、どこまで区別できるか</text>
+   </g>
+   <g id="text_16">
+    <text style="fill: #087f8c; font: 700 13px 'Noto Sans CJK JP'; text-anchor: start" x="316.8" y="173.813594" transform="rotate(-0 316.8 173.813594)">全情報条件</text>
+   </g>
+   <g id="text_17">
+    <text style="fill: #183247; font: 12px 'Noto Sans CJK JP'" transform="translate(316.8 196.03125)">IVポール近接の要因が成立</text>
+    <text style="fill: #183247; font: 12px 'Noto Sans CJK JP'" transform="translate(316.8 213.584438)">この画面の値は説明例です</text>
+   </g>
+   <g id="text_18">
+    <text style="fill: #bd681b; font: 700 13px 'Noto Sans CJK JP'; text-anchor: start" x="656.64" y="173.813594" transform="rotate(-0 656.64 173.813594)">既知情報条件</text>
+   </g>
+   <g id="text_19">
+    <text style="fill: #183247; font: 12px 'Noto Sans CJK JP'" transform="translate(656.64 196.03125)">複数の状態が残り、要因を特定できない</text>
+    <text style="fill: #183247; font: 12px 'Noto Sans CJK JP'" transform="translate(656.64 213.584438)">総合危険度が同じでも、内訳は異なり得る</text>
+   </g>
+   <g id="text_20">
+    <text style="fill: #183247; font: 700 17px 'Noto Sans CJK JP'; text-anchor: start" x="303.84" y="310.925469" transform="rotate(-0 303.84 310.925469)">未認識リスクの候補と、その根拠</text>
+   </g>
+   <g id="text_21">
+    <text style="fill: #587080; font: 11px 'Noto Sans CJK JP'; text-anchor: start" x="306" y="339.955312" transform="rotate(-0 306 339.955312)">対象</text>
+   </g>
+   <g id="text_22">
+    <text style="fill: #587080; font: 11px 'Noto Sans CJK JP'; text-anchor: start" x="468" y="339.955312" transform="rotate(-0 468 339.955312)">判定の区別</text>
+   </g>
+   <g id="text_23">
+    <text style="fill: #587080; font: 11px 'Noto Sans CJK JP'; text-anchor: start" x="734.4" y="339.955312" transform="rotate(-0 734.4 339.955312)">根拠</text>
+   </g>
+   <g id="text_24">
+    <text style="fill: #183247; font: 700 12px 'Noto Sans CJK JP'; text-anchor: start" x="306" y="375.335625" transform="rotate(-0 306 375.335625)">P01：IVポール近接</text>
+   </g>
+   <g id="text_25">
+    <text style="fill: #bd681b; font: 11px 'Noto Sans CJK JP'; text-anchor: start" x="468" y="374.515312" transform="rotate(-0 468 374.515312)">既知事実だけでは特定できない</text>
+   </g>
+   <g id="text_26">
+    <text style="fill: #183247; font: 11px 'Noto Sans CJK JP'" transform="translate(734.4 374.515312)">状態Aでは成立</text>
+    <text style="fill: #183247; font: 11px 'Noto Sans CJK JP'" transform="translate(734.4 390.605734)">状態Bでは不成立</text>
+   </g>
+   <g id="text_27">
+    <text style="fill: #183247; font: 11px 'Noto Sans CJK JP'; text-anchor: start" x="306" y="428.515312" transform="rotate(-0 306 428.515312)">関係・危険内容の既知タグ</text>
+   </g>
+   <g id="text_28">
+    <text style="fill: #183247; font: 11px 'Noto Sans CJK JP'; text-anchor: start" x="468" y="428.515312" transform="rotate(-0 468 428.515312)">明示された実験条件として別表示</text>
+   </g>
+   <g id="text_29">
+    <text style="fill: #587080; font: 10px 'Noto Sans CJK JP'; text-anchor: start" x="734.4" y="427.719375" transform="rotate(-0 734.4 427.719375)">未記入を未認識としない</text>
+   </g>
+   <g id="text_30">
+    <text style="fill: #183247; font: 700 15px 'Noto Sans CJK JP'; text-anchor: start" x="303.84" y="514.529531" transform="rotate(-0 303.84 514.529531)">同じ条件を渡した比較結果</text>
+   </g>
+   <g id="text_31">
+    <text style="fill: #183247; font: 10px 'Noto Sans CJK JP'; text-anchor: start" x="303.84" y="541.479375" transform="rotate(-0 303.84 541.479375)">総合危険度差分    ／    単一出力の寄与分析    ／    事象別の条件付き期待値    ／    参照同定方式</text>
+   </g>
+   <g id="text_32">
+    <text style="fill: #087f8c; font: 11px 'Noto Sans CJK JP'; text-anchor: start" x="303.84" y="571.075312" transform="rotate(-0 303.84 571.075312)">強い既存方式と同じ判定になる場合は、その一致も結果として記録する。</text>
+   </g>
+   <g id="text_33">
+    <text style="fill: #587080; font: 11px 'Noto Sans CJK JP'; text-anchor: start" x="21.6" y="630.835312" transform="rotate(-0 21.6 630.835312)">設計上の説明例。研究実験の出力・医療上の正解・動作中のReact画面ではありません。</text>
+   </g>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="p88153ce49f">
+   <rect x="0" y="0" width="1036.8" height="662.4"/>
+  </clipPath>
+ </defs>
+</svg>
